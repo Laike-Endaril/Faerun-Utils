@@ -1,0 +1,16 @@
+[
+{
+  "modid": "faerunutils",
+  "name": "Faerun Utils",
+  "description": "A server utility mod specific to the Faerun Heroes modpack on technic",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Laike_Endaril"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
