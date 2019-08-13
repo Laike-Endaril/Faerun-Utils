@@ -1,0 +1,99 @@
+package com.fantasticsource.faerunutils;
+
+import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.ServerTickTimer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class GCMessageFixer
+{
+    private static final int DELAY = 20;
+    private static final String EXT = "gclog";
+
+    private static BufferedReader reader;
+    private static StringBuilder current = new StringBuilder();
+
+    public static void init() throws IOException
+    {
+        File current = null;
+
+        File f = new File(MCTools.getConfigDir() + ".." + File.separator + "logs" + File.separator + "currentgclogfilename.txt");
+        if (f.exists())
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(f));
+            current = new File(MCTools.getConfigDir() + ".." + File.separator + "logs" + File.separator + reader.readLine() + "." + EXT);
+            reader.close();
+        }
+
+
+        //Remove old, already processed files
+        f = new File(MCTools.getConfigDir() + ".." + File.separator + "logs");
+        if (f.exists())
+        {
+            File[] files = f.listFiles();
+            if (files != null)
+            {
+                for (File file : files)
+                {
+                    String fullname = file.getName();
+                    int index = fullname.lastIndexOf(".");
+                    String ext = index == -1 ? "" : fullname.substring(index + 1);
+
+                    if (ext.equals(EXT) && (current == null || !file.getAbsolutePath().equals(current.getAbsolutePath()))) file.delete();
+                }
+            }
+        }
+
+
+        //Begin processing new file
+        if (current != null) init(current);
+        else System.out.println("FAIL =============================================================================================================");
+    }
+
+    private static void init(File file) throws IOException
+    {
+
+        reader = new BufferedReader(new FileReader(file));
+
+        MinecraftForge.EVENT_BUS.register(ServerTickTimer.class);
+        MinecraftForge.EVENT_BUS.register(GCMessageFixer.class);
+    }
+
+    @SubscribeEvent
+    public static void update(TickEvent.ServerTickEvent event) throws IOException
+    {
+        if (ServerTickTimer.currentTick() % DELAY == 0)
+        {
+            int i = reader.read();
+            while (i != -1)
+            {
+                char c = (char) i;
+                switch (c)
+                {
+                    case '\r':
+                        break;
+                    case '\n':
+                        processLine();
+                        break;
+                    default:
+                        current.append(c);
+                }
+
+                i = reader.read();
+            }
+        }
+    }
+
+    private static void processLine()
+    {
+        String s = current.toString().replaceAll("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[.][0-9]{3}-[0-9]{4}:[ ]", "");
+        current = new StringBuilder();
+        System.out.println(s);
+    }
+}
