@@ -2,7 +2,9 @@ package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.ServerTickTimer;
+import com.fantasticsource.omnipotence.Debug;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -18,9 +20,13 @@ public class GCMessageFixer
 
     private static BufferedReader reader;
     private static StringBuilder current = new StringBuilder();
+    private static boolean omnipotence;
+    private static long omniTimer = 0;
 
     public static void init() throws IOException
     {
+        omnipotence = Loader.isModLoaded("omnipotence");
+
         File current = null;
 
         File f = new File(MCTools.getConfigDir() + ".." + File.separator + "logs" + File.separator + "currentgclogfilename.txt");
@@ -53,7 +59,6 @@ public class GCMessageFixer
 
         //Begin processing new file
         if (current != null) init(current);
-        else System.out.println("FAIL =============================================================================================================");
     }
 
     private static void init(File file) throws IOException
@@ -68,6 +73,15 @@ public class GCMessageFixer
     @SubscribeEvent
     public static void update(TickEvent.ServerTickEvent event) throws IOException
     {
+        if (omnipotence)
+        {
+            if (++omniTimer == 20) //1 second after last processLine() call
+            {
+                System.out.println(Debug.memData());
+                System.out.println();
+            }
+        }
+
         if (ServerTickTimer.currentTick() % DELAY == 0)
         {
             int i = reader.read();
@@ -95,5 +109,7 @@ public class GCMessageFixer
         String s = current.toString().replaceAll("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[.][0-9]{3}-[0-9]{4}:[ ]", "");
         current = new StringBuilder();
         System.out.println(s);
+
+        if (omnipotence) omniTimer = 0;
     }
 }
