@@ -106,10 +106,8 @@ public class GCMessageFixer
 
     private static void processLine()
     {
-        String s = current.toString().replaceAll("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[.][0-9]{3}-[0-9]{4}:[ ]", "");
+        System.out.println(current);
         current = new StringBuilder();
-        System.out.println(s);
-
         if (omnipotence) omniTimer = 0;
     }
 }
