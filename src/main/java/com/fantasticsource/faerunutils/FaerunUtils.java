@@ -21,6 +21,7 @@ public class FaerunUtils
     public static void preInit(FMLPreInitializationEvent event) throws IOException
     {
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
+        MinecraftForge.EVENT_BUS.register(FireDamageAlterer.class);
 
         GCMessageFixer.init();
     }
