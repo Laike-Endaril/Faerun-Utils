@@ -15,13 +15,13 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.000";
+    public static final String VERSION = "1.12.2.001";
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event) throws IOException
     {
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
-        MinecraftForge.EVENT_BUS.register(FireDamageAlterer.class);
+        MinecraftForge.EVENT_BUS.register(DamageBlocker.class);
 
         GCMessageFixer.init();
     }
