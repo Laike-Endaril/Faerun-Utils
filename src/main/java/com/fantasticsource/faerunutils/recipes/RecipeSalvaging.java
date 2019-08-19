@@ -4,6 +4,7 @@ import com.fantasticsource.faerunutils.FaerunUtils;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -19,6 +20,8 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
 {
     private static final ResourceLocation RL = new ResourceLocation(FaerunUtils.MODID, "recipe_skin_powders");
 
+    private InventoryCrafting craftGrid = null;
+
     private int[] powderCounts = new int[100];
     private ArrayList<ItemStack> extraResults = new ArrayList<>();
     private ItemStack maxLvlStack = ItemStack.EMPTY;
@@ -30,7 +33,7 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
 
     public boolean matches(InventoryCrafting inv, World worldIn)
     {
-        System.out.println("matches");
+        craftGrid = inv;
 
         Arrays.fill(powderCounts, 0);
         extraResults.clear();
@@ -53,7 +56,6 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
                 }
                 catch (NumberFormatException e)
                 {
-                    System.out.println("1!");
                     return false;
                 }
                 quantity = stack.getCount() * 9;
@@ -67,7 +69,6 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
                 }
                 catch (NumberFormatException e)
                 {
-                    System.out.println("2!");
                     return false;
                 }
                 quantity = stack.getCount();
@@ -205,56 +206,59 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
 
     public ItemStack getCraftingResult(InventoryCrafting inv)
     {
-        System.out.println("getCraftingResult");
+        //Called whenever a crafting slot is changed
+
+        craftGrid = inv;
 
         return maxLvlStack.copy();
+    }
+
+    @Override
+    public NonNullList<Ingredient> getIngredients()
+    {
+        //Seems to be exclusively for recipe scrapers to display recipes; might play with this later
+
+        return null;
     }
 
     public ItemStack getRecipeOutput()
     {
-        System.out.println("getRecipeOutput");
+        //Called all over the place, especially for recipe scrapers
 
+        if (craftGrid == null) return TOKEN.copy();
         return maxLvlStack.copy();
     }
 
+    @Override
     public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv)
     {
-        System.out.println("getRemainingItems");
-        System.out.println();
+        //Only called from CraftingManager.getRemainingItems(), which is only called from SlotCrafting.onTake()
 
-        System.out.println(ItemStack.EMPTY.getDisplayName() + " (" + ItemStack.EMPTY.getCount() + ")");
-        System.out.println();
-
-        for (int i = inv.getSizeInventory() - 1; i >= 0; i--) inv.setInventorySlotContents(i, ItemStack.EMPTY);
-
-        NonNullList<ItemStack> result = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
-
-        int i = 0;
+        int i = 0, size = inv.getSizeInventory();
         for (ItemStack stack : extraResults)
         {
-            System.out.println(stack.getDisplayName() + " (" + stack.getCount() + ")");
-            result.set(i++, stack);
+            ItemStack copy = stack.copy();
+            copy.setCount(copy.getCount() + 1);
+            inv.stackList.set(i++, copy);
         }
-        System.out.println();
-
-        for (ItemStack stack : result)
+        while (i < size)
         {
-            System.out.println(stack.getDisplayName() + " (" + stack.getCount() + ")");
+            inv.stackList.set(i++, ItemStack.EMPTY);
         }
-        System.out.println();
 
-        return result;
+
+        inv.setInventorySlotContents(0, inv.getStackInSlot(0));
+
+        return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     }
 
     public boolean isDynamic()
     {
-        System.out.println("isDynamic");
         return true;
     }
 
     public boolean canFit(int width, int height)
     {
-        System.out.println("canFit");
         return width * height >= 1;
     }
 }

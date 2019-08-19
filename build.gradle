@@ -41,6 +41,14 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+
+    rename '(fearunutils_at.cfg)', 'META-INF/$1'
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': 'fearunutils_at.cfg'
+    }
 }
 
 task deobfJar(type: Jar) {
