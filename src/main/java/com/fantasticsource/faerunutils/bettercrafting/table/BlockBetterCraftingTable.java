@@ -86,7 +86,7 @@ public class BlockBetterCraftingTable extends Block
 
         public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
         {
-            return new ContainerBetterCraftingTable(playerInventory, this.world, this.position);
+            return new ContainerBetterCraftingTable(playerIn, this.world, this.position);
         }
 
         public String getGuiID()

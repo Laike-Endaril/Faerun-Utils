@@ -1,34 +1,45 @@
 package com.fantasticsource.faerunutils.bettercrafting.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
+import com.fantasticsource.faerunutils.bettercrafting.recipes.BetterRecipe;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+
 public class ContainerBetterCraftingTable extends Container
 {
-    public final World world;
     public final EntityPlayer player;
+    public final World world;
     public final BlockPos position;
-    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
-    public InventoryCraftResult craftResult = new InventoryCraftResult();
 
-    public ContainerBetterCraftingTable(InventoryPlayer playerInventory, World worldIn, BlockPos posIn)
+    public InventoryBetterCraftingInput invInput = new InventoryBetterCraftingInput(this, 3, 3);
+    public InventoryBetterCraftingOutput invOutput = new InventoryBetterCraftingOutput();
+    public BetterRecipe recipe = null;
+
+    private ArrayList<ItemStack> previousItems = new ArrayList<>();
+
+
+    public ContainerBetterCraftingTable(EntityPlayer player, World world, BlockPos position)
     {
-        world = worldIn;
-        position = posIn;
-        player = playerInventory.player;
+        this.player = player;
+        this.world = world;
+        this.position = position;
 
-        addSlotToContainer(new SlotCrafting(playerInventory.player, craftMatrix, craftResult, 0, 124, 35));
+        addSlotToContainer(new BetterCraftingResultSlot(player, invInput, invOutput, 0, 124, 35));
 
         for (int y = 0; y < 3; ++y)
         {
             for (int x = 0; x < 3; ++x)
             {
-                addSlotToContainer(new Slot(craftMatrix, x + y * 3, 30 + x * 18, 17 + y * 18));
+                addSlotToContainer(new BetterCraftingGridSlot(invInput, x + y * 3, 30 + x * 18, 17 + y * 18));
             }
         }
 
@@ -36,42 +47,52 @@ public class ContainerBetterCraftingTable extends Container
         {
             for (int x = 0; x < 9; ++x)
             {
-                addSlotToContainer(new Slot(playerInventory, x + y * 9 + 9, 8 + x * 18, 84 + y * 18));
+                addSlotToContainer(new Slot(player.inventory, x + y * 9 + 9, 8 + x * 18, 84 + y * 18));
             }
         }
 
         for (int x = 0; x < 9; ++x)
         {
-            addSlotToContainer(new Slot(playerInventory, x, 8 + x * 18, 142));
+            addSlotToContainer(new Slot(player.inventory, x, 8 + x * 18, 142));
         }
-    }
 
-    public void onCraftMatrixChanged(IInventory inventoryIn)
-    {
-        slotChangedCraftingGrid(world, player, craftMatrix, craftResult);
-    }
-
-    public void onContainerClosed(EntityPlayer playerIn)
-    {
-        super.onContainerClosed(playerIn);
-
-        if (!world.isRemote)
+        for (int i = invInput.getSizeInventory(); i >= 0; i--)
         {
-            clearContainer(playerIn, world, craftMatrix);
+            previousItems.add(ItemStack.EMPTY);
         }
     }
 
-    public boolean canInteractWith(EntityPlayer playerIn)
+    @Override
+    public void onCraftMatrixChanged(IInventory ignored)
     {
-        if (world.getBlockState(position).getBlock() != BlocksAndItems.blockBetterCraftingTable) return false;
-
-        return playerIn.getDistanceSq((double) position.getX() + 0.5, (double) position.getY() + 0.5, (double) position.getZ() + 0.5) <= 64;
     }
 
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
+    @Override
+    public void onContainerClosed(EntityPlayer ignored)
+    {
+        super.onContainerClosed(player);
+
+        if (!player.world.isRemote)
+        {
+            clearContainer(player, player.world, invInput);
+        }
+    }
+
+    @Override
+    public boolean canInteractWith(EntityPlayer ignored)
+    {
+        if (player.world != world) return false;
+
+        if (player.world.getBlockState(position).getBlock() != BlocksAndItems.blockBetterCraftingTable) return false;
+
+        return player.getDistanceSq((double) position.getX() + 0.5, (double) position.getY() + 0.5, (double) position.getZ() + 0.5) <= 64;
+    }
+
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer ignored, int index)
     {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = inventorySlots.get(index);
+        BetterCraftingGridSlot slot = (BetterCraftingGridSlot) inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack())
         {
@@ -80,7 +101,7 @@ public class ContainerBetterCraftingTable extends Container
 
             if (index == 0)
             {
-                itemstack1.getItem().onCreated(itemstack1, world, playerIn);
+                itemstack1.getItem().onCreated(itemstack1, player.world, player);
 
                 if (!mergeItemStack(itemstack1, 10, 46, true))
                 {
@@ -122,19 +143,71 @@ public class ContainerBetterCraftingTable extends Container
                 return ItemStack.EMPTY;
             }
 
-            ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
+            ItemStack itemstack2 = slot.onTake(player, itemstack1);
 
             if (index == 0)
             {
-                playerIn.dropItem(itemstack2, false);
+                player.dropItem(itemstack2, false);
             }
         }
 
         return itemstack;
     }
 
+    @Override
     public boolean canMergeSlot(ItemStack stack, Slot slotIn)
     {
-        return slotIn.inventory != craftResult && super.canMergeSlot(stack, slotIn);
+        return slotIn.inventory != invOutput && super.canMergeSlot(stack, slotIn);
+    }
+
+    public void update()
+    {
+        if (player.world.isRemote) return;
+
+
+        //Check previous item snapshot and return if same
+        ArrayList<Integer> changedIndices = new ArrayList<>();
+        int i = 0;
+        for (ItemStack stack : invInput.stackList)
+        {
+            if (previousItems.get(i) != stack) changedIndices.add(i);
+        }
+        if (changedIndices.size() == 0) return;
+
+
+        System.out.println("Changed!");
+
+        //Determine which recipe to use
+        if (recipe != null)
+        {
+            if (!recipe.matches(invInput)) recipe = null;
+        }
+
+        if (recipe == null)
+        {
+            for (BetterRecipe recipe : BetterRecipe.betterRecipes)
+            {
+                if (recipe.matches(invInput))
+                {
+                    this.recipe = recipe;
+                    break;
+                }
+            }
+        }
+
+        if (recipe != null) recipe.craft(invInput, invOutput, true);
+
+
+        //Update all changed slots for client
+        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, 0, invOutput.getStackInSlot(0)));
+        for (int index : changedIndices)
+        {
+            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, i + 1, invInput.stackList.get(index)));
+        }
+
+
+        //Save snapshot of current items
+        i = 0;
+        for (ItemStack stack : invInput.stackList) previousItems.set(i, stack);
     }
 }

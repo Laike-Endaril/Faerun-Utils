@@ -1,33 +1,15 @@
 package com.fantasticsource.faerunutils.bettercrafting.recipes;
 
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.world.World;
+import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
+import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
 
-public class BetterRecipe extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<IRecipe> implements IRecipe
+import java.util.ArrayList;
+
+public abstract class BetterRecipe
 {
-    @Override
-    public boolean matches(InventoryCrafting inv, World worldIn)
-    {
-        return false;
-    }
+    public static final ArrayList<BetterRecipe> betterRecipes = new ArrayList<>();
 
-    @Override
-    public ItemStack getCraftingResult(InventoryCrafting inv)
-    {
-        return ItemStack.EMPTY;
-    }
+    abstract public boolean matches(InventoryBetterCraftingInput inv);
 
-    @Override
-    public boolean canFit(int width, int height)
-    {
-        return false;
-    }
-
-    @Override
-    public ItemStack getRecipeOutput()
-    {
-        return ItemStack.EMPTY;
-    }
+    abstract public void craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, boolean preview);
 }

@@ -24,9 +24,9 @@ public class FaerunUtils
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
         MinecraftForge.EVENT_BUS.register(DamageBlocker.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
-        MinecraftForge.EVENT_BUS.register(Recipes.class);
 
         GCMessageFixer.init();
+        Recipes.init();
     }
 
     @SubscribeEvent

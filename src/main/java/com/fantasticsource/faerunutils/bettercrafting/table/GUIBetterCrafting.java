@@ -16,7 +16,7 @@ public class GUIBetterCrafting extends GuiContainer
 
     public GUIBetterCrafting()
     {
-        super(new ContainerBetterCraftingTable(Minecraft.getMinecraft().player.inventory, Minecraft.getMinecraft().world, BlockPos.ORIGIN));
+        super(new ContainerBetterCraftingTable(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world, BlockPos.ORIGIN));
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks)

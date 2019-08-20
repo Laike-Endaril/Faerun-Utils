@@ -1,26 +1,17 @@
 package com.fantasticsource.faerunutils.bettercrafting.recipes;
 
-import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.faerunutils.bettercrafting.table.ContainerBetterCraftingTable;
-import com.fantasticsource.mctools.MCTools;
-import com.fantasticsource.tools.ReflectionTool;
+import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
+import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -29,36 +20,15 @@ import static com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes.TOK
 
 public class RecipeSalvaging extends BetterRecipe
 {
-    private static final ResourceLocation RL = new ResourceLocation(FaerunUtils.MODID, "recipe_skin_powders");
-    private static Field stackListField;
-
-    static
-    {
-        try
-        {
-            stackListField = ReflectionTool.getField(InventoryCrafting.class, "field_70466_a", "stackList");
-        }
-        catch (NoSuchFieldException | IllegalAccessException e)
-        {
-            MCTools.crash(e, 2001, false);
-        }
-    }
-
-    private InventoryCrafting craftGrid = null;
+    private InventoryBetterCraftingInput craftGrid = null;
 
     private int[] powderCounts = new int[100];
     private ArrayList<ItemStack> extraResults = new ArrayList<>();
     private ItemStack maxLvlStack = ItemStack.EMPTY;
 
 
-    public RecipeSalvaging()
-    {
-        setRegistryName(RL);
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-
-    public boolean matches(InventoryCrafting inv, World worldIn)
+    @Override
+    public boolean matches(InventoryBetterCraftingInput inv)
     {
         System.out.println("matches");
         craftGrid = inv;
@@ -232,23 +202,10 @@ public class RecipeSalvaging extends BetterRecipe
         return true;
     }
 
-    public ItemStack getCraftingResult(InventoryCrafting inv)
-    {
-        System.out.println("getCraftingResult");
-        //Called whenever a crafting slot is changed
-
-        craftGrid = inv;
-
-        return maxLvlStack.copy();
-    }
-
     @Override
-    public NonNullList<Ingredient> getIngredients()
+    public void craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, boolean preview)
     {
-        System.out.println("getIngredients");
-        //Seems to be exclusively for recipe scrapers to display recipes; might play with this later
 
-        return NonNullList.create();
     }
 
     public ItemStack getRecipeOutput()
@@ -260,23 +217,14 @@ public class RecipeSalvaging extends BetterRecipe
         return maxLvlStack.copy();
     }
 
-    @Override
-    public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv)
+    public NonNullList<ItemStack> getRemainingItems(InventoryBetterCraftingInput inv)
     {
         System.out.println("getRemainingItems");
 
         //Only called from CraftingManager.getRemainingItems(), which is only called from SlotCrafting.onTake()
 
         //Use reflection, because the AT for this is failing on Faerun pack.  Maybe another AT overriding, or ASM, or who knows
-        NonNullList<ItemStack> stackList = null;
-        try
-        {
-            stackList = (NonNullList<ItemStack>) stackListField.get(inv);
-        }
-        catch (IllegalAccessException e)
-        {
-            MCTools.crash(e, 2002, false);
-        }
+        NonNullList<ItemStack> stackList = inv.stackList;
 
         //Hack past MC's default handling for this by setting inv slots directly and by accounting for its auto-shrink "feature" by adding 1 to each stack count
         int i = 0, size = inv.getSizeInventory();
@@ -309,36 +257,10 @@ public class RecipeSalvaging extends BetterRecipe
             }
 
             //Calculate and send the maxLvlStack for *after* this crafting is complete (because we just crafted the current one and it's now the client's "held item")
-            matches(inv, player.world);
+            matches(inv);
             connection.sendPacket(new SPacketSetSlot(betterCraftingTable.windowId, 0, maxLvlStack));
         }
 
         return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
-    }
-
-    public boolean isDynamic()
-    {
-        System.out.println("isDynamic");
-        return true;
-    }
-
-    public boolean canFit(int width, int height)
-    {
-        System.out.println("canFit");
-        return width * height >= 1;
-    }
-
-    @SubscribeEvent
-    public void serverTick(TickEvent.ServerTickEvent event)
-    {
-        if (event.phase == TickEvent.Phase.END)
-        {
-            if (craftGrid == null)
-            {
-            }
-            else
-            {
-            }
-        }
     }
 }
