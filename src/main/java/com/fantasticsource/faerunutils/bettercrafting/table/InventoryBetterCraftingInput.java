@@ -1,6 +1,5 @@
 package com.fantasticsource.faerunutils.bettercrafting.table;
 
-import net.minecraft.client.util.RecipeItemHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -43,7 +42,7 @@ public class InventoryBetterCraftingInput implements IInventory
 
     public ItemStack getStackInSlot(int index)
     {
-        return index >= this.getSizeInventory() ? ItemStack.EMPTY : (ItemStack) this.stackList.get(index);
+        return index >= this.getSizeInventory() ? ItemStack.EMPTY : this.stackList.get(index);
     }
 
     public ItemStack getStackInRowAndColumn(int row, int column)
@@ -143,13 +142,5 @@ public class InventoryBetterCraftingInput implements IInventory
     public int getWidth()
     {
         return this.inventoryWidth;
-    }
-
-    public void fillStackedContents(RecipeItemHelper helper)
-    {
-        for (ItemStack itemstack : this.stackList)
-        {
-            helper.accountStack(itemstack);
-        }
     }
 }

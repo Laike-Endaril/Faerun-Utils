@@ -4,6 +4,7 @@ import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.BetterRecipe;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -13,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ContainerBetterCraftingTable extends Container
 {
@@ -58,6 +60,7 @@ public class ContainerBetterCraftingTable extends Container
         }
 
         previousItems = new ItemStack[invInput.getSizeInventory()];
+        Arrays.fill(previousItems, ItemStack.EMPTY);
         previousAmounts = new int[invInput.getSizeInventory()];
     }
 
@@ -171,15 +174,28 @@ public class ContainerBetterCraftingTable extends Container
         int i = 0;
         for (ItemStack stack : invInput.stackList)
         {
-            if (previousItems[i] != stack || previousAmounts[i] != stack.getCount())
+            ItemStack previous = previousItems[i];
+            if (previous.getItem() == Items.AIR && stack.getItem() == Items.AIR)
+            {
+                i++;
+                continue;
+            }
+
+            if (previous != stack || (previousAmounts[i] != stack.getCount()))
             {
                 changedIndices.add(i);
+                System.out.println(i + ": " + previousItems[i] + " -> " + stack);
                 previousItems[i] = stack;
                 previousAmounts[i] = stack.getCount();
             }
             i++;
         }
-        if (changedIndices.size() == 0) return;
+        if (changedIndices.size() == 0)
+        {
+            System.out.println("Unchanged");
+            return;
+        }
+        System.out.println("Changed");
 
 
         //Determine which recipe to use

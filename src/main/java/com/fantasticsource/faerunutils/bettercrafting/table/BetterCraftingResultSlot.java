@@ -7,12 +7,12 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class BetterCraftingResultSlot extends Slot
 {
-    private final ContainerBetterCraftingTable contianer;
+    private final ContainerBetterCraftingTable container;
 
     public BetterCraftingResultSlot(ContainerBetterCraftingTable container, int slotIndex, int xPosition, int yPosition)
     {
         super(container.invOutput, slotIndex, xPosition, yPosition);
-        this.contianer = container;
+        this.container = container;
     }
 
     public boolean isItemValid(ItemStack stack)
@@ -22,17 +22,20 @@ public class BetterCraftingResultSlot extends Slot
 
     public ItemStack onTake(EntityPlayer player, ItemStack outputStack)
     {
-        if (contianer.recipe == null)
+        if (container.recipe == null)
         {
-            System.out.println("Null recipe");
+            System.out.println("Null recipe " + (player.world.isRemote ? "client" : "server"));
             return ItemStack.EMPTY;
         }
+        else System.out.println("Valid recipe " + (player.world.isRemote ? "client" : "server"));
 
-        for (ItemStack stack : contianer.recipe.craft(contianer.invInput, contianer.invOutput))
+        for (ItemStack stack : container.recipe.craft(container.invInput, container.invOutput))
         {
             stack.onCrafting(player.world, player, stack.getCount());
-            FMLCommonHandler.instance().firePlayerCraftingEvent(player, stack, contianer.invInput);
+            FMLCommonHandler.instance().firePlayerCraftingEvent(player, stack, container.invInput);
         }
+
+        container.update();
 
         return outputStack;
     }
