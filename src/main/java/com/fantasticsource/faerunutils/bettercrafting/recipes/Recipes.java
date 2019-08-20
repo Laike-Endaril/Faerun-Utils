@@ -3,6 +3,7 @@ package com.fantasticsource.faerunutils.bettercrafting.recipes;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -19,7 +20,9 @@ public class Recipes
     public static void init()
     {
         POWDER.setStackDisplayName("Equipment Powder Level ");
+        POWDER.setTagInfo("RepairCost", new NBTTagInt(0));
         TOKEN.setStackDisplayName("Skin Token Level ");
+        TOKEN.setTagInfo("RepairCost", new NBTTagInt(0));
 
         MinecraftForge.EVENT_BUS.register(Recipes.class);
 

@@ -22,12 +22,8 @@ public class InventoryBetterCraftingOutput implements IInventory
     {
         for (ItemStack itemstack : this.stackResult)
         {
-            if (!itemstack.isEmpty())
-            {
-                return false;
-            }
+            if (!itemstack.isEmpty()) return false;
         }
-
         return true;
     }
 
@@ -53,16 +49,19 @@ public class InventoryBetterCraftingOutput implements IInventory
 
     public ItemStack decrStackSize(int index, int count)
     {
+        System.out.println("decrStackSize");
         return ItemStackHelper.getAndRemove(this.stackResult, 0);
     }
 
     public ItemStack removeStackFromSlot(int index)
     {
+        System.out.println("removeStackFromSlot");
         return ItemStackHelper.getAndRemove(this.stackResult, 0);
     }
 
     public void setInventorySlotContents(int index, ItemStack stack)
     {
+        System.out.println("setInventorySlotContents");
         this.stackResult.set(0, stack);
     }
 

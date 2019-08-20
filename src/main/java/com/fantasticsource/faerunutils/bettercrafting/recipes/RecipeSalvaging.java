@@ -5,11 +5,37 @@ import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraft
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.util.ArrayList;
+
 import static com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes.POWDER;
 import static com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes.TOKEN;
 
 public class RecipeSalvaging extends BetterRecipe
 {
+    private static int getValue(String rarityName)
+    {
+        switch (rarityName)
+        {
+            case "COMMON":
+            case "UNCOMMON":
+                return 1;
+
+            case "RARE":
+            case "EPIC":
+                return 3;
+
+            case "LEGENDARY":
+            case "MYTHIC":
+                return 5;
+
+            case "GODLIKE":
+                return 10;
+
+            default:
+                throw new IllegalArgumentException("Unknown rarity: " + rarityName);
+        }
+    }
+
     @Override
     public boolean matches(InventoryBetterCraftingInput inv)
     {
@@ -112,17 +138,12 @@ public class RecipeSalvaging extends BetterRecipe
             }
             else
             {
-                NBTTagCompound compound = stack.serializeNBT();
-                compound = compound.getCompoundTag("ForgeCaps");
-                compound = compound.getCompoundTag("Parent");
-
-                NBTTagCompound stats = compound.getCompoundTag("bluerpg:gear_stats");
-                lvl = stats.getInteger("ilvl");
+                NBTTagCompound statsTag = stack.serializeNBT().getCompoundTag("ForgeCaps").getCompoundTag("Parent").getCompoundTag("bluerpg:gear_stats");
+                lvl = statsTag.getInteger("ilvl");
                 if (lvl < maxLvl) continue;
 
-
                 int q = 0;
-                switch (stats.getString("rarity"))
+                switch (statsTag.getString("rarity"))
                 {
                     case "COMMON":
                         q = 1;
@@ -174,7 +195,124 @@ public class RecipeSalvaging extends BetterRecipe
     }
 
     @Override
-    public void craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
+    public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
     {
+        int maxLvl = 0;
+        int[] quantities = new int[100];
+        int freeSlots = in.getSizeInventory();
+        for (ItemStack stack : in.stackList)
+        {
+            if (stack.isEmpty()) continue;
+
+
+            String name = stack.getDisplayName();
+            int lvl = 0;
+            if (stack.getItem() == TOKEN.getItem())
+            {
+                lvl = Integer.parseInt(name.replace(TOKEN.getDisplayName(), ""));
+                if (quantities[lvl] == 0) freeSlots--;
+                quantities[lvl] += stack.getCount() * 9;
+            }
+            else if (stack.getItem() == POWDER.getItem())
+            {
+                lvl = Integer.parseInt(name.replace(POWDER.getDisplayName(), ""));
+                if (quantities[lvl] == 0) freeSlots--;
+                quantities[lvl] += stack.getCount();
+            }
+            else
+            {
+                NBTTagCompound statsTag = stack.serializeNBT().getCompoundTag("ForgeCaps").getCompoundTag("Parent").getCompoundTag("bluerpg:gear_stats");
+                if (quantities[lvl] == 0) freeSlots--;
+                quantities[statsTag.getInteger("ilvl")] += getValue(statsTag.getString("rarity"));
+            }
+
+            if (lvl > maxLvl) maxLvl = lvl;
+        }
+
+
+        ItemStack stack;
+        ArrayList<ItemStack> crafted = new ArrayList<>();
+        int inputIndex = 0;
+
+        int quantity = quantities[maxLvl];
+        if (quantity <= 9 || quantity % 9 == 0)
+        {
+            //Only taking the one slot we already reserved
+            //Which is already in output in this case, so add to free slot count if we aren't splitting the max level stack
+            freeSlots++;
+
+            if (quantity % 9 == 0)
+            {
+                stack = TOKEN.copy();
+                stack.setCount(quantity / 9);
+            }
+            else
+            {
+                stack = POWDER.copy();
+                stack.setCount(quantity);
+            }
+
+            stack.setStackDisplayName(stack.getDisplayName() + maxLvl);
+            crafted.add(stack);
+        }
+        else
+        {
+            //Taking one input slot in addition to output slot
+            stack = TOKEN.copy();
+            stack.setStackDisplayName(stack.getDisplayName() + maxLvl);
+            stack.setCount(quantity / 9);
+            crafted.add(stack);
+
+            quantity -= stack.getCount() * 9;
+            stack = POWDER.copy();
+            stack.setStackDisplayName(stack.getDisplayName() + maxLvl);
+            stack.setCount(quantity);
+            in.setInventorySlotContents(inputIndex++, stack);
+            crafted.add(stack);
+        }
+
+
+        for (int lvl = maxLvl - 1; lvl >= 0; lvl--)
+        {
+            quantity = quantities[lvl];
+            if (freeSlots == 0 || quantity <= 9 || quantity % 9 == 0)
+            {
+                //Only taking the one slot we already reserved
+                if (quantity % 9 == 0)
+                {
+                    stack = TOKEN.copy();
+                    stack.setCount(quantity / 9);
+                }
+                else
+                {
+                    stack = POWDER.copy();
+                    stack.setCount(quantity);
+                }
+
+                stack.setStackDisplayName(stack.getDisplayName() + lvl);
+                in.setInventorySlotContents(inputIndex++, stack);
+                crafted.add(stack);
+            }
+            else
+            {
+                //Taking one additional free slot
+                freeSlots--;
+
+                stack = TOKEN.copy();
+                stack.setStackDisplayName(stack.getDisplayName() + lvl);
+                stack.setCount(quantity / 9);
+                in.setInventorySlotContents(inputIndex++, stack);
+                crafted.add(stack);
+
+                quantity -= stack.getCount() * 9;
+                stack = POWDER.copy();
+                stack.setStackDisplayName(stack.getDisplayName() + lvl);
+                stack.setCount(quantity);
+                in.setInventorySlotContents(inputIndex++, stack);
+                crafted.add(stack);
+            }
+        }
+
+        return crafted;
     }
 }

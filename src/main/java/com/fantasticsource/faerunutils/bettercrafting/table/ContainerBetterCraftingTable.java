@@ -34,7 +34,7 @@ public class ContainerBetterCraftingTable extends Container
         this.world = world;
         this.position = position;
 
-        addSlotToContainer(new BetterCraftingResultSlot(player, invInput, invOutput, 0, 124, 35));
+        addSlotToContainer(new BetterCraftingResultSlot(this, 0, 124, 35));
 
         for (int y = 0; y < 3; ++y)
         {

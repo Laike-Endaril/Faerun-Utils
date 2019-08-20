@@ -1,4 +1,1 @@
 Improve GCMessageFixer by allowing it to run before server start
-
-For RecipeSalvaging...
-...none of the methods in the class are called when you increase the stack size of an existing stack in the crafting grid, which means the results don't update and you end up not getting some items when crafting
