@@ -17,6 +17,8 @@ import java.util.Arrays;
 
 public class ContainerBetterCraftingTable extends Container
 {
+    private static final boolean DEBUG = false;
+
     public final EntityPlayer player;
     public final World world;
     public final BlockPos position;
@@ -178,14 +180,20 @@ public class ContainerBetterCraftingTable extends Container
                 continue;
             }
 
-            if (previous != stack || previous.getCount() != stack.getCount())
+            if (previous.getItem() != stack.getItem() || previous.getCount() != stack.getCount() || previous.getItemDamage() != stack.getItemDamage() || !previous.getDisplayName().equals(stack.getDisplayName()) || !previous.serializeNBT().toString().equals(stack.serializeNBT().toString()))
             {
                 changedIndices.add(i);
+                if (DEBUG) System.out.println(i + ": " + previous + " -> " + stack);
                 previousItems[i] = stack.copy();
             }
             i++;
         }
-        if (changedIndices.size() == 0) return;
+        if (changedIndices.size() == 0)
+        {
+            if (DEBUG) System.out.println("Unchanged");
+            return;
+        }
+        if (DEBUG) System.out.println("Changed");
 
 
         //Determine which recipe to use
