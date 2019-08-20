@@ -1,4 +1,4 @@
-package com.fantasticsource.faerunutils.crafting;
+package com.fantasticsource.faerunutils.bettercrafting.table;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;

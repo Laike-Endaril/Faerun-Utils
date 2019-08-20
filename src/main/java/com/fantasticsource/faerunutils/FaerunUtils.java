@@ -1,6 +1,6 @@
 package com.fantasticsource.faerunutils;
 
-import com.fantasticsource.faerunutils.crafting.recipes.Recipes;
+import com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;

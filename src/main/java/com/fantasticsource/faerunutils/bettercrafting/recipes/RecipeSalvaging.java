@@ -1,7 +1,7 @@
-package com.fantasticsource.faerunutils.crafting.recipes;
+package com.fantasticsource.faerunutils.bettercrafting.recipes;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
-import com.fantasticsource.faerunutils.crafting.ContainerBetterCraftingTable;
+import com.fantasticsource.faerunutils.bettercrafting.table.ContainerBetterCraftingTable;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tools.ReflectionTool;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,8 +24,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.fantasticsource.faerunutils.crafting.recipes.Recipes.POWDER;
-import static com.fantasticsource.faerunutils.crafting.recipes.Recipes.TOKEN;
+import static com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes.POWDER;
+import static com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes.TOKEN;
 
 public class RecipeSalvaging extends BetterRecipe
 {

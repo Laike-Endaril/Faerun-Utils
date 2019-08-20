@@ -1,4 +1,4 @@
-package com.fantasticsource.faerunutils.crafting;
+package com.fantasticsource.faerunutils.bettercrafting.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.ClientProxy;

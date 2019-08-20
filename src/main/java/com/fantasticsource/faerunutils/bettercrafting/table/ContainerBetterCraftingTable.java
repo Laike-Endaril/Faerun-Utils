@@ -1,4 +1,4 @@
-package com.fantasticsource.faerunutils.crafting;
+package com.fantasticsource.faerunutils.bettercrafting.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,25 +24,25 @@ public class ContainerBetterCraftingTable extends Container
 
         addSlotToContainer(new SlotCrafting(playerInventory.player, craftMatrix, craftResult, 0, 124, 35));
 
-        for (int i = 0; i < 3; ++i)
+        for (int y = 0; y < 3; ++y)
         {
-            for (int j = 0; j < 3; ++j)
+            for (int x = 0; x < 3; ++x)
             {
-                addSlotToContainer(new Slot(craftMatrix, j + i * 3, 30 + j * 18, 17 + i * 18));
+                addSlotToContainer(new Slot(craftMatrix, x + y * 3, 30 + x * 18, 17 + y * 18));
             }
         }
 
-        for (int k = 0; k < 3; ++k)
+        for (int y = 0; y < 3; ++y)
         {
-            for (int i1 = 0; i1 < 9; ++i1)
+            for (int x = 0; x < 9; ++x)
             {
-                addSlotToContainer(new Slot(playerInventory, i1 + k * 9 + 9, 8 + i1 * 18, 84 + k * 18));
+                addSlotToContainer(new Slot(playerInventory, x + y * 9 + 9, 8 + x * 18, 84 + y * 18));
             }
         }
 
-        for (int l = 0; l < 9; ++l)
+        for (int x = 0; x < 9; ++x)
         {
-            addSlotToContainer(new Slot(playerInventory, l, 8 + l * 18, 142));
+            addSlotToContainer(new Slot(playerInventory, x, 8 + x * 18, 142));
         }
     }
 
@@ -65,7 +65,7 @@ public class ContainerBetterCraftingTable extends Container
     {
         if (world.getBlockState(position).getBlock() != BlocksAndItems.blockBetterCraftingTable) return false;
 
-        return playerIn.getDistanceSq((double) position.getX() + 0.5D, (double) position.getY() + 0.5D, (double) position.getZ() + 0.5D) <= 64.0D;
+        return playerIn.getDistanceSq((double) position.getX() + 0.5, (double) position.getY() + 0.5, (double) position.getZ() + 0.5) <= 64;
     }
 
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)

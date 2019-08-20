@@ -1,7 +1,7 @@
 package com.fantasticsource.faerunutils;
 
-import com.fantasticsource.faerunutils.crafting.BlockBetterCraftingTable;
-import com.fantasticsource.faerunutils.crafting.ItemBetterCraftingTable;
+import com.fantasticsource.faerunutils.bettercrafting.table.BlockBetterCraftingTable;
+import com.fantasticsource.faerunutils.bettercrafting.table.ItemBetterCraftingTable;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;

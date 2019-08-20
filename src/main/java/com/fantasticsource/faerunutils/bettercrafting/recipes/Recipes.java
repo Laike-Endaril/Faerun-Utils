@@ -1,4 +1,4 @@
-package com.fantasticsource.faerunutils.crafting.recipes;
+package com.fantasticsource.faerunutils.bettercrafting.recipes;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
