@@ -32,22 +32,22 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
 
-    rename '(fearunutils_at.cfg)', 'META-INF/$1'
+    rename 'faerunutils_at.cfg', 'META-INF/faerunutils_at.cfg'
 }
 
 jar {
     manifest {
-        attributes 'FMLAT': 'fearunutils_at.cfg'
+        attributes 'FMLAT': 'faerunutils_at.cfg'
     }
 }
 
