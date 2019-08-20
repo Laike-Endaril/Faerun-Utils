@@ -30,175 +30,174 @@ public class RecipeSalvaging extends BetterRecipe
     @Override
     public boolean matches(InventoryBetterCraftingInput inv)
     {
-        System.out.println("matches");
-        craftGrid = inv;
-
-        Arrays.fill(powderCounts, 0);
-        extraResults.clear();
-        maxLvlStack = ItemStack.EMPTY;
-
-
-        int maxLvl = 0, freeSlots = inv.getSizeInventory();
-        for (int i = inv.getSizeInventory() - 1; i >= 0; i--)
-        {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (stack == ItemStack.EMPTY) continue;
-
-            int lvl, quantity;
-            if (stack.getItem() == TOKEN.getItem())
-            {
-                String name = stack.getDisplayName();
-                try
-                {
-                    lvl = Integer.parseInt(name.substring(name.lastIndexOf(' ') + 1));
-                }
-                catch (NumberFormatException e)
-                {
-                    return false;
-                }
-                quantity = stack.getCount() * 9;
-            }
-            else if (stack.getItem() == POWDER.getItem())
-            {
-                String name = stack.getDisplayName();
-                try
-                {
-                    lvl = Integer.parseInt(name.substring(name.lastIndexOf(' ') + 1));
-                }
-                catch (NumberFormatException e)
-                {
-                    return false;
-                }
-                quantity = stack.getCount();
-            }
-            else
-            {
-                NBTTagCompound compound = stack.serializeNBT();
-                if (!compound.hasKey("ForgeCaps")) return false;
-
-                compound = compound.getCompoundTag("ForgeCaps");
-                if (!compound.hasKey("Parent")) return false;
-
-                compound = compound.getCompoundTag("Parent");
-                if (!compound.hasKey("bluerpg:gear_stats")) return false;
-
-                NBTTagCompound stats = compound.getCompoundTag("bluerpg:gear_stats");
-                lvl = stats.getInteger("ilvl");
-                if (lvl == 0) return false;
-
-
-                switch (stats.getString("rarity"))
-                {
-                    case "COMMON":
-                        quantity = 1;
-                        break;
-
-                    case "UNCOMMON":
-                        quantity = 1;
-                        break;
-
-                    case "RARE":
-                        quantity = 3;
-                        break;
-
-                    case "EPIC":
-                        quantity = 3;
-                        break;
-
-                    case "LEGENDARY":
-                        quantity = 5;
-                        break;
-
-                    case "MYTHIC":
-                        quantity = 5;
-                        break;
-
-                    case "GODLIKE":
-                        quantity = 10;
-                        break;
-
-                    default:
-                        System.out.println("Unknown rarity: " + stats.getString("rarity"));
-                        continue;
-                }
-            }
-
-
-            if (maxLvl < lvl) maxLvl = lvl;
-
-            int before = powderCounts[lvl];
-            powderCounts[lvl] += quantity;
-
-            if (before == 0) freeSlots--;
-        }
-
-
-        if (maxLvl == 0) return false;
-
-
-        ItemStack stack;
-        int powders = powderCounts[maxLvl];
-        if (powders < 9)
-        {
-            maxLvlStack = POWDER.copy();
-            maxLvlStack.setCount(powders);
-            maxLvlStack.setStackDisplayName("Equipment Powder Level " + maxLvl);
-
-            freeSlots++;
-        }
-        else
-        {
-            maxLvlStack = TOKEN.copy();
-            maxLvlStack.setCount(powders / 9);
-            maxLvlStack.setStackDisplayName("Skin Token Level " + maxLvl);
-
-            powders -= maxLvlStack.getCount() * 9;
-            if (powders == 0) freeSlots++;
-            else
-            {
-                stack = POWDER.copy();
-                stack.setCount(powders);
-                stack.setStackDisplayName("Equipment Powder Level " + maxLvl);
-                extraResults.add(stack);
-            }
-        }
-
-        for (int lvl = maxLvl - 1; lvl > 0; lvl--)
-        {
-            powders = powderCounts[lvl];
-            if (powders == 0) continue;
-
-            if (powders % 9 == 0)
-            {
-                stack = TOKEN.copy();
-                stack.setCount(powders / 9);
-                stack.setStackDisplayName("Skin Token Level " + lvl);
-                extraResults.add(stack);
-            }
-            else if (freeSlots == 0)
-            {
-                stack = POWDER.copy();
-                stack.setCount(powders);
-                stack.setStackDisplayName("Equipment Powder Level " + maxLvl);
-                extraResults.add(stack);
-            }
-            else
-            {
-                stack = TOKEN.copy();
-                stack.setCount(powders / 9);
-                stack.setStackDisplayName("Skin Token Level " + lvl);
-                extraResults.add(stack);
-
-                powders -= stack.getCount() * 9;
-                stack = POWDER.copy();
-                stack.setCount(powders);
-                stack.setStackDisplayName("Equipment Powder Level " + maxLvl);
-                extraResults.add(stack);
-
-                freeSlots--;
-            }
-        }
-
+//        craftGrid = inv;
+//
+//        Arrays.fill(powderCounts, 0);
+//        extraResults.clear();
+//        maxLvlStack = ItemStack.EMPTY;
+//
+//
+//        int maxLvl = 0, freeSlots = inv.getSizeInventory();
+//        for (int i = inv.getSizeInventory() - 1; i >= 0; i--)
+//        {
+//            ItemStack stack = inv.getStackInSlot(i);
+//            if (stack == ItemStack.EMPTY) continue;
+//
+//            int lvl, quantity;
+//            if (stack.getItem() == TOKEN.getItem())
+//            {
+//                String name = stack.getDisplayName();
+//                try
+//                {
+//                    lvl = Integer.parseInt(name.substring(name.lastIndexOf(' ') + 1));
+//                }
+//                catch (NumberFormatException e)
+//                {
+//                    return false;
+//                }
+//                quantity = stack.getCount() * 9;
+//            }
+//            else if (stack.getItem() == POWDER.getItem())
+//            {
+//                String name = stack.getDisplayName();
+//                try
+//                {
+//                    lvl = Integer.parseInt(name.substring(name.lastIndexOf(' ') + 1));
+//                }
+//                catch (NumberFormatException e)
+//                {
+//                    return false;
+//                }
+//                quantity = stack.getCount();
+//            }
+//            else
+//            {
+//                NBTTagCompound compound = stack.serializeNBT();
+//                if (!compound.hasKey("ForgeCaps")) return false;
+//
+//                compound = compound.getCompoundTag("ForgeCaps");
+//                if (!compound.hasKey("Parent")) return false;
+//
+//                compound = compound.getCompoundTag("Parent");
+//                if (!compound.hasKey("bluerpg:gear_stats")) return false;
+//
+//                NBTTagCompound stats = compound.getCompoundTag("bluerpg:gear_stats");
+//                lvl = stats.getInteger("ilvl");
+//                if (lvl == 0) return false;
+//
+//
+//                switch (stats.getString("rarity"))
+//                {
+//                    case "COMMON":
+//                        quantity = 1;
+//                        break;
+//
+//                    case "UNCOMMON":
+//                        quantity = 1;
+//                        break;
+//
+//                    case "RARE":
+//                        quantity = 3;
+//                        break;
+//
+//                    case "EPIC":
+//                        quantity = 3;
+//                        break;
+//
+//                    case "LEGENDARY":
+//                        quantity = 5;
+//                        break;
+//
+//                    case "MYTHIC":
+//                        quantity = 5;
+//                        break;
+//
+//                    case "GODLIKE":
+//                        quantity = 10;
+//                        break;
+//
+//                    default:
+//                        System.out.println("Unknown rarity: " + stats.getString("rarity"));
+//                        continue;
+//                }
+//            }
+//
+//
+//            if (maxLvl < lvl) maxLvl = lvl;
+//
+//            int before = powderCounts[lvl];
+//            powderCounts[lvl] += quantity;
+//
+//            if (before == 0) freeSlots--;
+//        }
+//
+//
+//        if (maxLvl == 0) return false;
+//
+//
+//        ItemStack stack;
+//        int powders = powderCounts[maxLvl];
+//        if (powders < 9)
+//        {
+//            maxLvlStack = POWDER.copy();
+//            maxLvlStack.setCount(powders);
+//            maxLvlStack.setStackDisplayName("Equipment Powder Level " + maxLvl);
+//
+//            freeSlots++;
+//        }
+//        else
+//        {
+//            maxLvlStack = TOKEN.copy();
+//            maxLvlStack.setCount(powders / 9);
+//            maxLvlStack.setStackDisplayName("Skin Token Level " + maxLvl);
+//
+//            powders -= maxLvlStack.getCount() * 9;
+//            if (powders == 0) freeSlots++;
+//            else
+//            {
+//                stack = POWDER.copy();
+//                stack.setCount(powders);
+//                stack.setStackDisplayName("Equipment Powder Level " + maxLvl);
+//                extraResults.add(stack);
+//            }
+//        }
+//
+//        for (int lvl = maxLvl - 1; lvl > 0; lvl--)
+//        {
+//            powders = powderCounts[lvl];
+//            if (powders == 0) continue;
+//
+//            if (powders % 9 == 0)
+//            {
+//                stack = TOKEN.copy();
+//                stack.setCount(powders / 9);
+//                stack.setStackDisplayName("Skin Token Level " + lvl);
+//                extraResults.add(stack);
+//            }
+//            else if (freeSlots == 0)
+//            {
+//                stack = POWDER.copy();
+//                stack.setCount(powders);
+//                stack.setStackDisplayName("Equipment Powder Level " + maxLvl);
+//                extraResults.add(stack);
+//            }
+//            else
+//            {
+//                stack = TOKEN.copy();
+//                stack.setCount(powders / 9);
+//                stack.setStackDisplayName("Skin Token Level " + lvl);
+//                extraResults.add(stack);
+//
+//                powders -= stack.getCount() * 9;
+//                stack = POWDER.copy();
+//                stack.setCount(powders);
+//                stack.setStackDisplayName("Equipment Powder Level " + maxLvl);
+//                extraResults.add(stack);
+//
+//                freeSlots--;
+//            }
+//        }
+//
         return true;
     }
 

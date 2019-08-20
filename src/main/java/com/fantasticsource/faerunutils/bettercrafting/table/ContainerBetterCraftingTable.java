@@ -24,7 +24,8 @@ public class ContainerBetterCraftingTable extends Container
     public InventoryBetterCraftingOutput invOutput = new InventoryBetterCraftingOutput();
     public BetterRecipe recipe = null;
 
-    private ArrayList<ItemStack> previousItems = new ArrayList<>();
+    private ItemStack[] previousItems;
+    private int[] previousAmounts;
 
 
     public ContainerBetterCraftingTable(EntityPlayer player, World world, BlockPos position)
@@ -56,10 +57,8 @@ public class ContainerBetterCraftingTable extends Container
             addSlotToContainer(new Slot(player.inventory, x, 8 + x * 18, 142));
         }
 
-        for (int i = invInput.getSizeInventory(); i >= 0; i--)
-        {
-            previousItems.add(ItemStack.EMPTY);
-        }
+        previousItems = new ItemStack[invInput.getSizeInventory()];
+        previousAmounts = new int[invInput.getSizeInventory()];
     }
 
     @Override
@@ -165,17 +164,23 @@ public class ContainerBetterCraftingTable extends Container
         if (player.world.isRemote) return;
 
 
-        //Check previous item snapshot and return if same
+        //Check previous item snapshot
+        //If same, return
+        //If different, track changed indices and update item snapshot
         ArrayList<Integer> changedIndices = new ArrayList<>();
         int i = 0;
         for (ItemStack stack : invInput.stackList)
         {
-            if (previousItems.get(i) != stack) changedIndices.add(i);
+            if (previousItems[i] != stack || previousAmounts[i] != stack.getCount())
+            {
+                changedIndices.add(i);
+                previousItems[i] = stack;
+                previousAmounts[i] = stack.getCount();
+            }
+            i++;
         }
         if (changedIndices.size() == 0) return;
 
-
-        System.out.println("Changed!");
 
         //Determine which recipe to use
         if (recipe != null)
@@ -202,12 +207,7 @@ public class ContainerBetterCraftingTable extends Container
         ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, 0, invOutput.getStackInSlot(0)));
         for (int index : changedIndices)
         {
-            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, i + 1, invInput.stackList.get(index)));
+            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, index + 1, invInput.stackList.get(index)));
         }
-
-
-        //Save snapshot of current items
-        i = 0;
-        for (ItemStack stack : invInput.stackList) previousItems.set(i, stack);
     }
 }
