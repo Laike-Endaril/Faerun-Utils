@@ -22,12 +22,7 @@ public class BetterCraftingResultSlot extends Slot
 
     public ItemStack onTake(EntityPlayer player, ItemStack outputStack)
     {
-        if (container.recipe == null)
-        {
-            System.out.println("Null recipe " + (player.world.isRemote ? "client" : "server"));
-            return ItemStack.EMPTY;
-        }
-        else System.out.println("Valid recipe " + (player.world.isRemote ? "client" : "server"));
+        if (container.recipe == null) return ItemStack.EMPTY;
 
         for (ItemStack stack : container.recipe.craft(container.invInput, container.invOutput))
         {

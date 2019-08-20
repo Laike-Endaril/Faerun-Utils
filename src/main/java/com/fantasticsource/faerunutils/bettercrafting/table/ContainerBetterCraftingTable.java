@@ -4,7 +4,6 @@ import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.BetterRecipe;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -27,7 +26,6 @@ public class ContainerBetterCraftingTable extends Container
     public BetterRecipe recipe = null;
 
     private ItemStack[] previousItems;
-    private int[] previousAmounts;
 
 
     public ContainerBetterCraftingTable(EntityPlayer player, World world, BlockPos position)
@@ -61,7 +59,6 @@ public class ContainerBetterCraftingTable extends Container
 
         previousItems = new ItemStack[invInput.getSizeInventory()];
         Arrays.fill(previousItems, ItemStack.EMPTY);
-        previousAmounts = new int[invInput.getSizeInventory()];
     }
 
     @Override
@@ -94,7 +91,7 @@ public class ContainerBetterCraftingTable extends Container
     public ItemStack transferStackInSlot(EntityPlayer ignored, int index)
     {
         ItemStack itemstack = ItemStack.EMPTY;
-        BetterCraftingGridSlot slot = (BetterCraftingGridSlot) inventorySlots.get(index);
+        Slot slot = inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack())
         {
@@ -175,27 +172,20 @@ public class ContainerBetterCraftingTable extends Container
         for (ItemStack stack : invInput.stackList)
         {
             ItemStack previous = previousItems[i];
-            if (previous.getItem() == Items.AIR && stack.getItem() == Items.AIR)
+            if (previous.isEmpty() && stack.isEmpty())
             {
                 i++;
                 continue;
             }
 
-            if (previous != stack || (previousAmounts[i] != stack.getCount()))
+            if (previous != stack || previous.getCount() != stack.getCount())
             {
                 changedIndices.add(i);
-                System.out.println(i + ": " + previousItems[i] + " -> " + stack);
-                previousItems[i] = stack;
-                previousAmounts[i] = stack.getCount();
+                previousItems[i] = stack.copy();
             }
             i++;
         }
-        if (changedIndices.size() == 0)
-        {
-            System.out.println("Unchanged");
-            return;
-        }
-        System.out.println("Changed");
+        if (changedIndices.size() == 0) return;
 
 
         //Determine which recipe to use

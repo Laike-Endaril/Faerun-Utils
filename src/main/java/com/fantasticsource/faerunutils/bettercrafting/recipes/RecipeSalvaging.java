@@ -313,6 +313,11 @@ public class RecipeSalvaging extends BetterRecipe
             }
         }
 
+        while (inputIndex < in.getSizeInventory())
+        {
+            in.setInventorySlotContents(inputIndex++, ItemStack.EMPTY);
+        }
+
         return crafted;
     }
 }
