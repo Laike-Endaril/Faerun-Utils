@@ -200,7 +200,10 @@ public class ContainerBetterCraftingTable extends Container
             }
         }
 
-        if (recipe != null) recipe.craft(invInput, invOutput, true);
+
+        //Set server-side output via recipe method
+        if (recipe == null) invOutput.setInventorySlotContents(0, ItemStack.EMPTY);
+        else recipe.preview(invInput, invOutput);
 
 
         //Update all changed slots for client

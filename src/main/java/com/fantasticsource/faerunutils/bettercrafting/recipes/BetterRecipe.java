@@ -11,5 +11,7 @@ public abstract class BetterRecipe
 
     abstract public boolean matches(InventoryBetterCraftingInput inv);
 
-    abstract public void craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, boolean preview);
+    abstract public void preview(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out);
+
+    abstract public void craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out);
 }

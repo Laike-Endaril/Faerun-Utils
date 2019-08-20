@@ -18,6 +18,9 @@ public class Recipes
 
     public static void init()
     {
+        POWDER.setStackDisplayName("Equipment Powder Level ");
+        TOKEN.setStackDisplayName("Skin Token Level ");
+
         MinecraftForge.EVENT_BUS.register(Recipes.class);
 
         BetterRecipe.betterRecipes.add(new RecipeSalvaging());
