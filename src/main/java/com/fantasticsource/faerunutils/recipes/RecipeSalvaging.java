@@ -1,14 +1,20 @@
 package com.fantasticsource.faerunutils.recipes;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.ContainerWorkbench;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -234,6 +240,7 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
     {
         //Only called from CraftingManager.getRemainingItems(), which is only called from SlotCrafting.onTake()
 
+        //Hack past MC's default handling for this by setting inv slots directly and by accounting for its auto-shrink "feature" by adding 1 to each stack count
         int i = 0, size = inv.getSizeInventory();
         for (ItemStack stack : extraResults)
         {
@@ -247,7 +254,25 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
         }
 
 
-        inv.setInventorySlotContents(0, inv.getStackInSlot(0));
+        //Manually sync slots to client, because MC sucks
+        EntityPlayer player = ForgeHooks.getCraftingPlayer();
+        if (player instanceof EntityPlayerMP)
+        {
+            ContainerWorkbench workbench = (ContainerWorkbench) player.openContainer;
+            NetHandlerPlayServer connection = ((EntityPlayerMP) player).connection;
+
+            //The crafting grid contents *after* this crafting is complete (because we just crafted it)
+            for (int slot = inv.getSizeInventory() - 1; slot >= 0; slot--)
+            {
+                ItemStack clientStack = inv.getStackInSlot(slot).copy();
+                clientStack.shrink(1);
+                connection.sendPacket(new SPacketSetSlot(workbench.windowId, slot + 1, clientStack));
+            }
+
+            //Calculate and send the maxLvlStack for *after* this crafting is complete (because we just crafted the current one and it's now the client's "held item")
+            matches(inv, player.world);
+            connection.sendPacket(new SPacketSetSlot(workbench.windowId, 0, maxLvlStack));
+        }
 
         return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
     }
