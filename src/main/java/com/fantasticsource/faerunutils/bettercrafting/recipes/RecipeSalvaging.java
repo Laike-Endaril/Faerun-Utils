@@ -142,39 +142,12 @@ public class RecipeSalvaging extends BetterRecipe
                 lvl = statsTag.getInteger("ilvl");
                 if (lvl < maxLvl) continue;
 
-                int q = 0;
-                switch (statsTag.getString("rarity"))
-                {
-                    case "COMMON":
-                        q = 1;
-                        break;
-                    case "UNCOMMON":
-                        q = 1;
-                        break;
-                    case "RARE":
-                        q = 3;
-                        break;
-                    case "EPIC":
-                        q = 3;
-                        break;
-                    case "LEGENDARY":
-                        q = 5;
-                        break;
-                    case "MYTHIC":
-                        q = 5;
-                        break;
-                    case "GODLIKE":
-                        q = 10;
-                        break;
-                }
-
-
                 if (lvl > maxLvl)
                 {
                     maxLvl = lvl;
-                    quantity = q;
+                    quantity = getValue(statsTag.getString("rarity"));
                 }
-                else quantity += q;
+                else quantity += getValue(statsTag.getString("rarity"));
             }
         }
 
@@ -210,20 +183,24 @@ public class RecipeSalvaging extends BetterRecipe
             if (stack.getItem() == TOKEN.getItem())
             {
                 lvl = Integer.parseInt(name.replace(TOKEN.getDisplayName(), ""));
+
                 if (quantities[lvl] == 0) freeSlots--;
                 quantities[lvl] += stack.getCount() * 9;
             }
             else if (stack.getItem() == POWDER.getItem())
             {
                 lvl = Integer.parseInt(name.replace(POWDER.getDisplayName(), ""));
+
                 if (quantities[lvl] == 0) freeSlots--;
                 quantities[lvl] += stack.getCount();
             }
             else
             {
                 NBTTagCompound statsTag = stack.serializeNBT().getCompoundTag("ForgeCaps").getCompoundTag("Parent").getCompoundTag("bluerpg:gear_stats");
+                lvl = statsTag.getInteger("ilvl");
+
                 if (quantities[lvl] == 0) freeSlots--;
-                quantities[statsTag.getInteger("ilvl")] += getValue(statsTag.getString("rarity"));
+                quantities[lvl] += getValue(statsTag.getString("rarity"));
             }
 
             if (lvl > maxLvl) maxLvl = lvl;
