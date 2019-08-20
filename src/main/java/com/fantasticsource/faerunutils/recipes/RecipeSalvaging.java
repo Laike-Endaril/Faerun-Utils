@@ -1,6 +1,8 @@
 package com.fantasticsource.faerunutils.recipes;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
+import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.tools.ReflectionTool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ContainerWorkbench;
@@ -16,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -24,6 +27,20 @@ import static com.fantasticsource.faerunutils.recipes.Recipes.TOKEN;
 
 public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<IRecipe> implements IRecipe
 {
+    private static Field stackListField;
+
+    static
+    {
+        try
+        {
+            stackListField = ReflectionTool.getField(InventoryCrafting.class, "field_70466_a", "stackList");
+        }
+        catch (NoSuchFieldException | IllegalAccessException e)
+        {
+            MCTools.crash(e, 2001, false);
+        }
+    }
+
     private static final ResourceLocation RL = new ResourceLocation(FaerunUtils.MODID, "recipe_skin_powders");
 
     private InventoryCrafting craftGrid = null;
@@ -240,17 +257,29 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
     {
         //Only called from CraftingManager.getRemainingItems(), which is only called from SlotCrafting.onTake()
 
+        //Use reflection, because the AT for this is failing on Faerun pack.  Maybe another AT overriding, or ASM, or who knows
+        NonNullList<ItemStack> stackList = null;
+        try
+        {
+            stackList = (NonNullList<ItemStack>) stackListField.get(inv);
+        }
+        catch (IllegalAccessException e)
+        {
+            MCTools.crash(e, 2002, false);
+        }
+
         //Hack past MC's default handling for this by setting inv slots directly and by accounting for its auto-shrink "feature" by adding 1 to each stack count
         int i = 0, size = inv.getSizeInventory();
         for (ItemStack stack : extraResults)
         {
             ItemStack copy = stack.copy();
             copy.setCount(copy.getCount() + 1);
-            inv.stackList.set(i++, copy);
+
+            stackList.set(i++, ItemStack.EMPTY);
         }
         while (i < size)
         {
-            inv.stackList.set(i++, ItemStack.EMPTY);
+            stackList.set(i++, ItemStack.EMPTY);
         }
 
 

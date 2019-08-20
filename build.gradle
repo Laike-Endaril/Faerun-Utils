@@ -41,14 +41,6 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-
-    rename 'faerunutils_at.cfg', 'META-INF/faerunutils_at.cfg'
-}
-
-jar {
-    manifest {
-        attributes 'FMLAT': 'faerunutils_at.cfg'
-    }
 }
 
 task deobfJar(type: Jar) {
