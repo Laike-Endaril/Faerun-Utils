@@ -1,6 +1,6 @@
 package com.fantasticsource.faerunutils;
 
-import com.fantasticsource.faerunutils.recipes.Recipes;
+import com.fantasticsource.faerunutils.crafting.recipes.Recipes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -23,6 +23,7 @@ public class FaerunUtils
     {
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
         MinecraftForge.EVENT_BUS.register(DamageBlocker.class);
+        MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
         MinecraftForge.EVENT_BUS.register(Recipes.class);
 
         GCMessageFixer.init();

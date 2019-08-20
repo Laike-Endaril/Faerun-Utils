@@ -1,14 +1,13 @@
-package com.fantasticsource.faerunutils.recipes;
+package com.fantasticsource.faerunutils.crafting.recipes;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
+import com.fantasticsource.faerunutils.crafting.ContainerBetterCraftingTable;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tools.ReflectionTool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ContainerWorkbench;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -17,16 +16,20 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.fantasticsource.faerunutils.recipes.Recipes.POWDER;
-import static com.fantasticsource.faerunutils.recipes.Recipes.TOKEN;
+import static com.fantasticsource.faerunutils.crafting.recipes.Recipes.POWDER;
+import static com.fantasticsource.faerunutils.crafting.recipes.Recipes.TOKEN;
 
-public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistryEntry.Impl<IRecipe> implements IRecipe
+public class RecipeSalvaging extends BetterRecipe
 {
+    private static final ResourceLocation RL = new ResourceLocation(FaerunUtils.MODID, "recipe_skin_powders");
     private static Field stackListField;
 
     static
@@ -41,21 +44,23 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
         }
     }
 
-    private static final ResourceLocation RL = new ResourceLocation(FaerunUtils.MODID, "recipe_skin_powders");
-
     private InventoryCrafting craftGrid = null;
 
     private int[] powderCounts = new int[100];
     private ArrayList<ItemStack> extraResults = new ArrayList<>();
     private ItemStack maxLvlStack = ItemStack.EMPTY;
 
+
     public RecipeSalvaging()
     {
         setRegistryName(RL);
+        MinecraftForge.EVENT_BUS.register(this);
     }
+
 
     public boolean matches(InventoryCrafting inv, World worldIn)
     {
+        System.out.println("matches");
         craftGrid = inv;
 
         Arrays.fill(powderCounts, 0);
@@ -229,6 +234,7 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
 
     public ItemStack getCraftingResult(InventoryCrafting inv)
     {
+        System.out.println("getCraftingResult");
         //Called whenever a crafting slot is changed
 
         craftGrid = inv;
@@ -239,13 +245,15 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
     @Override
     public NonNullList<Ingredient> getIngredients()
     {
+        System.out.println("getIngredients");
         //Seems to be exclusively for recipe scrapers to display recipes; might play with this later
 
-        return null;
+        return NonNullList.create();
     }
 
     public ItemStack getRecipeOutput()
     {
+        System.out.println("getRecipeOutput");
         //Called all over the place, especially for recipe scrapers
 
         if (craftGrid == null) return TOKEN.copy();
@@ -255,6 +263,8 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
     @Override
     public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv)
     {
+        System.out.println("getRemainingItems");
+
         //Only called from CraftingManager.getRemainingItems(), which is only called from SlotCrafting.onTake()
 
         //Use reflection, because the AT for this is failing on Faerun pack.  Maybe another AT overriding, or ASM, or who knows
@@ -287,7 +297,7 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
         EntityPlayer player = ForgeHooks.getCraftingPlayer();
         if (player instanceof EntityPlayerMP)
         {
-            ContainerWorkbench workbench = (ContainerWorkbench) player.openContainer;
+            ContainerBetterCraftingTable betterCraftingTable = (ContainerBetterCraftingTable) player.openContainer;
             NetHandlerPlayServer connection = ((EntityPlayerMP) player).connection;
 
             //The crafting grid contents *after* this crafting is complete (because we just crafted it)
@@ -295,12 +305,12 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
             {
                 ItemStack clientStack = inv.getStackInSlot(slot).copy();
                 clientStack.shrink(1);
-                connection.sendPacket(new SPacketSetSlot(workbench.windowId, slot + 1, clientStack));
+                connection.sendPacket(new SPacketSetSlot(betterCraftingTable.windowId, slot + 1, clientStack));
             }
 
             //Calculate and send the maxLvlStack for *after* this crafting is complete (because we just crafted the current one and it's now the client's "held item")
             matches(inv, player.world);
-            connection.sendPacket(new SPacketSetSlot(workbench.windowId, 0, maxLvlStack));
+            connection.sendPacket(new SPacketSetSlot(betterCraftingTable.windowId, 0, maxLvlStack));
         }
 
         return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
@@ -308,11 +318,27 @@ public class RecipeSalvaging extends net.minecraftforge.registries.IForgeRegistr
 
     public boolean isDynamic()
     {
+        System.out.println("isDynamic");
         return true;
     }
 
     public boolean canFit(int width, int height)
     {
+        System.out.println("canFit");
         return width * height >= 1;
+    }
+
+    @SubscribeEvent
+    public void serverTick(TickEvent.ServerTickEvent event)
+    {
+        if (event.phase == TickEvent.Phase.END)
+        {
+            if (craftGrid == null)
+            {
+            }
+            else
+            {
+            }
+        }
     }
 }
