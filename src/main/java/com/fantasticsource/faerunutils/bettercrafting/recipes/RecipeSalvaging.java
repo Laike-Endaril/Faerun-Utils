@@ -275,6 +275,8 @@ public class RecipeSalvaging extends BetterRecipe
         for (int lvl = maxLvl - 1; lvl >= 0; lvl--)
         {
             quantity = quantities[lvl];
+            if (quantity <= 0) continue;
+
             if (freeSlots == 0 || quantity <= 9 || quantity % 9 == 0)
             {
                 //Only taking the one slot we already reserved
