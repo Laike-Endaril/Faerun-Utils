@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Loader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,10 @@ public class ContainerBetterCraftingTable extends Container
     public final EntityPlayer player;
     public final World world;
     public final BlockPos position;
+
+    public final int playerInventoryWidth;
+    public final int outputIndex, craftingGridStartIndex, craftingGridSize, playerInventoryStartIndex, playerInventorySize, hotbarStartIndex, hotbarSize;
+    public final int fullInventoryStart, fullInventoryEnd;
 
     public InventoryBetterCraftingInput invInput = new InventoryBetterCraftingInput(this, 3, 3);
     public InventoryBetterCraftingOutput invOutput = new InventoryBetterCraftingOutput();
@@ -36,28 +41,61 @@ public class ContainerBetterCraftingTable extends Container
         this.world = world;
         this.position = position;
 
+
+        //Slot indices
+        outputIndex = 0;
+
+        craftingGridSize = invInput.getSizeInventory();
+        craftingGridStartIndex = outputIndex + 1;
+
+        boolean bluerpg = Loader.isModLoaded("bluerpg");
+        if (bluerpg)
+        {
+            playerInventoryWidth = 13;
+            hotbarSize = 4;
+        }
+        else
+        {
+            playerInventoryWidth = 9;
+            hotbarSize = 9;
+        }
+
+        playerInventorySize = player.inventory.mainInventory.size() - hotbarSize;
+
+        hotbarStartIndex = craftingGridStartIndex + craftingGridSize;
+        playerInventoryStartIndex = hotbarStartIndex + hotbarSize;
+
+        fullInventoryStart = hotbarStartIndex;
+        fullInventoryEnd = fullInventoryStart + hotbarSize + playerInventorySize - 1;
+
+
+        //Crafting slots
         addSlotToContainer(new BetterCraftingResultSlot(this, 0, 124, 35));
 
-        for (int y = 0; y < 3; ++y)
+        for (int y = 0; y < invInput.inventoryWidth; ++y)
         {
-            for (int x = 0; x < 3; ++x)
+            for (int x = 0; x < invInput.inventoryHeight; ++x)
             {
                 addSlotToContainer(new BetterCraftingGridSlot(invInput, x + y * 3, 30 + x * 18, 17 + y * 18));
             }
         }
 
-        for (int y = 0; y < 3; ++y)
+
+        //Inventory
+        for (int i = 0; i < playerInventorySize; i++)
         {
-            for (int x = 0; x < 9; ++x)
-            {
-                addSlotToContainer(new Slot(player.inventory, x + y * 9 + 9, 8 + x * 18, 84 + y * 18));
-            }
+            addSlotToContainer(new Slot(player.inventory, hotbarSize + i, 8 + (i % playerInventoryWidth) * 18, 84 + (i / playerInventoryWidth) * 18));
         }
 
-        for (int x = 0; x < 9; ++x)
+
+        //Hotbar
+        int hotbarY = 88 + ((playerInventorySize + playerInventoryWidth - 1) / playerInventoryWidth) * 18; //Pseudo-ceil function
+
+        for (int x = 0; x < hotbarSize; x++)
         {
-            addSlotToContainer(new Slot(player.inventory, x, 8 + x * 18, 142));
+            addSlotToContainer(new Slot(player.inventory, x, 8 + x * 18, hotbarY));
         }
+
 
         previousItems = new ItemStack[invInput.getSizeInventory()];
         Arrays.fill(previousItems, ItemStack.EMPTY);
@@ -92,65 +130,50 @@ public class ContainerBetterCraftingTable extends Container
     @Override
     public ItemStack transferStackInSlot(EntityPlayer ignored, int index)
     {
-        ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = inventorySlots.get(index);
+        if (slot == null) return ItemStack.EMPTY;
 
-        if (slot != null && slot.getHasStack())
+        ItemStack itemstack = slot.getStack();
+        if (itemstack.isEmpty()) return ItemStack.EMPTY;
+
+
+        ItemStack itemstack1 = slot.getStack();
+        itemstack = itemstack1.copy();
+
+        if (slot instanceof BetterCraftingResultSlot) //From output
         {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
+            itemstack1.getItem().onCreated(itemstack1, player.world, player);
 
-            if (index == 0)
-            {
-                itemstack1.getItem().onCreated(itemstack1, player.world, player);
+            //To inventory or hotbar
+            if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
 
-                if (!mergeItemStack(itemstack1, 10, 46, true))
-                {
-                    return ItemStack.EMPTY;
-                }
-
-                slot.onSlotChange(itemstack1, itemstack);
-            }
-            else if (index >= 10 && index < 37)
-            {
-                if (!mergeItemStack(itemstack1, 37, 46, false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (index >= 37 && index < 46)
-            {
-                if (!mergeItemStack(itemstack1, 10, 37, false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (!mergeItemStack(itemstack1, 10, 46, false))
-            {
-                return ItemStack.EMPTY;
-            }
-
-            if (itemstack1.isEmpty())
-            {
-                slot.putStack(ItemStack.EMPTY);
-            }
-            else
-            {
-                slot.onSlotChanged();
-            }
-
-            if (itemstack1.getCount() == itemstack.getCount())
-            {
-                return ItemStack.EMPTY;
-            }
-
-            ItemStack itemstack2 = slot.onTake(player, itemstack1);
-
-            if (index == 0)
-            {
-                player.dropItem(itemstack2, false);
-            }
+            slot.onSlotChange(itemstack1, itemstack);
         }
+        else if (slot instanceof BetterCraftingGridSlot) //From crafting grid / input
+        {
+            //To inventory or hotbar
+            if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
+        }
+        else if (index >= fullInventoryStart && index <= fullInventoryEnd) //From inventory or hotbar
+        {
+            //To crafting grid / input
+            if (!mergeItemStack(itemstack1, craftingGridStartIndex, craftingGridStartIndex + craftingGridSize, false)) return ItemStack.EMPTY;
+        }
+        else
+        {
+            throw new IllegalStateException("Unsupported custom inventory detected!");
+        }
+
+
+        if (itemstack1.isEmpty()) slot.putStack(ItemStack.EMPTY);
+        else slot.onSlotChanged();
+
+        if (itemstack1.getCount() == itemstack.getCount()) return ItemStack.EMPTY;
+
+        ItemStack itemstack2 = slot.onTake(player, itemstack1);
+
+        if (index == 0) player.dropItem(itemstack2, false);
+
 
         return itemstack;
     }
