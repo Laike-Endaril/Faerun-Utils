@@ -57,6 +57,6 @@ public class BlocksAndItems
     @SubscribeEvent
     public static void modelRegistry(ModelRegistryEvent event)
     {
-        ModelLoader.setCustomModelResourceLocation(itemBetterCraftingTable, 0, new ModelResourceLocation("faerunutils:bettercraftingtable", "inventory"));
+        ModelLoader.setCustomModelResourceLocation(itemBetterCraftingTable, 0, new ModelResourceLocation("minecraft:crafting_table", "inventory"));
     }
 }

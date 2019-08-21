@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils.bettercrafting.table;
 
+import com.fantasticsource.faerunutils.FaerunUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -12,7 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GUIBetterCrafting extends GuiContainer
 {
-    private static final ResourceLocation CRAFTING_TABLE_GUI_TEXTURES = new ResourceLocation("textures/gui/container/crafting_table.png");
+    private static final ResourceLocation CRAFTING_TABLE_GUI_TEXTURES = new ResourceLocation(FaerunUtils.MODID, "textures/gui/bettercraftingtable.png");
 
     public GUIBetterCrafting()
     {
