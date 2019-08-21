@@ -11,10 +11,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Loader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static com.fantasticsource.faerunutils.FaerunUtils.faerun;
 
 public class ContainerBetterCraftingTable extends Container
 {
@@ -48,8 +49,7 @@ public class ContainerBetterCraftingTable extends Container
         craftingGridSize = invInput.getSizeInventory();
         craftingGridStartIndex = outputIndex + 1;
 
-        boolean bluerpg = Loader.isModLoaded("bluerpg");
-        if (bluerpg)
+        if (faerun)
         {
             playerInventoryWidth = 13;
             hotbarSize = 4;
