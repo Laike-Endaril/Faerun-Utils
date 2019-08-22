@@ -1,9 +1,6 @@
 package com.fantasticsource.faerunutils.bettercrafting.recipes;
 
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -19,16 +16,8 @@ public class Recipes
     public static final ArrayList<BetterRecipe> recipeList = new ArrayList<>();
 
 
-    public static final ItemStack POWDER = new ItemStack(Items.GOLD_NUGGET);
-    public static final ItemStack TOKEN = new ItemStack(Items.SLIME_BALL);
-
     public static void init()
     {
-        POWDER.setStackDisplayName("Equipment Powder Level ");
-        POWDER.setTagInfo("RepairCost", new NBTTagInt(0));
-        TOKEN.setStackDisplayName("Skin Token Level ");
-        TOKEN.setTagInfo("RepairCost", new NBTTagInt(0));
-
         MinecraftForge.EVENT_BUS.register(Recipes.class);
 
         recipeList.add(new RecipeSalvaging());

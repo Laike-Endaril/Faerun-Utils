@@ -2,16 +2,27 @@ package com.fantasticsource.faerunutils.bettercrafting.recipes;
 
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagInt;
 
 import java.util.ArrayList;
 
-import static com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes.POWDER;
-import static com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes.TOKEN;
-
 public class RecipeSalvaging extends BetterRecipe
 {
+    private static final ItemStack POWDER = new ItemStack(Items.GOLD_NUGGET);
+    private static final ItemStack TOKEN = new ItemStack(Items.SLIME_BALL);
+
+    static
+    {
+        POWDER.setStackDisplayName("Equipment Powder Level ");
+        POWDER.setTagInfo("RepairCost", new NBTTagInt(0));
+
+        TOKEN.setStackDisplayName("Skin Token Level ");
+        TOKEN.setTagInfo("RepairCost", new NBTTagInt(0));
+    }
+
     private static int getValue(String rarityName)
     {
         switch (rarityName)
