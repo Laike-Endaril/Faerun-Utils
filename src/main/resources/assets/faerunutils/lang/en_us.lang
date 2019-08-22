@@ -1,3 +1,7 @@
 itemGroup.faerunutils=Faerun Utils
 
 tile.faerunutils:bettercraftingtable.name=Better Crafting Table
+
+faerunutils:recipe.null=No Recipe
+
+faerunutils:recipe.salvage=Salvage

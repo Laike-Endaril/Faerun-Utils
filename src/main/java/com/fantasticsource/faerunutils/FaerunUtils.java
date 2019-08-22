@@ -1,15 +1,22 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
+import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistry;
 
 import java.io.IOException;
 
@@ -30,7 +37,9 @@ public class FaerunUtils
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
 
         GCMessageFixer.init();
-        Recipes.init();
+        Network.init();
+
+        Recipes.add(new RecipeSalvaging());
     }
 
     @Mod.EventHandler
@@ -43,6 +52,13 @@ public class FaerunUtils
     public static void saveConfig(ConfigChangedEvent.OnConfigChangedEvent event)
     {
         if (event.getModID().equals(MODID)) ConfigManager.sync(MODID, Config.Type.INSTANCE);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void recipeRegistry(RegistryEvent.Register<IRecipe> event)
+    {
+        ForgeRegistry recipes = (ForgeRegistry) ForgeRegistries.RECIPES;
+        for (ResourceLocation rl : (ResourceLocation[]) recipes.getKeys().toArray(new ResourceLocation[0])) recipes.remove(rl);
     }
 
 //    @SubscribeEvent

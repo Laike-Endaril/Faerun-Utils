@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils.bettercrafting.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
+import com.fantasticsource.faerunutils.Network;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.tools.Tools;
@@ -33,7 +34,7 @@ public class ContainerBetterCraftingTable extends Container
 
     public InventoryBetterCraftingInput invInput = new InventoryBetterCraftingInput(this, 3, 3);
     public InventoryBetterCraftingOutput invOutput = new InventoryBetterCraftingOutput();
-    public BetterRecipe recipe = null;
+    private BetterRecipe recipe = null;
 
     private ItemStack[] previousItems;
 
@@ -224,16 +225,16 @@ public class ContainerBetterCraftingTable extends Container
         //Determine which recipe to use
         if (recipe != null)
         {
-            if (!recipe.matches(invInput)) recipe = null;
+            if (!recipe.matches(invInput)) setRecipe(null);
         }
 
         if (recipe == null)
         {
-            for (BetterRecipe recipe : Recipes.recipeList)
+            for (BetterRecipe recipe : Recipes.recipeList.values())
             {
                 if (recipe.matches(invInput))
                 {
-                    this.recipe = recipe;
+                    setRecipe(recipe);
                     break;
                 }
             }
@@ -256,7 +257,7 @@ public class ContainerBetterCraftingTable extends Container
     public void switchRecipe(int offset)
     {
         ArrayList<BetterRecipe> validRecipes = new ArrayList<>();
-        for (BetterRecipe r : Recipes.recipeList)
+        for (BetterRecipe r : Recipes.recipeList.values())
         {
             if (r.matches(invInput)) validRecipes.add(r);
         }
@@ -266,7 +267,7 @@ public class ContainerBetterCraftingTable extends Container
 
         if (validRecipes.size() == 1)
         {
-            recipe = validRecipes.get(0);
+            setRecipe(validRecipes.get(0));
             return;
         }
 
@@ -279,6 +280,26 @@ public class ContainerBetterCraftingTable extends Container
             index = offset;
         }
 
-        recipe = validRecipes.get(Tools.posMod(index, validRecipes.size()));
+        setRecipe(validRecipes.get(Tools.posMod(index, validRecipes.size())));
+        update();
+    }
+
+    public BetterRecipe getRecipe()
+    {
+        return recipe;
+    }
+
+    public void setRecipe(BetterRecipe recipe)
+    {
+        if (!world.isRemote)
+        {
+            this.recipe = recipe;
+            Network.WRAPPER.sendTo(new Network.SetRecipePacket(recipe), (EntityPlayerMP) player);
+        }
+    }
+
+    public void setRecipe(BetterRecipe recipe, boolean fromServerPacket)
+    {
+        if (world.isRemote) this.recipe = recipe;
     }
 }

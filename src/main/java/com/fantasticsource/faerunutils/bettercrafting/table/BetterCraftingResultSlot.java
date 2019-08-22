@@ -22,9 +22,9 @@ public class BetterCraftingResultSlot extends Slot
 
     public ItemStack onTake(EntityPlayer player, ItemStack outputStack)
     {
-        if (container.recipe == null) return ItemStack.EMPTY;
+        if (container.getRecipe() == null) return ItemStack.EMPTY;
 
-        for (ItemStack stack : container.recipe.craft(container.invInput, container.invOutput))
+        for (ItemStack stack : container.getRecipe().craft(container.invInput, container.invOutput))
         {
             stack.onCrafting(player.world, player, stack.getCount());
             FMLCommonHandler.instance().firePlayerCraftingEvent(player, stack, container.invInput);

@@ -1,8 +1,10 @@
 package com.fantasticsource.faerunutils.bettercrafting.recipes;
 
+import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
+import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -46,6 +48,18 @@ public class RecipeSalvaging extends BetterRecipe
             default:
                 throw new IllegalArgumentException("Unknown rarity: " + rarityName);
         }
+    }
+
+    @Override
+    public String translationKey()
+    {
+        return FaerunUtils.MODID + ":recipe.salvage";
+    }
+
+    @Override
+    public Color color()
+    {
+        return Color.RED;
     }
 
     @Override

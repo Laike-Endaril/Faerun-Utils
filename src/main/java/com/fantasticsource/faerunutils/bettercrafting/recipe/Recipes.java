@@ -1,33 +1,24 @@
 package com.fantasticsource.faerunutils.bettercrafting.recipe;
 
-import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistry;
-
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class Recipes
 {
-    public static final ArrayList<BetterRecipe> recipeList = new ArrayList<>();
+    public static final LinkedHashMap<String, BetterRecipe> recipeList = new LinkedHashMap<>();
 
 
-    public static void init()
+    public static void add(BetterRecipe recipe)
     {
-        MinecraftForge.EVENT_BUS.register(Recipes.class);
-
-        recipeList.add(new RecipeSalvaging());
+        recipeList.put(recipe.translationKey(), recipe);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void recipeRegistry(RegistryEvent.Register<IRecipe> event)
+    public static void remove(BetterRecipe recipe)
     {
-        ForgeRegistry recipes = (ForgeRegistry) ForgeRegistries.RECIPES;
-        for (ResourceLocation rl : (ResourceLocation[]) recipes.getKeys().toArray(new ResourceLocation[0])) recipes.remove(rl);
+        recipeList.remove(recipe.translationKey());
+    }
+
+    public static BetterRecipe get(String translationKey)
+    {
+        return recipeList.get(translationKey);
     }
 }

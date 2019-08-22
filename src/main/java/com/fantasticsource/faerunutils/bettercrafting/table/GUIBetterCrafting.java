@@ -1,6 +1,8 @@
 package com.fantasticsource.faerunutils.bettercrafting.table;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
+import com.fantasticsource.faerunutils.Network;
+import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
 import com.fantasticsource.tools.Collision;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -8,6 +10,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
@@ -44,6 +47,18 @@ public class GUIBetterCrafting extends GuiContainer
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         renderHoveredToolTip(mouseX, mouseY);
+    }
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
+    {
+        //Recipe name
+        BetterRecipe recipe = ((ContainerBetterCraftingTable) inventorySlots).getRecipe();
+        if (recipe != null)
+        {
+            fontRenderer.drawString(I18n.format(recipe.translationKey()), 88, 16, recipe.color().toARGB());
+        }
+        else fontRenderer.drawString(I18n.format(FaerunUtils.MODID + ":recipe.null"), 88, 16, 0xFFFF0000);
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
@@ -115,13 +130,13 @@ public class GUIBetterCrafting extends GuiContainer
         int upY1 = y1 + 31;
         int upY2 = upY1 + 10;
 
-        if (Collision.pointRectangle(mouseX, mouseY, arrowsX1, upY1, arrowsX2, upY2)) ((ContainerBetterCraftingTable) inventorySlots).switchRecipe(-1);
+        if (Collision.pointRectangle(mouseX, mouseY, arrowsX1, upY1, arrowsX2, upY2)) Network.WRAPPER.sendToServer(new Network.ChangeRecipePacket(-1));
         else
         {
             int downY1 = upY2 + 3;
             int downY2 = downY1 + 10;
 
-            if (Collision.pointRectangle(mouseX, mouseY, arrowsX1, downY1, arrowsX2, downY2)) ((ContainerBetterCraftingTable) inventorySlots).switchRecipe(1);
+            if (Collision.pointRectangle(mouseX, mouseY, arrowsX1, downY1, arrowsX2, downY2)) Network.WRAPPER.sendToServer(new Network.ChangeRecipePacket(1));
         }
     }
 }
