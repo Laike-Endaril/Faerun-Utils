@@ -13,14 +13,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.io.IOException;
+
 import static com.fantasticsource.faerunutils.FaerunUtils.faerun;
 
 @SideOnly(Side.CLIENT)
 public class GUIBetterCrafting extends GuiContainer
 {
     private static final ResourceLocation TEXTURE = new ResourceLocation(FaerunUtils.MODID, "textures/gui/bettercraftingtable.png");
-
     private static final ResourceLocation TEXTURE_FAERUN = new ResourceLocation(FaerunUtils.MODID, "textures/gui/bettercraftingtablefaerun.png");
+
+    private static final double ARROW_V1 = 240d / 256, ARROW_V2 = 250d / 256;
+    private static final double UP_INACTIVE_U1 = 224d / 256, UP_ACTIVE_U1 = 232d / 256, DOWN_INACTIVE_U1 = 240d / 256, DOWN_ACTIVE_U1 = 248d / 256;
 
     public GUIBetterCrafting()
     {
@@ -48,17 +52,16 @@ public class GUIBetterCrafting extends GuiContainer
 
         mc.getTextureManager().bindTexture(faerun ? TEXTURE_FAERUN : TEXTURE);
 
-        int x1 = (width >> 1) - (xSize >> 1);
-        int y1 = (height >> 1) - (ySize >> 1);
-
-        int x2 = x1 + xSize;
-        int y2 = y1 + ySize;
-
-
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 
+
         //Main background
+        int x1 = (width >> 1) - (xSize >> 1);
+        int y1 = (height >> 1) - (ySize >> 1);
+        int x2 = x1 + xSize;
+        int y2 = y1 + ySize;
+
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         bufferbuilder.pos(x1, y2, zLevel).tex(0, (double) ySize / 256).endVertex();
         bufferbuilder.pos(x2, y2, zLevel).tex((double) xSize / 256, (double) ySize / 256).endVertex();
@@ -68,45 +71,57 @@ public class GUIBetterCrafting extends GuiContainer
 
 
         //Up arrow
-        x1 += 152;
-        y1 += 31;
-        x2 = x1 + 8;
-        y2 = y1 + 10;
+        int arrowsX1 = x1 + 152;
+        int arrowsX2 = arrowsX1 + 8;
+        int upY1 = y1 + 31;
+        int upY2 = upY1 + 10;
 
-        double u1;
-        if (Collision.pointRectangle(mouseX, mouseY, x1, y1, x2, y2)) u1 = 232; //active
-        else u1 = 224; //inactive
-
-        double v1 = 240, u2 = u1 + 8, v2 = v1 + 10;
-
-        u1 /= 256;
-        v1 /= 256;
-        u2 /= 256;
-        v2 /= 256;
+        double u1 = Collision.pointRectangle(mouseX, mouseY, arrowsX1, upY1, arrowsX2, upY2) ? UP_ACTIVE_U1 : UP_INACTIVE_U1;
+        double u2 = u1 + 8d / 256;
 
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-        bufferbuilder.pos(x1, y2, zLevel).tex(u1, v2).endVertex();
-        bufferbuilder.pos(x2, y2, zLevel).tex(u2, v2).endVertex();
-        bufferbuilder.pos(x2, y1, zLevel).tex(u2, v1).endVertex();
-        bufferbuilder.pos(x1, y1, zLevel).tex(u1, v1).endVertex();
+        bufferbuilder.pos(arrowsX1, upY2, zLevel).tex(u1, ARROW_V2).endVertex();
+        bufferbuilder.pos(arrowsX2, upY2, zLevel).tex(u2, ARROW_V2).endVertex();
+        bufferbuilder.pos(arrowsX2, upY1, zLevel).tex(u2, ARROW_V1).endVertex();
+        bufferbuilder.pos(arrowsX1, upY1, zLevel).tex(u1, ARROW_V1).endVertex();
         tessellator.draw();
 
 
         //Down arrow
-        y1 += 13;
-        y2 += 13;
+        int downY1 = upY2 + 3;
+        int downY2 = downY1 + 10;
 
-        if (Collision.pointRectangle(mouseX, mouseY, x1, y1, x2, y2)) u1 = 248; //active
-        else u1 = 240; //inactive
-
-        u2 = (u1 + 8) / 256;
-        u1 /= 256;
+        u1 = Collision.pointRectangle(mouseX, mouseY, arrowsX1, downY1, arrowsX2, downY2) ? DOWN_ACTIVE_U1 : DOWN_INACTIVE_U1;
+        u2 = u1 + 8d / 256;
 
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-        bufferbuilder.pos(x1, y2, zLevel).tex(u1, v2).endVertex();
-        bufferbuilder.pos(x2, y2, zLevel).tex(u2, v2).endVertex();
-        bufferbuilder.pos(x2, y1, zLevel).tex(u2, v1).endVertex();
-        bufferbuilder.pos(x1, y1, zLevel).tex(u1, v1).endVertex();
+        bufferbuilder.pos(arrowsX1, downY2, zLevel).tex(u1, ARROW_V2).endVertex();
+        bufferbuilder.pos(arrowsX2, downY2, zLevel).tex(u2, ARROW_V2).endVertex();
+        bufferbuilder.pos(arrowsX2, downY1, zLevel).tex(u2, ARROW_V1).endVertex();
+        bufferbuilder.pos(arrowsX1, downY1, zLevel).tex(u1, ARROW_V1).endVertex();
         tessellator.draw();
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        int x1 = (width >> 1) - (xSize >> 1);
+        int y1 = (height >> 1) - (ySize >> 1);
+
+        int arrowsX1 = x1 + 152;
+        int arrowsX2 = arrowsX1 + 8;
+        int upY1 = y1 + 31;
+        int upY2 = upY1 + 10;
+
+        if (Collision.pointRectangle(mouseX, mouseY, arrowsX1, upY1, arrowsX2, upY2)) ((ContainerBetterCraftingTable) inventorySlots).switchRecipe(-1);
+        else
+        {
+            int downY1 = upY2 + 3;
+            int downY2 = downY1 + 10;
+
+            if (Collision.pointRectangle(mouseX, mouseY, arrowsX1, downY1, arrowsX2, downY2)) ((ContainerBetterCraftingTable) inventorySlots).switchRecipe(1);
+        }
     }
 }

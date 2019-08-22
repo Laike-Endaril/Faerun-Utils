@@ -3,6 +3,7 @@ package com.fantasticsource.faerunutils.bettercrafting.table;
 import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.BetterRecipe;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -250,5 +251,24 @@ public class ContainerBetterCraftingTable extends Container
         {
             ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, index + 1, invInput.stackList.get(index)));
         }
+    }
+
+    public void switchRecipe(int offset)
+    {
+        ArrayList<BetterRecipe> validRecipes = new ArrayList<>();
+        for (BetterRecipe r : Recipes.recipeList)
+        {
+            if (r.matches(invInput)) validRecipes.add(r);
+        }
+
+        int index = validRecipes.indexOf(recipe);
+        if (index >= 0) index += offset;
+        else
+        {
+            if (offset > 0) offset--;
+            index = offset;
+        }
+
+        recipe = validRecipes.get(Tools.posMod(index, validRecipes.size()));
     }
 }
