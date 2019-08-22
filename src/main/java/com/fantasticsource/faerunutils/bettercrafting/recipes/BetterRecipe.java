@@ -8,8 +8,6 @@ import java.util.ArrayList;
 
 public abstract class BetterRecipe
 {
-    public static final ArrayList<BetterRecipe> betterRecipes = new ArrayList<>();
-
     /**
      * Unlike the vanilla version, this is *only* for checking whether a recipe matches, not for caching.  Do not save any data from within this method!
      */

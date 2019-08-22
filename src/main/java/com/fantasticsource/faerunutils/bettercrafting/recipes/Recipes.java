@@ -12,8 +12,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
 
+import java.util.ArrayList;
+
 public class Recipes
 {
+    public static final ArrayList<BetterRecipe> recipeList = new ArrayList<>();
+
+
     public static final ItemStack POWDER = new ItemStack(Items.GOLD_NUGGET);
     public static final ItemStack TOKEN = new ItemStack(Items.SLIME_BALL);
 
@@ -26,7 +31,7 @@ public class Recipes
 
         MinecraftForge.EVENT_BUS.register(Recipes.class);
 
-        BetterRecipe.betterRecipes.add(new RecipeSalvaging());
+        recipeList.add(new RecipeSalvaging());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

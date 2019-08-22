@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.bettercrafting.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.BetterRecipe;
+import com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -227,7 +228,7 @@ public class ContainerBetterCraftingTable extends Container
 
         if (recipe == null)
         {
-            for (BetterRecipe recipe : BetterRecipe.betterRecipes)
+            for (BetterRecipe recipe : Recipes.recipeList)
             {
                 if (recipe.matches(invInput))
                 {
