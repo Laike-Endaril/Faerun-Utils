@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils.bettercrafting.recipes;
 
+import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
 import net.minecraft.init.Items;

@@ -1,4 +1,4 @@
-package com.fantasticsource.faerunutils.bettercrafting.recipes;
+package com.fantasticsource.faerunutils.bettercrafting.recipe;
 
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;

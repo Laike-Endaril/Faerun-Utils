@@ -1,8 +1,8 @@
 package com.fantasticsource.faerunutils.bettercrafting.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
-import com.fantasticsource.faerunutils.bettercrafting.recipes.BetterRecipe;
-import com.fantasticsource.faerunutils.bettercrafting.recipes.Recipes;
+import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
+import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -260,6 +260,16 @@ public class ContainerBetterCraftingTable extends Container
         {
             if (r.matches(invInput)) validRecipes.add(r);
         }
+
+
+        if (validRecipes.size() == 0) return;
+
+        if (validRecipes.size() == 1)
+        {
+            recipe = validRecipes.get(0);
+            return;
+        }
+
 
         int index = validRecipes.indexOf(recipe);
         if (index >= 0) index += offset;

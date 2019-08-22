@@ -1,5 +1,6 @@
-package com.fantasticsource.faerunutils.bettercrafting.recipes;
+package com.fantasticsource.faerunutils.bettercrafting.recipe;
 
+import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
