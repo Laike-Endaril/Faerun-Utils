@@ -3,6 +3,7 @@ package com.fantasticsource.faerunutils.bettercrafting.table;
 import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.faerunutils.Network;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
+import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.tools.Collision;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -54,11 +55,9 @@ public class GUIBetterCrafting extends GuiContainer
     {
         //Recipe name
         BetterRecipe recipe = ((ContainerBetterCraftingTable) inventorySlots).getRecipe();
-        if (recipe != null)
-        {
-            fontRenderer.drawString(I18n.format(recipe.translationKey()), 88, 16, recipe.color().toARGB());
-        }
-        else fontRenderer.drawString(I18n.format(FaerunUtils.MODID + ":recipe.null"), 88, 16, 0xFFFF0000);
+        if (recipe == null) recipe = Recipes.NULL;
+
+        fontRenderer.drawString(I18n.format(recipe.translationKey()), 88, 16, recipe.color().toARGB());
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)

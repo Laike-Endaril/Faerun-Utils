@@ -97,7 +97,8 @@ public class Network
         @Override
         public void toBytes(ByteBuf buf)
         {
-            ByteBufUtils.writeUTF8String(buf, recipe == null ? FaerunUtils.MODID + ":recipe.null" : recipe.translationKey());
+            if (recipe == null) recipe = Recipes.NULL;
+            ByteBufUtils.writeUTF8String(buf, recipe.translationKey());
         }
 
         @Override
