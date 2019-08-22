@@ -44,4 +44,18 @@ public class FaerunUtils
     {
         if (event.getModID().equals(MODID)) ConfigManager.sync(MODID, Config.Type.INSTANCE);
     }
+
+//    @SubscribeEvent
+//    public static void entityJoin(EntityJoinWorldEvent event)
+//    {
+//        if (event.getEntity() instanceof EntityItem)
+//        {
+//            EntityItem item = (EntityItem) event.getEntity();
+//
+//            if (item.getItem().getItem() == Items.DIAMOND_CHESTPLATE || item.getItem().getItem() == Items.DIAMOND_SWORD)
+//            {
+//                item.setDead();
+//            }
+//        }
+//    }
 }
