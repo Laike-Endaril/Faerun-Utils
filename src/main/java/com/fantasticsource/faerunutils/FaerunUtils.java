@@ -3,12 +3,17 @@ package com.fantasticsource.faerunutils;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepair;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -63,17 +68,20 @@ public class FaerunUtils
         for (ResourceLocation rl : (ResourceLocation[]) recipes.getKeys().toArray(new ResourceLocation[0])) recipes.remove(rl);
     }
 
-//    @SubscribeEvent
-//    public static void entityJoin(EntityJoinWorldEvent event)
-//    {
-//        if (event.getEntity() instanceof EntityItem)
-//        {
-//            EntityItem item = (EntityItem) event.getEntity();
-//
-//            if (item.getItem().getItem() == Items.DIAMOND_CHESTPLATE || item.getItem().getItem() == Items.DIAMOND_SWORD)
-//            {
-//                item.setDead();
-//            }
-//        }
-//    }
+    @SubscribeEvent
+    public static void entityJoin(EntityJoinWorldEvent event)
+    {
+        Entity entity = event.getEntity();
+        //Prevent entities from nudging player
+        if (entity instanceof EntityPlayer) entity.entityCollisionReduction = 1;
+        else if (!event.getWorld().isRemote)
+        {
+            if (event.getEntity() instanceof EntityItem)
+            {
+                EntityItem item = (EntityItem) event.getEntity();
+
+                if (item.getItem().getItem() == Items.DIAMOND_CHESTPLATE || item.getItem().getItem() == Items.DIAMOND_SWORD) item.lifespan = 1800;
+            }
+        }
+    }
 }
