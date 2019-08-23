@@ -4,8 +4,8 @@ import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepair;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
@@ -31,7 +31,7 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.003";
+    public static final String VERSION = "1.12.2.003a";
 
     public static boolean faerun;
 
@@ -72,8 +72,8 @@ public class FaerunUtils
     public static void entityJoin(EntityJoinWorldEvent event)
     {
         Entity entity = event.getEntity();
-        //Prevent entities from nudging player
-        if (entity instanceof EntityPlayer) entity.entityCollisionReduction = 1;
+        //Prevent entities from nudging each other
+        if (entity instanceof EntityLivingBase) entity.entityCollisionReduction = 1;
         else if (!event.getWorld().isRemote)
         {
             if (event.getEntity() instanceof EntityItem)
