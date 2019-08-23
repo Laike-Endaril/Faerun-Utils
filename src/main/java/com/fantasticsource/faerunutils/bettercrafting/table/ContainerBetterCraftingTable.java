@@ -300,6 +300,12 @@ public class ContainerBetterCraftingTable extends Container
 
     public void setRecipe(BetterRecipe recipe, boolean fromServerPacket)
     {
-        if (world.isRemote) this.recipe = recipe;
+        if (world.isRemote)
+        {
+            if (recipe == null) recipe = Recipes.NULL;
+            this.recipe = recipe;
+
+            recipe.preview(invInput, invOutput);
+        }
     }
 }

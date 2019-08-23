@@ -26,9 +26,9 @@ public class RecipeSalvaging extends BetterRecipe
         TOKEN.setTagInfo("RepairCost", new NBTTagInt(0));
     }
 
-    private static int getValue(String rarityName)
+    private static int getValue(String rarity)
     {
-        switch (rarityName)
+        switch (rarity)
         {
             case "COMMON":
             case "UNCOMMON":
@@ -46,7 +46,7 @@ public class RecipeSalvaging extends BetterRecipe
                 return 10;
 
             default:
-                throw new IllegalArgumentException("Unknown rarity: " + rarityName);
+                throw new IllegalArgumentException("Unknown rarity: " + rarity);
         }
     }
 
@@ -205,7 +205,7 @@ public class RecipeSalvaging extends BetterRecipe
 
 
             String name = stack.getDisplayName();
-            int lvl = 0;
+            int lvl;
             if (stack.getItem() == TOKEN.getItem())
             {
                 lvl = Integer.parseInt(name.replace(TOKEN.getDisplayName(), ""));

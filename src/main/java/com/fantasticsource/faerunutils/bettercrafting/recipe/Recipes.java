@@ -36,6 +36,7 @@ public class Recipes
         @Override
         public void preview(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
         {
+            out.setInventorySlotContents(0, ItemStack.EMPTY);
         }
 
         @Override

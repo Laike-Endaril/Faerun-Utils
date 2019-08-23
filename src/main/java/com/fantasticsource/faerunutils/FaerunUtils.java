@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
+import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepair;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
@@ -20,7 +21,7 @@ import net.minecraftforge.registries.ForgeRegistry;
 
 import java.io.IOException;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021a,)")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021c,)")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
@@ -39,6 +40,7 @@ public class FaerunUtils
         GCMessageFixer.init();
         Network.init();
 
+        Recipes.add(new RecipeRepair());
         Recipes.add(new RecipeSalvaging());
     }
 
