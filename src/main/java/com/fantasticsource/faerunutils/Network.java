@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Network
 {
@@ -110,6 +111,7 @@ public class Network
 
     public static class SetRecipePacketHandler implements IMessageHandler<SetRecipePacket, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(SetRecipePacket packet, MessageContext ctx)
         {
