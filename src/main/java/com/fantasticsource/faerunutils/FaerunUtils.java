@@ -92,12 +92,17 @@ public class FaerunUtils
     @SubscribeEvent
     public static void playerInteractEntity(PlayerInteractEvent.EntityInteractSpecific event)
     {
-        //Fix yaw and pitch when mounting an entity
+        EntityPlayer player = event.getEntityPlayer();
         Entity other = event.getTarget();
-        if (other instanceof EntityLivingBase && other instanceof IJumpingMount)
+        if (other instanceof EntityLivingBase && other instanceof IJumpingMount && other.getPassengers().size() == 0)
         {
-            EntityPlayer player = event.getEntityPlayer();
+            //Fix yaw and pitch when mounting an entity
             other.setLocationAndAngles(other.posX, other.posY, other.posZ, player.rotationYawHead, player.rotationPitch);
+        }
+        else if (player.isRiding())
+        {
+            //Dismount players on interact
+            player.dismountRidingEntity();
         }
     }
 }
