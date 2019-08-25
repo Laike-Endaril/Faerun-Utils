@@ -4,6 +4,7 @@ import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
+import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Color;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -91,6 +92,23 @@ public class RecipeSalvaging extends BetterRecipe
                     if (c < '0' || c > '9') return false;
                 }
             }
+            else if (stack.getItem().getRegistryName().toString().equals("armourers_workshop:item.skin"))
+            {
+                String[] tokens = Tools.fixedSplit(name, " ");
+                if (!tokens[0].equals("[Skin]")) return false;
+
+                if (!tokens[1].equals("Mod"))
+                {
+                    try
+                    {
+                        Integer.parseInt(tokens[tokens.length - 1]);
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        return false;
+                    }
+                }
+            }
             else
             {
                 NBTTagCompound compound = stack.serializeNBT();
@@ -162,6 +180,25 @@ public class RecipeSalvaging extends BetterRecipe
                 }
                 else quantity += stack.getCount();
             }
+            else if (stack.getItem().getRegistryName().toString().equals("armourers_workshop:item.skin"))
+            {
+                String[] tokens = Tools.fixedSplit(name, " ");
+
+                lvl = 5; //"Mod" skins are level 5
+                if (!tokens[1].equals("Mod"))
+                {
+                    lvl = Tools.max(1, Integer.parseInt(tokens[tokens.length - 1]) - 7);
+                }
+
+                if (lvl < maxLvl) continue;
+
+                if (lvl > maxLvl)
+                {
+                    maxLvl = lvl;
+                    quantity = 2;
+                }
+                else quantity += 3;
+            }
             else
             {
                 NBTTagCompound statsTag = stack.serializeNBT().getCompoundTag("ForgeCaps").getCompoundTag("Parent").getCompoundTag("bluerpg:gear_stats");
@@ -216,6 +253,19 @@ public class RecipeSalvaging extends BetterRecipe
             else if (stack.getItem() == POWDER.getItem())
             {
                 lvl = Integer.parseInt(name.replace(POWDER.getDisplayName(), ""));
+
+                if (quantities[lvl] == 0) freeSlots--;
+                quantities[lvl] += stack.getCount();
+            }
+            else if (stack.getItem().getRegistryName().toString().equals("armourers_workshop:item.skin"))
+            {
+                String[] tokens = Tools.fixedSplit(name, " ");
+
+                lvl = 5; //"Mod" skins are level 5
+                if (!tokens[1].equals("Mod"))
+                {
+                    lvl = Tools.max(1, Integer.parseInt(tokens[tokens.length - 1]) - 7);
+                }
 
                 if (quantities[lvl] == 0) freeSlots--;
                 quantities[lvl] += stack.getCount();
