@@ -5,7 +5,9 @@ import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepair;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IJumpingMount;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
@@ -14,6 +16,7 @@ import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -76,12 +79,25 @@ public class FaerunUtils
         if (entity instanceof EntityLivingBase) entity.entityCollisionReduction = 1;
         else if (!event.getWorld().isRemote)
         {
+            //Reduce lifespan of diamond swords and chestplates
             if (event.getEntity() instanceof EntityItem)
             {
                 EntityItem item = (EntityItem) event.getEntity();
 
                 if (item.getItem().getItem() == Items.DIAMOND_CHESTPLATE || item.getItem().getItem() == Items.DIAMOND_SWORD) item.lifespan = 1800;
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void playerInteractEntity(PlayerInteractEvent.EntityInteractSpecific event)
+    {
+        //Fix yaw and pitch when mounting an entity
+        Entity other = event.getTarget();
+        if (other instanceof EntityLivingBase && other instanceof IJumpingMount)
+        {
+            EntityPlayer player = event.getEntityPlayer();
+            other.setLocationAndAngles(other.posX, other.posY, other.posZ, player.rotationYawHead, player.rotationPitch);
         }
     }
 }
