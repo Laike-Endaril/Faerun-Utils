@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import static com.fantasticsource.faerunutils.FaerunUtilsConfig.gcMessageMode;
+
 public class GCMessageFixer
 {
     private static final int DELAY = 20;
@@ -73,7 +75,7 @@ public class GCMessageFixer
     @SubscribeEvent
     public static void update(TickEvent.ServerTickEvent event) throws IOException
     {
-        if (omnipotence)
+        if (gcMessageMode >= 1 && omnipotence)
         {
             if (++omniTimer == 20) //1 second after last processLine() call
             {
@@ -106,7 +108,7 @@ public class GCMessageFixer
 
     private static void processLine()
     {
-        System.out.println(current);
+        if (gcMessageMode == 2) System.out.println(current);
         current = new StringBuilder();
         if (omnipotence) omniTimer = 0;
     }
