@@ -15,5 +15,9 @@ public class DamageBlocker
         {
             event.setCanceled(true);
         }
+        else if (source == DamageSource.IN_WALL)
+        {
+            if (event.getEntityLiving().getRidingEntity() != null) event.setCanceled(true);
+        }
     }
 }
