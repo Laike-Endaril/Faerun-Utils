@@ -37,6 +37,7 @@ public class ContainerBetterCraftingTable extends Container
     private BetterRecipe recipe = null;
 
     private ItemStack[] previousItems;
+    private BetterRecipe previousRecipe = null;
 
 
     public ContainerBetterCraftingTable(EntityPlayer player, World world, BlockPos position)
@@ -189,6 +190,11 @@ public class ContainerBetterCraftingTable extends Container
 
     public void update()
     {
+        update(false);
+    }
+
+    public void update(boolean actionChange)
+    {
         if (player.world.isRemote) return;
 
 
@@ -196,30 +202,37 @@ public class ContainerBetterCraftingTable extends Container
         //If same, return
         //If different, track changed indices and update item snapshot
         ArrayList<Integer> changedIndices = new ArrayList<>();
-        int i = 0;
-        for (ItemStack stack : invInput.stackList)
+        if (actionChange)
         {
-            ItemStack previous = previousItems[i];
-            if (previous.isEmpty() && stack.isEmpty())
+            if (DEBUG) System.out.println("Action Change");
+        }
+        else
+        {
+            int i = 0;
+            for (ItemStack stack : invInput.stackList)
             {
-                i++;
-                continue;
-            }
+                ItemStack previous = previousItems[i];
+                if (previous.isEmpty() && stack.isEmpty())
+                {
+                    i++;
+                    continue;
+                }
 
-            if (previous.getItem() != stack.getItem() || previous.getCount() != stack.getCount() || previous.getItemDamage() != stack.getItemDamage() || !previous.getDisplayName().equals(stack.getDisplayName()) || !previous.serializeNBT().toString().equals(stack.serializeNBT().toString()))
-            {
-                changedIndices.add(i);
-                if (DEBUG) System.out.println(i + ": " + previous + " -> " + stack);
-                previousItems[i] = stack.copy();
+                if (previous.getItem() != stack.getItem() || previous.getCount() != stack.getCount() || previous.getItemDamage() != stack.getItemDamage() || !previous.getDisplayName().equals(stack.getDisplayName()) || !previous.serializeNBT().toString().equals(stack.serializeNBT().toString()))
+                {
+                    changedIndices.add(i);
+                    if (DEBUG) System.out.println(i + ": " + previous + " -> " + stack);
+                    previousItems[i] = stack.copy();
+                }
+                i++;
             }
-            i++;
+            if (changedIndices.size() == 0)
+            {
+                if (DEBUG) System.out.println("Unchanged");
+                return;
+            }
+            if (DEBUG) System.out.println("Changed");
         }
-        if (changedIndices.size() == 0)
-        {
-            if (DEBUG) System.out.println("Unchanged");
-            return;
-        }
-        if (DEBUG) System.out.println("Changed");
 
 
         //Determine which recipe to use
@@ -281,7 +294,7 @@ public class ContainerBetterCraftingTable extends Container
         }
 
         setRecipe(validRecipes.get(Tools.posMod(index, validRecipes.size())));
-        update();
+        update(true);
     }
 
     public BetterRecipe getRecipe()
