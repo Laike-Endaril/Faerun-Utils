@@ -99,6 +99,7 @@ public class RecipeSalvaging extends BetterRecipe
 
                 if (!tokens[1].equals("Mod"))
                 {
+                    if (tokens[tokens.length - 1].equals("R") || tokens[tokens.length - 1].equals("L")) tokens[tokens.length - 1] = tokens[tokens.length - 2]; //Shoulders have L or R after number
                     try
                     {
                         Integer.parseInt(tokens[tokens.length - 1]);
@@ -156,62 +157,52 @@ public class RecipeSalvaging extends BetterRecipe
 
             String name = stack.getDisplayName();
             int lvl;
+            int q;
             if (stack.getItem() == TOKEN.getItem())
             {
                 lvl = Integer.parseInt(name.replace(TOKEN.getDisplayName(), ""));
-                if (lvl < maxLvl) continue;
-
-                if (lvl > maxLvl)
-                {
-                    maxLvl = lvl;
-                    quantity = stack.getCount() * 9;
-                }
-                else quantity += stack.getCount() * 9;
+                q = stack.getCount() * 9;
             }
             else if (stack.getItem() == POWDER.getItem())
             {
                 lvl = Integer.parseInt(name.replace(POWDER.getDisplayName(), ""));
-                if (lvl < maxLvl) continue;
-
-                if (lvl > maxLvl)
-                {
-                    maxLvl = lvl;
-                    quantity = stack.getCount();
-                }
-                else quantity += stack.getCount();
+                q = stack.getCount();
             }
             else if (stack.getItem().getRegistryName().toString().equals("armourers_workshop:item.skin"))
             {
                 String[] tokens = Tools.fixedSplit(name, " ");
 
                 lvl = 5; //"Mod" skins are level 5
+                q = 2;
+
                 if (!tokens[1].equals("Mod"))
                 {
+                    if (tokens[tokens.length - 1].equals("R") || tokens[tokens.length - 1].equals("L"))
+                    {
+                        //Shoulders have L or R after number
+                        q = 1;
+                        tokens[tokens.length - 1] = tokens[tokens.length - 2];
+                    }
                     lvl = Tools.max(1, Integer.parseInt(tokens[tokens.length - 1]) - 7);
                 }
-
-                if (lvl < maxLvl) continue;
-
-                if (lvl > maxLvl)
-                {
-                    maxLvl = lvl;
-                    quantity = 2;
-                }
-                else quantity += 3;
             }
             else
             {
                 NBTTagCompound statsTag = stack.serializeNBT().getCompoundTag("ForgeCaps").getCompoundTag("Parent").getCompoundTag("bluerpg:gear_stats");
-                lvl = statsTag.getInteger("ilvl");
-                if (lvl < maxLvl) continue;
 
-                if (lvl > maxLvl)
-                {
-                    maxLvl = lvl;
-                    quantity = getValue(statsTag.getString("rarity"));
-                }
-                else quantity += getValue(statsTag.getString("rarity"));
+                lvl = statsTag.getInteger("ilvl");
+                q = getValue(statsTag.getString("rarity"));
             }
+
+
+            if (lvl < maxLvl) continue;
+
+            if (lvl > maxLvl)
+            {
+                maxLvl = lvl;
+                quantity = q;
+            }
+            else quantity += q;
         }
 
         if (quantity >= 9)
@@ -261,14 +252,21 @@ public class RecipeSalvaging extends BetterRecipe
             {
                 String[] tokens = Tools.fixedSplit(name, " ");
 
+                int q = 2;
                 lvl = 5; //"Mod" skins are level 5
                 if (!tokens[1].equals("Mod"))
                 {
+                    if (tokens[tokens.length - 1].equals("R") || tokens[tokens.length - 1].equals("L"))
+                    {
+                        //Shoulders have L or R after number
+                        q = 1;
+                        tokens[tokens.length - 1] = tokens[tokens.length - 2];
+                    }
                     lvl = Tools.max(1, Integer.parseInt(tokens[tokens.length - 1]) - 7);
                 }
 
                 if (quantities[lvl] == 0) freeSlots--;
-                quantities[lvl] += stack.getCount();
+                quantities[lvl] += q;
             }
             else
             {
