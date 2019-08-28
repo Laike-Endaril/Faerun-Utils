@@ -32,19 +32,25 @@ public class RecipeSalvaging extends BetterRecipe
         switch (rarity)
         {
             case "COMMON":
-            case "UNCOMMON":
                 return 1;
 
+            case "UNCOMMON":
+                return 2;
+
             case "RARE":
-            case "EPIC":
                 return 3;
 
+            case "EPIC":
+                return 6;
+
             case "LEGENDARY":
+                return 18;
+
             case "MYTHIC":
-                return 5;
+                return 27;
 
             case "GODLIKE":
-                return 10;
+                return 36;
 
             default:
                 throw new IllegalArgumentException("Unknown rarity: " + rarity);
