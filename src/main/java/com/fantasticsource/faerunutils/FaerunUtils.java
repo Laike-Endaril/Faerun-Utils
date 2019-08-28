@@ -4,6 +4,8 @@ import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepair;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSell;
+import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IJumpingMount;
@@ -11,6 +13,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
@@ -19,25 +22,30 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
 
+import java.io.File;
 import java.io.IOException;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021c,)", acceptableRemoteVersions = "[1.12.2.003," + FaerunUtils.VERSION + "]")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021d,)", acceptableRemoteVersions = "[1.12.2.003," + FaerunUtils.VERSION + "]")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.003h";
+    public static final String VERSION = "1.12.2.003i";
 
     public static boolean faerun;
+
+    private static double firstX, firstY, firstZ;
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event) throws IOException
@@ -60,6 +68,23 @@ public class FaerunUtils
             Recipes.add(new RecipeRepair());
             Recipes.add(new RecipeSalvaging());
             Recipes.add(new RecipeSell());
+        }
+
+        String[] tokens = Tools.fixedSplit(FaerunUtilsConfig.firstTimeSpawn, ",");
+        if (tokens.length == 3)
+        {
+            try
+            {
+                firstX = Double.parseDouble(tokens[0]);
+                firstY = Double.parseDouble(tokens[1]);
+                firstZ = Double.parseDouble(tokens[2]);
+            }
+            catch (NumberFormatException e)
+            {
+                firstX = Double.NaN;
+                firstY = Double.NaN;
+                firstZ = Double.NaN;
+            }
         }
     }
 
@@ -108,6 +133,25 @@ public class FaerunUtils
         {
             //Dismount players on interact
             player.dismountRidingEntity();
+        }
+    }
+
+    @SubscribeEvent
+    public static void playerJoin(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        File file = new File(MCTools.getDataDir(FMLCommonHandler.instance().getMinecraftServerInstance()) + ".." + File.separator + "playerdata");
+        boolean doIt = !file.exists();
+        if (!doIt)
+        {
+            file = new File(file.getAbsolutePath() + File.separator + event.player.getPersistentID() + ".dat");
+            doIt = !file.exists();
+        }
+
+        if (doIt)
+        {
+            //Very first time this player has logged into the server
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            if (!Double.isNaN(firstX)) server.commandManager.executeCommand(server, "/tp " + event.player.getName() + " " + firstX + " " + firstY + " " + firstZ);
         }
     }
 }
