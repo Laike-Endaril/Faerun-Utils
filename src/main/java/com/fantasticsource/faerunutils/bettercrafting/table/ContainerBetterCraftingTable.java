@@ -4,6 +4,7 @@ import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.Network;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
+import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSell;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -37,7 +38,8 @@ public class ContainerBetterCraftingTable extends Container
     private BetterRecipe recipe = null;
 
     private ItemStack[] previousItems;
-    private BetterRecipe previousRecipe = null;
+
+    public int count = 0;
 
 
     public ContainerBetterCraftingTable(EntityPlayer player, World world, BlockPos position)
@@ -146,12 +148,16 @@ public class ContainerBetterCraftingTable extends Container
 
         if (slot instanceof BetterCraftingResultSlot) //From output
         {
-            itemstack1.getItem().onCreated(itemstack1, player.world, player);
+            if (recipe instanceof RecipeSell) recipe.craft(invInput, invOutput, itemstack1);
+            else
+            {
+                itemstack1.getItem().onCreated(itemstack1, player.world, player);
 
-            //To inventory or hotbar
-            if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
+                //To inventory or hotbar
+                if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
 
-            slot.onSlotChange(itemstack1, itemstack);
+                slot.onSlotChange(itemstack1, itemstack);
+            }
         }
         else if (slot instanceof BetterCraftingGridSlot) //From crafting grid / input
         {
@@ -265,6 +271,9 @@ public class ContainerBetterCraftingTable extends Container
         {
             ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, index + 1, invInput.stackList.get(index)));
         }
+
+        //For higher-than-byte stack sizes in output
+        Network.WRAPPER.sendTo(new Network.RecipeOutputCountPacket(invOutput.getStackInSlot(0).getCount()), (EntityPlayerMP) player);
     }
 
     public void switchRecipe(int offset)

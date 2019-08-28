@@ -222,7 +222,7 @@ public class RecipeSalvaging extends BetterRecipe
     }
 
     @Override
-    public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
+    public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, ItemStack grabbedStack)
     {
         int maxLvl = 0;
         int[] quantities = new int[100];

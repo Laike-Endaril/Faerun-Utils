@@ -183,7 +183,7 @@ public class RecipeRepair extends BetterRecipe
     }
 
     @Override
-    public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
+    public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, ItemStack grabbedStack)
     {
         for (int i = in.getSizeInventory() - 1; i >= 0; i--)
         {

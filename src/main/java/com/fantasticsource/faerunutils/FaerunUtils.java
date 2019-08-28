@@ -3,6 +3,7 @@ package com.fantasticsource.faerunutils;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepair;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
+import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSell;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IJumpingMount;
@@ -34,7 +35,7 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.003g";
+    public static final String VERSION = "1.12.2.003h";
 
     public static boolean faerun;
 
@@ -47,15 +48,19 @@ public class FaerunUtils
 
         GCMessageFixer.init();
         Network.init();
-
-        Recipes.add(new RecipeRepair());
-        Recipes.add(new RecipeSalvaging());
     }
 
     @Mod.EventHandler
     public static void postInit(FMLPostInitializationEvent event)
     {
         faerun = Loader.isModLoaded("bluerpg");
+
+        if (faerun)
+        {
+            Recipes.add(new RecipeRepair());
+            Recipes.add(new RecipeSalvaging());
+            Recipes.add(new RecipeSell());
+        }
     }
 
     @SubscribeEvent

@@ -28,6 +28,59 @@ public class Network
     {
         WRAPPER.registerMessage(ChangeRecipePacketHandler.class, ChangeRecipePacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(SetRecipePacketHandler.class, SetRecipePacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(RecipeOutputCountPacketHandler.class, RecipeOutputCountPacket.class, discriminator++, Side.CLIENT);
+    }
+
+
+    public static class RecipeOutputCountPacket implements IMessage
+    {
+        int count;
+
+        public RecipeOutputCountPacket()
+        {
+            //Required
+        }
+
+        public RecipeOutputCountPacket(int count)
+        {
+            this.count = count;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeInt(count);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            count = buf.readInt();
+        }
+    }
+
+    public static class RecipeOutputCountPacketHandler implements IMessageHandler<RecipeOutputCountPacket, IMessage>
+    {
+        @SideOnly(Side.CLIENT)
+        @Override
+        public IMessage onMessage(RecipeOutputCountPacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft.getMinecraft().addScheduledTask(() ->
+                {
+                    EntityPlayer player = Minecraft.getMinecraft().player;
+                    if (player == null) return;
+
+                    Container container = player.openContainer;
+                    if (!(container instanceof ContainerBetterCraftingTable)) return;
+
+                    ((ContainerBetterCraftingTable) container).invOutput.getStackInSlot(0).setCount(packet.count);
+                });
+            }
+
+            return null;
+        }
     }
 
 
@@ -80,6 +133,7 @@ public class Network
             return null;
         }
     }
+
 
     public static class SetRecipePacket implements IMessage
     {

@@ -40,7 +40,7 @@ public class Recipes
         }
 
         @Override
-        public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
+        public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, ItemStack grabbedStack)
         {
             return new ArrayList<>();
         }

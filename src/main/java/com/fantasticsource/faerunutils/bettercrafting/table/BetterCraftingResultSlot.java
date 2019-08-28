@@ -20,11 +20,11 @@ public class BetterCraftingResultSlot extends Slot
         return false;
     }
 
-    public ItemStack onTake(EntityPlayer player, ItemStack outputStack)
+    public ItemStack onTake(EntityPlayer player, ItemStack grabbedStack)
     {
         if (container.getRecipe() == null) return ItemStack.EMPTY;
 
-        for (ItemStack stack : container.getRecipe().craft(container.invInput, container.invOutput))
+        for (ItemStack stack : container.getRecipe().craft(container.invInput, container.invOutput, grabbedStack))
         {
             stack.onCrafting(player.world, player, stack.getCount());
             FMLCommonHandler.instance().firePlayerCraftingEvent(player, stack, container.invInput);
@@ -32,6 +32,6 @@ public class BetterCraftingResultSlot extends Slot
 
         container.update();
 
-        return outputStack;
+        return grabbedStack;
     }
 }

@@ -32,5 +32,5 @@ public abstract class BetterRecipe
     /**
      * This should only ever be called when the item in the output is removed
      */
-    abstract public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out);
+    abstract public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, ItemStack grabbedStack);
 }

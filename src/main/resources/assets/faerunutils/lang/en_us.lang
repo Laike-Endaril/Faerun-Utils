@@ -6,3 +6,4 @@ faerunutils:recipe.null=No Recipe
 
 faerunutils:recipe.salvage=Salvage
 faerunutils:recipe.repair=Repair
+faerunutils:recipe.sell=Sell
