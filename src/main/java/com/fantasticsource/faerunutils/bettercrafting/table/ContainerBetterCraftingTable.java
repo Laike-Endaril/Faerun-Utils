@@ -106,6 +106,80 @@ public class ContainerBetterCraftingTable extends Container
         Arrays.fill(previousItems, ItemStack.EMPTY);
     }
 
+    protected ArrayList<Integer> mergeItemStackBetter(ItemStack stack, int startIndex, int endIndex)
+    {
+        ArrayList<Integer> result = new ArrayList<>();
+
+        int i = startIndex;
+
+        if (stack.isStackable())
+        {
+            while (!stack.isEmpty())
+            {
+                if (i >= endIndex) break;
+
+                Slot slot = inventorySlots.get(i);
+                ItemStack itemstack = slot.getStack();
+
+                if (!itemstack.isEmpty() && itemstack.getItem() == stack.getItem() && (!stack.getHasSubtypes() || stack.getMetadata() == itemstack.getMetadata()) && ItemStack.areItemStackTagsEqual(stack, itemstack))
+                {
+                    int j = itemstack.getCount() + stack.getCount();
+                    int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
+
+                    if (j <= maxSize)
+                    {
+                        stack.setCount(0);
+                        itemstack.setCount(j);
+                        slot.onSlotChanged();
+                        result.add(i);
+                    }
+                    else if (itemstack.getCount() < maxSize)
+                    {
+                        stack.shrink(maxSize - itemstack.getCount());
+                        itemstack.setCount(maxSize);
+                        slot.onSlotChanged();
+                        result.add(i);
+                    }
+                }
+
+                ++i;
+            }
+        }
+
+        if (!stack.isEmpty())
+        {
+            i = startIndex;
+
+            while (true)
+            {
+                if (i >= endIndex) break;
+
+                Slot slot1 = inventorySlots.get(i);
+                ItemStack itemstack1 = slot1.getStack();
+
+                if (itemstack1.isEmpty() && slot1.isItemValid(stack))
+                {
+                    if (stack.getCount() > slot1.getSlotStackLimit())
+                    {
+                        slot1.putStack(stack.splitStack(slot1.getSlotStackLimit()));
+                    }
+                    else
+                    {
+                        slot1.putStack(stack.splitStack(stack.getCount()));
+                    }
+
+                    slot1.onSlotChanged();
+                    result.add(i);
+                    break;
+                }
+
+                ++i;
+            }
+        }
+
+        return result;
+    }
+
     @Override
     public void onCraftMatrixChanged(IInventory ignored)
     {
@@ -132,6 +206,26 @@ public class ContainerBetterCraftingTable extends Container
         return player.getDistanceSq((double) position.getX() + 0.5, (double) position.getY() + 0.5, (double) position.getZ() + 0.5) <= 64;
     }
 
+    public int getSlotIndex(Slot slot)
+    {
+        for (int i = 0; i < inventorySlots.size(); i++)
+        {
+            if (inventorySlots.get(i) == slot) return i;
+        }
+
+        return -1;
+    }
+
+    protected void syncSlot(int slotIndex)
+    {
+        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, slotIndex, inventorySlots.get(slotIndex).getStack()));
+    }
+
+    protected void syncSlot(Slot slot)
+    {
+        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, getSlotIndex(slot), slot.getStack()));
+    }
+
     @Override
     public ItemStack transferStackInSlot(EntityPlayer ignored, int index)
     {
@@ -153,9 +247,11 @@ public class ContainerBetterCraftingTable extends Container
                 itemstack1.getItem().onCreated(itemstack1, player.world, player);
 
                 //To inventory or hotbar
-                if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
+                ArrayList<Integer> indices = mergeItemStackBetter(itemstack1, fullInventoryStart, fullInventoryEnd + 1);
+                if (indices.size() == 0) return ItemStack.EMPTY;
 
                 slot.onSlotChange(itemstack1, itemstack);
+                if (!world.isRemote) for (int i : indices) syncSlot(i);
             }
         }
         else if (slot instanceof BetterCraftingGridSlot) //From crafting grid / input
@@ -267,9 +363,9 @@ public class ContainerBetterCraftingTable extends Container
         //Update all changed slots for client
         for (int index : changedIndices)
         {
-            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, index + 1, invInput.stackList.get(index)));
+            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, index + 1, invInput.stackList.get(index)));
         }
-        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, 0, result.getValue()));
+        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, 0, result.getValue()));
 
         //For higher-than-byte stack sizes in output
         int count = result.getValue().getCount();
