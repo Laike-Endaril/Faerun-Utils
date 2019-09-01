@@ -140,7 +140,7 @@ public class RecipeRepairObfResult extends RecipeRepair
 
                 case "GODLIKE":
                     blueRPGTag.setString("rarity", "MYTHIC");
-                    name = "" + TextFormatting.WHITE + TextFormatting.BOLD + TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName());
+                    name = "" + TextFormatting.RED + TextFormatting.BOLD + TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName());
                     break;
 
                 default:
