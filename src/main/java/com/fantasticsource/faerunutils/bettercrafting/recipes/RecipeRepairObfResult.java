@@ -11,8 +11,11 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +49,10 @@ public class RecipeRepairObfResult extends RecipeRepair
 
     static
     {
-        MinecraftForge.EVENT_BUS.register(RecipeRepairObfResult.class);
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        {
+            MinecraftForge.EVENT_BUS.register(RecipeRepairObfResult.class);
+        }
     }
 
 
@@ -60,6 +66,7 @@ public class RecipeRepairObfResult extends RecipeRepair
     }
 
 
+    @SideOnly(Side.CLIENT)
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void tooltip(ItemTooltipEvent event)
     {
