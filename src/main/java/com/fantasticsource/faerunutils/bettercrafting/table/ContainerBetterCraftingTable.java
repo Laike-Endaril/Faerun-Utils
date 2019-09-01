@@ -6,6 +6,7 @@ import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSell;
 import com.fantasticsource.tools.Tools;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -35,11 +36,9 @@ public class ContainerBetterCraftingTable extends Container
 
     public InventoryBetterCraftingInput invInput = new InventoryBetterCraftingInput(this, 3, 3);
     public InventoryBetterCraftingOutput invOutput = new InventoryBetterCraftingOutput();
-    private BetterRecipe recipe = null;
-
-    private ItemStack[] previousItems;
-
     public int count = 0;
+    private BetterRecipe recipe = null;
+    private ItemStack[] previousItems;
 
 
     public ContainerBetterCraftingTable(EntityPlayer player, World world, BlockPos position)
@@ -244,7 +243,7 @@ public class ContainerBetterCraftingTable extends Container
         //Determine which recipe to use
         if (recipe != null)
         {
-            if (!recipe.matches(invInput)) setRecipe(null);
+            if (!recipe.matches(invInput)) setServerRecipe(null);
         }
 
         if (recipe == null)
@@ -253,7 +252,7 @@ public class ContainerBetterCraftingTable extends Container
             {
                 if (recipe.matches(invInput))
                 {
-                    setRecipe(recipe);
+                    setServerRecipe(recipe);
                     break;
                 }
             }
@@ -261,19 +260,20 @@ public class ContainerBetterCraftingTable extends Container
 
 
         //Set server-side output via recipe method
-        if (recipe == null) invOutput.setInventorySlotContents(0, ItemStack.EMPTY);
-        else recipe.preview(invInput, invOutput);
+        Pair<ItemStack, ItemStack> result = recipe == null ? new Pair<>(ItemStack.EMPTY, ItemStack.EMPTY) : recipe.prepareToCraft(invInput);
+        invOutput.setInventorySlotContents(0, result.getKey());
 
 
         //Update all changed slots for client
-        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, 0, invOutput.getStackInSlot(0)));
         for (int index : changedIndices)
         {
             ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, index + 1, invInput.stackList.get(index)));
         }
+        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(this.windowId, 0, result.getValue()));
 
         //For higher-than-byte stack sizes in output
-        Network.WRAPPER.sendTo(new Network.RecipeOutputCountPacket(invOutput.getStackInSlot(0).getCount()), (EntityPlayerMP) player);
+        int count = result.getValue().getCount();
+        if (count > 127) Network.WRAPPER.sendTo(new Network.RecipeOutputCountPacket(result.getValue().getCount()), (EntityPlayerMP) player);
     }
 
     public void switchRecipe(int offset)
@@ -289,7 +289,7 @@ public class ContainerBetterCraftingTable extends Container
 
         if (validRecipes.size() == 1)
         {
-            setRecipe(validRecipes.get(0));
+            setServerRecipe(validRecipes.get(0));
             return;
         }
 
@@ -302,7 +302,7 @@ public class ContainerBetterCraftingTable extends Container
             index = offset;
         }
 
-        setRecipe(validRecipes.get(Tools.posMod(index, validRecipes.size())));
+        setServerRecipe(validRecipes.get(Tools.posMod(index, validRecipes.size())));
         update(true);
     }
 
@@ -311,7 +311,7 @@ public class ContainerBetterCraftingTable extends Container
         return recipe;
     }
 
-    public void setRecipe(BetterRecipe recipe)
+    public void setServerRecipe(BetterRecipe recipe)
     {
         if (!world.isRemote)
         {
@@ -320,14 +320,12 @@ public class ContainerBetterCraftingTable extends Container
         }
     }
 
-    public void setRecipe(BetterRecipe recipe, boolean fromServerPacket)
+    public void setClientRecipe(BetterRecipe recipe)
     {
         if (world.isRemote)
         {
             if (recipe == null) recipe = Recipes.NULL;
             this.recipe = recipe;
-
-            recipe.preview(invInput, invOutput);
         }
     }
 }

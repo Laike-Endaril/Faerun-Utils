@@ -1,7 +1,7 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
-import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepair;
+import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepairObfResult;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSell;
 import com.fantasticsource.mctools.MCTools;
@@ -41,11 +41,11 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.004";
+    public static final String VERSION = "1.12.2.004a";
 
     public static boolean faerun;
 
-    private static double firstX, firstY, firstZ;
+    private static double firstX = Double.NaN, firstY = Double.NaN, firstZ = Double.NaN;
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event) throws IOException
@@ -63,12 +63,15 @@ public class FaerunUtils
     {
         faerun = Loader.isModLoaded("bluerpg");
 
+
+        //Register recipes
         if (faerun)
         {
-            Recipes.add(new RecipeRepair());
+            Recipes.add(new RecipeRepairObfResult());
             Recipes.add(new RecipeSalvaging());
             Recipes.add(new RecipeSell());
         }
+
 
         String[] tokens = Tools.fixedSplit(FaerunUtilsConfig.firstTimeSpawn, ",");
         if (tokens.length == 3)

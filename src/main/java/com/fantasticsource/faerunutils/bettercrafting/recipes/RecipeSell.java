@@ -6,6 +6,7 @@ import com.fantasticsource.faerunutils.bettercrafting.table.ContainerBetterCraft
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
 import com.fantasticsource.tools.datastructures.Color;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
@@ -73,7 +74,7 @@ public class RecipeSell extends BetterRecipe
     }
 
     @Override
-    public void preview(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
+    public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in)
     {
         int value = 0;
         for (ItemStack stack : in.stackList)
@@ -87,8 +88,10 @@ public class RecipeSell extends BetterRecipe
 
             ItemStack result = COPPER_COIN.copy();
             result.setCount(value);
-            out.setInventorySlotContents(0, result);
+            return new Pair<>(result, result);
         }
+
+        return null;
     }
 
     @Override

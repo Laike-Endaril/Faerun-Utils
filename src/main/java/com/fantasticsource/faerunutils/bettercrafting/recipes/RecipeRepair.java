@@ -6,6 +6,7 @@ import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraft
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Color;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,31 +17,37 @@ import java.util.ArrayList;
 
 public class RecipeRepair extends BetterRecipe
 {
-    private static boolean filter(NBTBase nbt)
+    protected static String[] removableStatTags = new String[]
+            {
+                    "LIFE_STEAL_CHANCE",
+                    "LIFE_STEAL",
+                    "REFLECT",
+                    "RESISTANCE",
+                    "REGEN",
+                    "INCREASED_DAMAGE",
+                    "CRIT_DAMAGE",
+                    "MANA_LEECH_CHANCE",
+                    "PARRY",
+                    "SPIRIT",
+                    "COOLDOWN_REDUCTION",
+                    "CRIT_CHANCE",
+                    "SLOW",
+                    "SPEED",
+                    "DODGE",
+                    "MANA_REDUCTION",
+                    "ROOT",
+                    "BONUS_DAMAGE",
+                    "BLOCK",
+                    "MANA_LEECH"
+            };
+
+    protected static boolean filterTag(NBTBase nbt)
     {
         String s = nbt.toString();
-
-        if (s.contains("\"LIFE_STEAL_CHANCE\"")) return true;
-        if (s.contains("\"LIFE_STEAL\"")) return true;
-        if (s.contains("\"REFLECT\"")) return true;
-        if (s.contains("\"RESISTANCE\"")) return true;
-        if (s.contains("\"REGEN\"")) return true;
-        if (s.contains("\"INCREASED_DAMAGE\"")) return true;
-        if (s.contains("\"CRIT_DAMAGE\"")) return true;
-        if (s.contains("\"MANA_LEECH_CHANCE\"")) return true;
-        if (s.contains("\"PARRY\"")) return true;
-        if (s.contains("\"SPIRIT\"")) return true;
-        if (s.contains("\"COOLDOWN_REDUCTION\"")) return true;
-        if (s.contains("\"CRIT_CHANCE\"")) return true;
-        if (s.contains("\"SLOW\"")) return true;
-        if (s.contains("\"SPEED\"")) return true;
-        if (s.contains("\"DODGE\"")) return true;
-        if (s.contains("\"MANA_REDUCTION\"")) return true;
-        if (s.contains("\"ROOT\"")) return true;
-        if (s.contains("\"BONUS_DAMAGE\"")) return true;
-        if (s.contains("\"BLOCK\"")) return true;
-        if (s.contains("\"MANA_LEECH\"")) return true;
-
+        for (String stat : removableStatTags)
+        {
+            if (s.contains('"' + stat + '"')) return true;
+        }
         return false;
     }
 
@@ -69,7 +76,7 @@ public class RecipeRepair extends BetterRecipe
             found = true;
 
 
-            NBTTagCompound compound = stack.serializeNBT();
+            NBTTagCompound compound = stack.serializeNBT().copy();
             if (!compound.hasKey("ForgeCaps")) return false;
 
             compound = compound.getCompoundTag("ForgeCaps");
@@ -105,7 +112,7 @@ public class RecipeRepair extends BetterRecipe
     }
 
     @Override
-    public void preview(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
+    public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in)
     {
         for (ItemStack stack : in.stackList)
         {
@@ -113,7 +120,7 @@ public class RecipeRepair extends BetterRecipe
 
             NBTTagCompound compound = stack.serializeNBT().copy();
             NBTTagCompound blueRPGTag = compound.getCompoundTag("ForgeCaps").getCompoundTag("Parent").getCompoundTag("bluerpg:gear_stats");
-            NBTTagList statsIntTagList = blueRPGTag.getCompoundTag("stats").getTagList("collection", 10); //Type is NBTTagCompound
+            NBTTagList statsTagList = blueRPGTag.getCompoundTag("stats").getTagList("collection", 10); //Type is NBTTagCompound
 
 
             //Remove pseudorandom stat based on display name (and technically number of stats as well)
@@ -122,13 +129,13 @@ public class RecipeRepair extends BetterRecipe
 
             ArrayList<Integer> stats = new ArrayList<>();
             int i = 0;
-            for (NBTBase stat : statsIntTagList)
+            for (NBTBase stat : statsTagList)
             {
-                if (filter(stat)) stats.add(i);
+                if (filterTag(stat)) stats.add(i);
                 i++;
             }
 
-            statsIntTagList.removeTag(stats.get(Tools.posMod(pseudorandom, stats.size())));
+            statsTagList.removeTag(stats.get(Tools.posMod(pseudorandom, stats.size())));
 
 
             //Generate new name and rarity
@@ -178,8 +185,10 @@ public class RecipeRepair extends BetterRecipe
             ItemStack result = new ItemStack(compound);
             result.setStackDisplayName(name);
             result.setItemDamage(0);
-            out.setInventorySlotContents(0, result);
+            return new Pair<>(result, result);
         }
+
+        return null;
     }
 
     @Override

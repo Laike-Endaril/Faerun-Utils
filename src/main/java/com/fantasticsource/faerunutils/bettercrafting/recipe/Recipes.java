@@ -4,6 +4,7 @@ import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
 import com.fantasticsource.tools.datastructures.Color;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
@@ -34,9 +35,9 @@ public class Recipes
         }
 
         @Override
-        public void preview(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
+        public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in)
         {
-            out.setInventorySlotContents(0, ItemStack.EMPTY);
+            return new Pair<>(ItemStack.EMPTY, ItemStack.EMPTY);
         }
 
         @Override

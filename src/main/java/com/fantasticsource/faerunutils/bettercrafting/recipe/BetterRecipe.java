@@ -3,6 +3,7 @@ package com.fantasticsource.faerunutils.bettercrafting.recipe;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
 import com.fantasticsource.tools.datastructures.Color;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
@@ -25,9 +26,9 @@ public abstract class BetterRecipe
     abstract public boolean matches(InventoryBetterCraftingInput inv);
 
     /**
-     * This is for setting the crafting output preview
+     * @return The resulting ItemStack, and the previewed ItemStack result, in that order
      */
-    abstract public void preview(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out);
+    abstract public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in);
 
     /**
      * This should only ever be called when the item in the output is removed

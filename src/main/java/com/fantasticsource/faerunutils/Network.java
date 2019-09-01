@@ -179,7 +179,7 @@ public class Network
                     Container container = player.openContainer;
                     if (!(container instanceof ContainerBetterCraftingTable)) return;
 
-                    ((ContainerBetterCraftingTable) container).setRecipe(packet.recipe, true);
+                    ((ContainerBetterCraftingTable) container).setClientRecipe(packet.recipe);
                 });
             }
 

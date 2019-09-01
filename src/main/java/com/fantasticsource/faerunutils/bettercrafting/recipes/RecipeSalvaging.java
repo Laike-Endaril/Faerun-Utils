@@ -6,6 +6,7 @@ import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraft
 import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Color;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -153,7 +154,7 @@ public class RecipeSalvaging extends BetterRecipe
     }
 
     @Override
-    public void preview(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out)
+    public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in)
     {
         int maxLvl = 0, quantity = 0;
         for (ItemStack stack : in.stackList)
@@ -211,20 +212,19 @@ public class RecipeSalvaging extends BetterRecipe
             else quantity += q;
         }
 
+        ItemStack stack;
         if (quantity >= 9)
         {
-            ItemStack stack = TOKEN.copy();
-            stack.setStackDisplayName(stack.getDisplayName() + maxLvl);
+            stack = TOKEN.copy();
             stack.setCount(quantity / 9);
-            out.setInventorySlotContents(0, stack);
         }
         else
         {
-            ItemStack stack = POWDER.copy();
-            stack.setStackDisplayName(stack.getDisplayName() + maxLvl);
+            stack = POWDER.copy();
             stack.setCount(quantity);
-            out.setInventorySlotContents(0, stack);
         }
+        stack.setStackDisplayName(stack.getDisplayName() + maxLvl);
+        return new Pair<>(stack, stack);
     }
 
     @Override
