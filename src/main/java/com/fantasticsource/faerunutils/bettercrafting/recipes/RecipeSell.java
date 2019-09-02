@@ -85,13 +85,11 @@ public class RecipeSell extends BetterRecipe
             loreString = loreString.substring(loreString.indexOf("Value:") + 6);
             loreString = loreString.substring(0, loreString.indexOf('"'));
             value += Integer.parseInt(loreString) * stack.getCount();
-
-            ItemStack result = COPPER_COIN.copy();
-            result.setCount(value);
-            return new Pair<>(result, result);
         }
 
-        return null;
+        ItemStack result = COPPER_COIN.copy();
+        result.setCount(value);
+        return new Pair<>(result, result);
     }
 
     @Override
