@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IJumpingMount;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.server.MinecraftServer;
@@ -41,7 +42,7 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.005b";
+    public static final String VERSION = "1.12.2.005c";
 
     public static boolean faerun;
 
@@ -155,6 +156,17 @@ public class FaerunUtils
             //Very first time this player has logged into the server
             MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
             if (!Double.isNaN(firstX)) server.commandManager.executeCommand(server, "/tp " + event.player.getName() + " " + firstX + " " + firstY + " " + firstZ);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void playerChangeDim(PlayerEvent.PlayerChangedDimensionEvent event)
+    {
+        EntityPlayer player = event.player;
+        if (player instanceof EntityPlayerMP && event.fromDim != event.toDim)
+        {
+            Runnable runnable = () -> MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerChangedDimensionEvent(player, player.dimension, player.dimension));
+            MCTools.schedule(FMLCommonHandler.instance().getMinecraftServerInstance(), runnable, "FaerunUtils XP desync fix", 3000);
         }
     }
 }
