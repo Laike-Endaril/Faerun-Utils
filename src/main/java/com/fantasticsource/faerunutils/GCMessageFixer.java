@@ -65,7 +65,6 @@ public class GCMessageFixer
 
     private static void init(File file) throws IOException
     {
-
         reader = new BufferedReader(new FileReader(file));
 
         MinecraftForge.EVENT_BUS.register(ServerTickTimer.class);

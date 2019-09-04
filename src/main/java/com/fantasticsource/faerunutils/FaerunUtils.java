@@ -5,6 +5,7 @@ import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepairObfRes
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSell;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -166,7 +167,7 @@ public class FaerunUtils
         if (player instanceof EntityPlayerMP && event.fromDim != event.toDim)
         {
             Runnable runnable = () -> MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerChangedDimensionEvent(player, player.dimension, player.dimension));
-            MCTools.schedule(FMLCommonHandler.instance().getMinecraftServerInstance(), runnable, "FaerunUtils XP desync fix", 3000);
+            ServerTickTimer.schedule(60, runnable);
         }
     }
 }
