@@ -38,12 +38,12 @@ import net.minecraftforge.registries.ForgeRegistry;
 import java.io.File;
 import java.io.IOException;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021d,)", acceptableRemoteVersions = "[1.12.2.005," + FaerunUtils.VERSION + "]")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021h,)", acceptableRemoteVersions = "[1.12.2.005," + FaerunUtils.VERSION + "]")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.005c";
+    public static final String VERSION = "1.12.2.005d";
 
     public static boolean faerun;
 
@@ -167,7 +167,7 @@ public class FaerunUtils
         if (player instanceof EntityPlayerMP && event.fromDim != event.toDim)
         {
             Runnable runnable = () -> MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerChangedDimensionEvent(player, player.dimension, player.dimension));
-            ServerTickTimer.schedule(60, runnable);
+            ServerTickTimer.schedule(2, runnable);
         }
     }
 }
