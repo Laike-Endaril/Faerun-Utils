@@ -17,6 +17,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -43,7 +45,7 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.005d";
+    public static final String VERSION = "1.12.2.005e";
 
     public static boolean faerun;
 
@@ -156,6 +158,15 @@ public class FaerunUtils
         {
             //Very first time this player has logged into the server
             MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+
+            //Show "first time join" message
+            TextComponentString message = new TextComponentString(TextFormatting.GOLD + event.player.getName() + " just joined the server for the very first time!");
+            for (EntityPlayerMP player : server.getPlayerList().getPlayers())
+            {
+                player.sendMessage(message);
+            }
+
+            //Teleport player depending on config
             if (!Double.isNaN(firstX)) server.commandManager.executeCommand(server, "/tp " + event.player.getName() + " " + firstX + " " + firstY + " " + firstZ);
         }
     }
