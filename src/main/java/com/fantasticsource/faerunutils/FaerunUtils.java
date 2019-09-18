@@ -52,7 +52,7 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.005e";
+    public static final String VERSION = "1.12.2.005f";
 
     public static boolean faerun;
 
