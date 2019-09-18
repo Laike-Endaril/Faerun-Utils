@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.dynamicstealth.server.threat.Threat;
 import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeRepairObfResult;
 import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSalvaging;
@@ -229,7 +230,11 @@ public class FaerunUtils
         if (livingBase.getClass() == CNPCClass)
         {
             ICustomNpc npc = ((ICustomNpc) livingBase);
-            if (livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > 10000) npc.reset();
+            if (livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > 10000)
+            {
+                npc.reset();
+                Threat.set(livingBase, null, 0);
+            }
         }
     }
 }
