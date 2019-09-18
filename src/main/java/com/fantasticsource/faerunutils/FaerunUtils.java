@@ -230,10 +230,10 @@ public class FaerunUtils
         if (livingBase.getClass() == CNPCClass)
         {
             ICustomNpc npc = ((ICustomNpc) livingBase);
-            if (livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > 10000)
+            if (livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > 10000 && Threat.getThreat(livingBase) > 0)
             {
                 npc.reset();
-                Threat.set(livingBase, null, 0);
+                Threat.setThreat(livingBase, 0);
             }
         }
     }
