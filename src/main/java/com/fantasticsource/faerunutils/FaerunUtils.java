@@ -26,6 +26,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -40,6 +41,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
+import noppes.npcs.api.entity.ICustomNpc;
 
 import java.io.File;
 import java.io.IOException;
@@ -217,6 +219,17 @@ public class FaerunUtils
         {
             event.setDroppedExperience(0);
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void livingUpdate(LivingEvent.LivingUpdateEvent event)
+    {
+        EntityLivingBase livingBase = event.getEntityLiving();
+        if (livingBase.getClass() == CNPCClass)
+        {
+            ICustomNpc npc = ((ICustomNpc) livingBase);
+            if (livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > 10000) npc.reset();
         }
     }
 }
