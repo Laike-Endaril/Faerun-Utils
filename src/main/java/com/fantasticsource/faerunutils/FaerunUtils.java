@@ -24,6 +24,9 @@ import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -34,6 +37,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
 
@@ -50,6 +54,8 @@ public class FaerunUtils
     public static boolean faerun;
 
     private static double firstX = Double.NaN, firstY = Double.NaN, firstZ = Double.NaN;
+    private static Class CNPCClass = null;
+    private static final String TAG_NO_LOOT_OR_EXP = MODID + "NoLootOrExp";
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event) throws IOException
@@ -93,6 +99,9 @@ public class FaerunUtils
                 firstZ = Double.NaN;
             }
         }
+
+        EntityEntry entry = ForgeRegistries.ENTITIES.getValue(new ResourceLocation("customnpcs", "customnpc"));
+        if (entry != null) CNPCClass = entry.getEntityClass();
     }
 
     @SubscribeEvent
@@ -179,6 +188,35 @@ public class FaerunUtils
         {
             Runnable runnable = () -> MinecraftForge.EVENT_BUS.post(new PlayerEvent.PlayerChangedDimensionEvent(player, player.dimension, player.dimension));
             ServerTickTimer.schedule(2, runnable);
+        }
+    }
+
+    @SubscribeEvent
+    public static void death(LivingDeathEvent event)
+    {
+        if (event.getEntityLiving().getClass() == CNPCClass) event.getEntityLiving().addTag(TAG_NO_LOOT_OR_EXP);
+    }
+
+    @SubscribeEvent
+    public static void lootDrop(LivingDropsEvent event)
+    {
+        EntityLivingBase livingBase = event.getEntityLiving();
+        if (livingBase.getTags().contains(TAG_NO_LOOT_OR_EXP))
+        {
+            livingBase.removeTag(TAG_NO_LOOT_OR_EXP);
+            event.getDrops().clear();
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void expDrop(LivingExperienceDropEvent event)
+    {
+        EntityLivingBase livingBase = event.getEntityLiving();
+        if (livingBase.getTags().contains(TAG_NO_LOOT_OR_EXP))
+        {
+            event.setDroppedExperience(0);
+            event.setCanceled(true);
         }
     }
 }
