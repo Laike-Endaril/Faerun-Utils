@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -25,10 +26,7 @@ import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -42,6 +40,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
+import noppes.npcs.api.NpcAPI;
 import noppes.npcs.api.entity.ICustomNpc;
 
 import java.io.File;
@@ -195,9 +194,16 @@ public class FaerunUtils
     }
 
     @SubscribeEvent
-    public static void death(LivingDeathEvent event)
+    public static void fatalDamage(LivingHurtEvent event)
     {
-        if (event.getEntityLiving().getClass() == CNPCClass) event.getEntityLiving().addTag(TAG_NO_LOOT_OR_EXP);
+        EntityLivingBase livingBase = event.getEntityLiving();
+        if (!livingBase.world.isRemote && livingBase.getClass() == CNPCClass && event.getAmount() > livingBase.getMaxHealth())
+        {
+            DamageSource source = event.getSource();
+            Entity killer = source.getTrueSource();
+            if (killer == null) killer = source.getImmediateSource();
+            if (killer.getClass() == CNPCClass) livingBase.addTag(TAG_NO_LOOT_OR_EXP);
+        }
     }
 
     @SubscribeEvent
@@ -206,7 +212,6 @@ public class FaerunUtils
         EntityLivingBase livingBase = event.getEntityLiving();
         if (livingBase.getTags().contains(TAG_NO_LOOT_OR_EXP))
         {
-            livingBase.removeTag(TAG_NO_LOOT_OR_EXP);
             event.getDrops().clear();
             event.setCanceled(true);
         }
@@ -224,13 +229,19 @@ public class FaerunUtils
     }
 
     @SubscribeEvent
+    public static void death(LivingDeathEvent event)
+    {
+        event.getEntityLiving().removeTag(TAG_NO_LOOT_OR_EXP);
+    }
+
+    @SubscribeEvent
     public static void livingUpdate(LivingEvent.LivingUpdateEvent event)
     {
         EntityLivingBase livingBase = event.getEntityLiving();
         if (livingBase.getClass() == CNPCClass)
         {
-            ICustomNpc npc = ((ICustomNpc) livingBase);
-            if (livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > 10000 && Threat.getThreat(livingBase) > 0)
+            ICustomNpc npc = (ICustomNpc) NpcAPI.Instance().getIEntity(livingBase);
+            if (npc != null && livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > 10000 && Threat.getThreat(livingBase) > 0)
             {
                 npc.reset();
                 Threat.setThreat(livingBase, 0);
