@@ -15,6 +15,8 @@ import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
 
+import static net.minecraftforge.common.util.Constants.NBT.TAG_STRING;
+
 public class RecipeRepair extends BetterRecipe
 {
     protected static String[] removableStatTags = new String[]
@@ -74,6 +76,21 @@ public class RecipeRepair extends BetterRecipe
 
             if (found) return false; //Only allow one non-empty item in crafting grid
             found = true;
+
+
+            NBTTagCompound tagCompound = stack.getTagCompound();
+            if (tagCompound.hasKey("display"))
+            {
+                tagCompound = tagCompound.getCompoundTag("display");
+                if (tagCompound.hasKey("Lore"))
+                {
+                    NBTTagList list = tagCompound.getTagList("Lore", TAG_STRING);
+                    for (int i = 0; i < list.tagCount(); i++)
+                    {
+                        if (list.get(i).toString().toLowerCase().equals("\"ethereal\"")) return false;
+                    }
+                }
+            }
 
 
             NBTTagCompound compound = stack.serializeNBT().copy();

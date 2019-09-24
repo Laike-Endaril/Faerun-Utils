@@ -11,8 +11,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.NBTTagList;
 
 import java.util.ArrayList;
+
+import static net.minecraftforge.common.util.Constants.NBT.TAG_STRING;
 
 public class RecipeSalvaging extends BetterRecipe
 {
@@ -80,6 +83,21 @@ public class RecipeSalvaging extends BetterRecipe
 
 
             found = true;
+
+
+            NBTTagCompound tagCompound = stack.getTagCompound();
+            if (tagCompound.hasKey("display"))
+            {
+                tagCompound = tagCompound.getCompoundTag("display");
+                if (tagCompound.hasKey("Lore"))
+                {
+                    NBTTagList list = tagCompound.getTagList("Lore", TAG_STRING);
+                    for (int i = 0; i < list.tagCount(); i++)
+                    {
+                        if (list.get(i).toString().toLowerCase().equals("\"ethereal\"")) return false;
+                    }
+                }
+            }
 
 
             String name = stack.getDisplayName();
