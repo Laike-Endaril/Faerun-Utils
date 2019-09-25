@@ -14,8 +14,10 @@ import net.minecraft.entity.IJumpingMount;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
@@ -46,12 +48,14 @@ import noppes.npcs.api.entity.ICustomNpc;
 import java.io.File;
 import java.io.IOException;
 
+import static net.minecraftforge.common.util.Constants.NBT.TAG_STRING;
+
 @Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.021h,)", acceptableRemoteVersions = "[1.12.2.005," + FaerunUtils.VERSION + "]")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.005g";
+    public static final String VERSION = "1.12.2.005h";
 
     public static boolean faerun;
 
@@ -127,12 +131,11 @@ public class FaerunUtils
         if (entity instanceof EntityLivingBase) entity.entityCollisionReduction = 1;
         else if (!event.getWorld().isRemote)
         {
-            //Reduce lifespan of diamond swords and chestplates
-            if (event.getEntity() instanceof EntityItem)
+            //Reduce lifespan of ethereal items
+            if (entity instanceof EntityItem)
             {
-                EntityItem item = (EntityItem) event.getEntity();
-
-                if (item.getItem().getItem() == Items.DIAMOND_CHESTPLATE || item.getItem().getItem() == Items.DIAMOND_SWORD) item.lifespan = 1800;
+                EntityItem item = (EntityItem) entity;
+                if (isEthereal(item.getItem())) item.lifespan = 1800;
             }
         }
     }
@@ -247,5 +250,23 @@ public class FaerunUtils
                 Threat.setThreat(livingBase, 0);
             }
         }
+    }
+
+    public static boolean isEthereal(ItemStack stack)
+    {
+        if (!stack.hasTagCompound()) return false;
+
+        NBTTagCompound tagCompound = stack.getTagCompound();
+        if (!tagCompound.hasKey("display")) return false;
+
+        tagCompound = tagCompound.getCompoundTag("display");
+        if (!tagCompound.hasKey("Lore")) return false;
+
+        NBTTagList list = tagCompound.getTagList("Lore", TAG_STRING);
+        for (int i = 0; i < list.tagCount(); i++)
+        {
+            if (list.get(i).toString().toLowerCase().equals("\"ethereal\"")) return true;
+        }
+        return false;
     }
 }
