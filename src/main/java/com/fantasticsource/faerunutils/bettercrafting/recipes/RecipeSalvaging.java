@@ -16,12 +16,17 @@ import java.util.ArrayList;
 
 public class RecipeSalvaging extends BetterRecipe
 {
-    private static final ItemStack POWDER = new ItemStack(Items.GOLD_NUGGET);
-    private static final ItemStack TOKEN = new ItemStack(Items.SLIME_BALL);
+    private static final ItemStack
+            POWDER_OLD = new ItemStack(Items.GOLD_NUGGET),
+            POWDER = new ItemStack(Items.GOLD_NUGGET),
+            TOKEN = new ItemStack(Items.SLIME_BALL);
 
     static
     {
-        POWDER.setStackDisplayName("Equipment Powder Level ");
+        POWDER_OLD.setStackDisplayName("Equipment Powder Level ");
+        POWDER_OLD.setTagInfo("RepairCost", new NBTTagInt(0));
+
+        POWDER.setStackDisplayName("Skin Powder Level ");
         POWDER.setTagInfo("RepairCost", new NBTTagInt(0));
 
         TOKEN.setStackDisplayName("Skin Token Level ");
@@ -97,6 +102,14 @@ public class RecipeSalvaging extends BetterRecipe
             else if (stack.getItem() == POWDER.getItem())
             {
                 String lvl = name.replace(POWDER.getDisplayName(), "");
+                for (char c : lvl.toCharArray())
+                {
+                    if (c < '0' || c > '9') return false;
+                }
+            }
+            else if (stack.getItem() == POWDER_OLD.getItem())
+            {
+                String lvl = name.replace(POWDER_OLD.getDisplayName(), "");
                 for (char c : lvl.toCharArray())
                 {
                     if (c < '0' || c > '9') return false;
@@ -178,6 +191,11 @@ public class RecipeSalvaging extends BetterRecipe
                 lvl = Integer.parseInt(name.replace(POWDER.getDisplayName(), ""));
                 q = stack.getCount();
             }
+            else if (stack.getItem() == POWDER_OLD.getItem())
+            {
+                lvl = Integer.parseInt(name.replace(POWDER_OLD.getDisplayName(), ""));
+                q = stack.getCount();
+            }
             else if (stack.getItem().getRegistryName().toString().equals("armourers_workshop:item.skin"))
             {
                 String[] tokens = Tools.fixedSplit(name, " ");
@@ -253,6 +271,13 @@ public class RecipeSalvaging extends BetterRecipe
             else if (stack.getItem() == POWDER.getItem())
             {
                 lvl = Integer.parseInt(name.replace(POWDER.getDisplayName(), ""));
+
+                if (quantities[lvl] == 0) freeSlots--;
+                quantities[lvl] += stack.getCount();
+            }
+            else if (stack.getItem() == POWDER_OLD.getItem())
+            {
+                lvl = Integer.parseInt(name.replace(POWDER_OLD.getDisplayName(), ""));
 
                 if (quantities[lvl] == 0) freeSlots--;
                 quantities[lvl] += stack.getCount();
