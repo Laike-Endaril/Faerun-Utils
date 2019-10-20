@@ -53,7 +53,7 @@ public class RecipeSalvaging extends BetterRecipe
         if (!compound.hasKey("display")) compound.setTag("display", new NBTTagCompound());
 
         compound = compound.getCompoundTag("display");
-        NBTTagList lore = new NBTTagList();
+        lore = new NBTTagList();
         compound.setTag("Lore", lore);
 
         lore.appendTag(new NBTTagString("Bring these to the character creation area, and gamble for new cosmetics!"));
