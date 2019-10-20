@@ -11,6 +11,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 
 import java.util.ArrayList;
 
@@ -26,11 +28,35 @@ public class RecipeSalvaging extends BetterRecipe
         POWDER_OLD.setStackDisplayName("Equipment Powder Level ");
         POWDER_OLD.setTagInfo("RepairCost", new NBTTagInt(0));
 
+
         POWDER.setStackDisplayName("Skin Powder Level ");
         POWDER.setTagInfo("RepairCost", new NBTTagInt(0));
 
+        if (!POWDER.hasTagCompound()) POWDER.setTagCompound(new NBTTagCompound());
+
+        NBTTagCompound compound = POWDER.getTagCompound();
+        if (!compound.hasKey("display")) compound.setTag("display", new NBTTagCompound());
+
+        compound = compound.getCompoundTag("display");
+        NBTTagList lore = new NBTTagList();
+        compound.setTag("Lore", lore);
+
+        lore.appendTag(new NBTTagString("9 powders of the same level can be crafted into a token at a crafting table"));
+
+
         TOKEN.setStackDisplayName("Skin Token Level ");
         TOKEN.setTagInfo("RepairCost", new NBTTagInt(0));
+
+        if (!TOKEN.hasTagCompound()) TOKEN.setTagCompound(new NBTTagCompound());
+
+        compound = TOKEN.getTagCompound();
+        if (!compound.hasKey("display")) compound.setTag("display", new NBTTagCompound());
+
+        compound = compound.getCompoundTag("display");
+        NBTTagList lore = new NBTTagList();
+        compound.setTag("Lore", lore);
+
+        lore.appendTag(new NBTTagString("Bring these to the character creation area, and gamble for new cosmetics!"));
     }
 
     private static int getValue(String rarity)
