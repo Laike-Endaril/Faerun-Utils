@@ -125,7 +125,7 @@ public class RecipeSalvaging extends BetterRecipe
                     if (c < '0' || c > '9') return false;
                 }
             }
-            else if (stack.getItem() == POWDER.getItem())
+            else if (stack.getItem() == POWDER.getItem() && stack.getDisplayName().contains(POWDER.getDisplayName()))
             {
                 String lvl = name.replace(POWDER.getDisplayName(), "");
                 for (char c : lvl.toCharArray())
@@ -133,7 +133,7 @@ public class RecipeSalvaging extends BetterRecipe
                     if (c < '0' || c > '9') return false;
                 }
             }
-            else if (stack.getItem() == POWDER_OLD.getItem())
+            else if (stack.getItem() == POWDER_OLD.getItem() && stack.getDisplayName().contains(POWDER_OLD.getDisplayName()))
             {
                 String lvl = name.replace(POWDER_OLD.getDisplayName(), "");
                 for (char c : lvl.toCharArray())
@@ -212,12 +212,12 @@ public class RecipeSalvaging extends BetterRecipe
                 lvl = Integer.parseInt(name.replace(TOKEN.getDisplayName(), ""));
                 q = stack.getCount() * 9;
             }
-            else if (stack.getItem() == POWDER.getItem())
+            else if (stack.getItem() == POWDER.getItem() && stack.getDisplayName().contains(POWDER.getDisplayName()))
             {
                 lvl = Integer.parseInt(name.replace(POWDER.getDisplayName(), ""));
                 q = stack.getCount();
             }
-            else if (stack.getItem() == POWDER_OLD.getItem())
+            else if (stack.getItem() == POWDER_OLD.getItem() && stack.getDisplayName().contains(POWDER_OLD.getDisplayName()))
             {
                 lvl = Integer.parseInt(name.replace(POWDER_OLD.getDisplayName(), ""));
                 q = stack.getCount();
@@ -294,14 +294,14 @@ public class RecipeSalvaging extends BetterRecipe
                 if (quantities[lvl] == 0) freeSlots--;
                 quantities[lvl] += stack.getCount() * 9;
             }
-            else if (stack.getItem() == POWDER.getItem())
+            else if (stack.getItem() == POWDER.getItem() && stack.getDisplayName().contains(POWDER.getDisplayName()))
             {
                 lvl = Integer.parseInt(name.replace(POWDER.getDisplayName(), ""));
 
                 if (quantities[lvl] == 0) freeSlots--;
                 quantities[lvl] += stack.getCount();
             }
-            else if (stack.getItem() == POWDER_OLD.getItem())
+            else if (stack.getItem() == POWDER_OLD.getItem() && stack.getDisplayName().contains(POWDER_OLD.getDisplayName()))
             {
                 lvl = Integer.parseInt(name.replace(POWDER_OLD.getDisplayName(), ""));
 
