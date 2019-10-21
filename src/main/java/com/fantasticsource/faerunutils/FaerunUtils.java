@@ -55,7 +55,7 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.005h";
+    public static final String VERSION = "1.12.2.005j";
 
     public static boolean faerun;
 
@@ -128,8 +128,9 @@ public class FaerunUtils
     {
         Entity entity = event.getEntity();
         //Prevent entities from nudging each other
-        if (entity instanceof EntityLivingBase) entity.entityCollisionReduction = 1;
-        else if (!event.getWorld().isRemote)
+//        if (entity instanceof EntityLivingBase) entity.entityCollisionReduction = 1;
+
+        if (!event.getWorld().isRemote)
         {
             //Reduce lifespan of ethereal items
             if (entity instanceof EntityItem)
