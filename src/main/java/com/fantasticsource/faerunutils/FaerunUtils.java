@@ -245,7 +245,7 @@ public class FaerunUtils
         if (livingBase.getClass() == CNPCClass)
         {
             ICustomNpc npc = (ICustomNpc) NpcAPI.Instance().getIEntity(livingBase);
-            if (npc != null && livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > 10000 && Threat.getThreat(livingBase) > 0)
+            if (npc != null && livingBase.getDistanceSq(npc.getHomeX(), npc.getHomeY(), npc.getHomeZ()) > Math.pow(FaerunUtilsConfig.cnpcResetDistance, 2) && Threat.getThreat(livingBase) > 0)
             {
                 npc.reset();
                 Threat.setThreat(livingBase, 0);

@@ -2,6 +2,10 @@ faerunutils.config.gcMessageMode=GC Message Mode
 faerunutils.config.gcMessageMode.tooltip=0 = none, 1 = basic, 2 = detail
 faerunutils.config.firstTimeSpawn=First Time Spawn
 faerunutils.config.firstTimeSpawn.tooltip=Where a player spawns the very first time they join the server; leave blank to disable.  Syntax is just comma-separated x, y, z
+faerunutils.config.cnpcResetDistance=CNPC reset distance
+faerunutils.config.cnpcResetDistance.tooltip=If a CNPC roams this far or more from their spawn point, they reset
+
+
 
 itemGroup.faerunutils=Faerun Utils
 

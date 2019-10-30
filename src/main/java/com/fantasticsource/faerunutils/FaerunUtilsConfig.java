@@ -15,4 +15,9 @@ public class FaerunUtilsConfig
     @Config.Comment("Where a player spawns the very first time they join the server; leave blank to disable.  Syntax is just comma-separated x, y, z")
     @Config.LangKey(FaerunUtils.MODID + ".config.firstTimeSpawn")
     public static String firstTimeSpawn = "";
+
+    @Config.Name("030 CNPC reset distance")
+    @Config.Comment("If a CNPC roams this far or more from their spawn point, they reset")
+    @Config.LangKey(FaerunUtils.MODID + ".config.cnpcResetDistance")
+    public static double cnpcResetDistance = 100;
 }
