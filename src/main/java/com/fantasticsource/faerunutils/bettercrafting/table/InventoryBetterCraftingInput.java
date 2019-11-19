@@ -45,11 +45,6 @@ public class InventoryBetterCraftingInput implements IInventory
         return index >= this.getSizeInventory() ? ItemStack.EMPTY : this.stackList.get(index);
     }
 
-    public ItemStack getStackInRowAndColumn(int row, int column)
-    {
-        return row >= 0 && row < this.inventoryWidth && column >= 0 && column <= this.inventoryHeight ? this.getStackInSlot(row + column * this.inventoryWidth) : ItemStack.EMPTY;
-    }
-
     public String getName()
     {
         return "container.crafting";
