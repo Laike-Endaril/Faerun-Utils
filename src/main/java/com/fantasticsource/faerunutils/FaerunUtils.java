@@ -1,8 +1,10 @@
 package com.fantasticsource.faerunutils;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -32,5 +34,11 @@ public class FaerunUtils
     public static void serverStarting(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new CmdDie());
+    }
+
+    @SubscribeEvent
+    public static void cancelHPRegen(LivingHealEvent event)
+    {
+        if (event.getEntity() instanceof EntityPlayerMP) event.setCanceled(true);
     }
 }
