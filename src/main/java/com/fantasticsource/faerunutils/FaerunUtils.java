@@ -1,6 +1,6 @@
 package com.fantasticsource.faerunutils;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -39,6 +39,6 @@ public class FaerunUtils
     @SubscribeEvent
     public static void cancelHPRegen(LivingHealEvent event)
     {
-        if (event.getEntity() instanceof EntityPlayerMP) event.setCanceled(true);
+        if (event.getEntity() instanceof EntityPlayer) event.setCanceled(true);
     }
 }
