@@ -5,6 +5,7 @@ import com.fantasticsource.faerunutils.Network;
 import com.fantasticsource.faerunutils.assembler.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.assembler.recipe.Recipes;
 import com.fantasticsource.faerunutils.assembler.recipes.RecipeSell;
+import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,6 +24,83 @@ import java.util.Arrays;
 public class ContainerAssembler extends Container
 {
     private static final boolean DEBUG = false;
+
+    protected static final String[] FULL_ITEM_TYPES = new String[]
+            {
+                    "Dagger",
+                    "Sword",
+                    "Greatsword",
+                    "Axe",
+                    "Fist",
+                    "Spear",
+                    "Staff",
+                    "Bow",
+                    "Mace",
+                    "Shield",
+                    "Focus",
+                    "Cape",
+                    "Wrap",
+                    "Cloth Helm",
+                    "Cloth Shoulders",
+                    "Cloth Chest",
+                    "Cloth Leggings",
+                    "Cloth Boots",
+                    "Leather Helm",
+                    "Leather Shoulders",
+                    "Leather Chest",
+                    "Leather Leggings",
+                    "Leather Boots",
+                    "Chain Helm",
+                    "Chain Shoulders",
+                    "Chain Chest",
+                    "Chain Leggings",
+                    "Chain Boots",
+                    "Scale Helm",
+                    "Scale Shoulders",
+                    "Scale Chest",
+                    "Scale Leggings",
+                    "Scale Boots",
+                    "Plate Helm",
+                    "Plate Shoulders",
+                    "Plate Chest",
+                    "Plate Leggings",
+                    "Plate Boots",
+                    "Brigandine Helm",
+                    "Brigandine Shoulders",
+                    "Brigandine Chest",
+                    "Brigandine Leggings",
+                    "Brigandine Boots",
+            };
+
+    protected static final String[] PRIMARY_PART_ITEM_TYPES = new String[]
+            {
+                    "Dagger Blade",
+                    "Sword Blade",
+                    "Greatsword Blade",
+                    "Axehead",
+                    "Fist Blade",
+                    "Spearhead",
+                    "Staff Head",
+                    "Bowlimbs",
+                    "Mace Head",
+                    "Shield Center",
+                    "Focus Head",
+            };
+
+    protected static final String[] SECONDARY_PART_ITEM_TYPES = new String[]
+            {
+                    "Dagger Hilt",
+                    "Sword Hilt",
+                    "Greatsword Hilt",
+                    "Axe Handle",
+                    "Fist Blade",
+                    "Spearshaft",
+                    "Staff Shaft",
+                    "Bowstring",
+                    "Mace Handle",
+                    "Shield Rim",
+                    "Focus Handle",
+            };
 
     public final EntityPlayer player;
     public final World world;
@@ -64,12 +142,20 @@ public class ContainerAssembler extends Container
 
 
         //Crafting slots
-        addSlotToContainer(new AssemblerResultSlot(this, 0, 132, 35));
+        addSlotToContainer(new AssemblerResultSlot(this, 0, 132, 35, 176, 0, stack -> Tools.contains(FULL_ITEM_TYPES, MiscTags.getItemTypeName(stack))));
 
-        for (int x = 0; x < 4; x++)
+        addSlotToContainer(new AssemblerGridSlot(invInput, 0, 20, 35, 208, 240, stack -> MiscTags.getItemTypeName(stack).contains("Blueprint")));
+        addSlotToContainer(new AssemblerGridSlot(invInput, 1, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
+        addSlotToContainer(new AssemblerGridSlot(invInput, 2, 56, 35, 240, 240, stack ->
         {
-            addSlotToContainer(new AssemblerGridSlot(invInput, x, 20 + x * 18, 35));
-        }
+            String typename = MiscTags.getItemTypeName(stack);
+            return typename.contains("Core") || Tools.contains(PRIMARY_PART_ITEM_TYPES, typename);
+        }));
+        addSlotToContainer(new AssemblerGridSlot(invInput, 3, 74, 35, 240, 240, stack ->
+        {
+            String typename = MiscTags.getItemTypeName(stack);
+            return typename.contains("Trim") || Tools.contains(SECONDARY_PART_ITEM_TYPES, typename);
+        }));
 
 
         //Inventory
