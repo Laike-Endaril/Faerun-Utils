@@ -13,16 +13,12 @@ import net.minecraft.util.text.TextComponentTranslation;
 public class InventoryAssemblerInput implements IInventory
 {
     public final NonNullList<ItemStack> stackList;
-    public final int inventoryWidth;
-    public final int inventoryHeight;
     public final Container container;
 
-    public InventoryAssemblerInput(Container eventHandlerIn, int width, int height)
+    public InventoryAssemblerInput(Container eventHandlerIn)
     {
-        this.stackList = NonNullList.withSize(width * height, ItemStack.EMPTY);
+        this.stackList = NonNullList.withSize(4, ItemStack.EMPTY);
         this.container = eventHandlerIn;
-        this.inventoryWidth = width;
-        this.inventoryHeight = height;
     }
 
     public int getSizeInventory()
@@ -127,15 +123,5 @@ public class InventoryAssemblerInput implements IInventory
     public void clear()
     {
         this.stackList.clear();
-    }
-
-    public int getHeight()
-    {
-        return this.inventoryHeight;
-    }
-
-    public int getWidth()
-    {
-        return this.inventoryWidth;
     }
 }

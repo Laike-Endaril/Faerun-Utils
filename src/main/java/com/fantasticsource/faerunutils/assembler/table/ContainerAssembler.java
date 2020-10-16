@@ -32,7 +32,7 @@ public class ContainerAssembler extends Container
     public final int outputIndex, craftingGridStartIndex, craftingGridSize, playerInventoryStartIndex, playerInventorySize, hotbarStartIndex, hotbarSize;
     public final int fullInventoryStart, fullInventoryEnd;
 
-    public InventoryAssemblerInput invInput = new InventoryAssemblerInput(this, 3, 3);
+    public InventoryAssemblerInput invInput = new InventoryAssemblerInput(this);
     public InventoryAssemblerOutput invOutput = new InventoryAssemblerOutput();
     private BetterRecipe recipe = null;
     private ItemStack[] previousItems;
@@ -64,14 +64,11 @@ public class ContainerAssembler extends Container
 
 
         //Crafting slots
-        addSlotToContainer(new AssemblerResultSlot(this, 0, 124, 35));
+        addSlotToContainer(new AssemblerResultSlot(this, 0, 132, 35));
 
-        for (int y = 0; y < invInput.inventoryWidth; ++y)
+        for (int x = 0; x < 4; x++)
         {
-            for (int x = 0; x < invInput.inventoryHeight; ++x)
-            {
-                addSlotToContainer(new AssemblerGridSlot(invInput, x + y * 3, 30 + x * 18, 17 + y * 18));
-            }
+            addSlotToContainer(new AssemblerGridSlot(invInput, x, 20 + x * 18, 35));
         }
 
 
