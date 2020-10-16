@@ -22,6 +22,7 @@ public class FaerunUtils
     public static void preInit(FMLPreInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
+        MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
     }
 
     @SubscribeEvent
