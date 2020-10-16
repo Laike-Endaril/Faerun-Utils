@@ -1,7 +1,7 @@
-package com.fantasticsource.faerunutils.bettercrafting.recipe;
+package com.fantasticsource.faerunutils.assembler.recipe;
 
-import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
-import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
+import com.fantasticsource.faerunutils.assembler.table.InventoryAssemblerInput;
+import com.fantasticsource.faerunutils.assembler.table.InventoryAssemblerOutput;
 import com.fantasticsource.tools.datastructures.Color;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.item.ItemStack;
@@ -23,15 +23,15 @@ public abstract class BetterRecipe
     /**
      * Unlike the vanilla version, this is *only* for checking whether a recipe matches, not for caching.  Do not save any data from within this method!
      */
-    abstract public boolean matches(InventoryBetterCraftingInput inv);
+    abstract public boolean matches(InventoryAssemblerInput inv);
 
     /**
      * @return The resulting ItemStack, and the previewed ItemStack result, in that order
      */
-    abstract public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in);
+    abstract public Pair<ItemStack, ItemStack> prepareToCraft(InventoryAssemblerInput in);
 
     /**
      * This should only ever be called when the item in the output is removed
      */
-    abstract public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, ItemStack grabbedStack);
+    abstract public ArrayList<ItemStack> craft(InventoryAssemblerInput in, InventoryAssemblerOutput out, ItemStack grabbedStack);
 }

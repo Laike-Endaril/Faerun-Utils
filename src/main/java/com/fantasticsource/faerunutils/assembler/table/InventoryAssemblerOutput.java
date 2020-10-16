@@ -1,7 +1,6 @@
-package com.fantasticsource.faerunutils.bettercrafting.table;
+package com.fantasticsource.faerunutils.assembler.table;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
@@ -10,44 +9,32 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
-public class InventoryBetterCraftingInput implements IInventory
+public class InventoryAssemblerOutput implements IInventory
 {
-    public final NonNullList<ItemStack> stackList;
-    public final int inventoryWidth;
-    public final int inventoryHeight;
-    public final Container container;
-
-    public InventoryBetterCraftingInput(Container eventHandlerIn, int width, int height)
-    {
-        this.stackList = NonNullList.withSize(width * height, ItemStack.EMPTY);
-        this.container = eventHandlerIn;
-        this.inventoryWidth = width;
-        this.inventoryHeight = height;
-    }
+    private final NonNullList<ItemStack> stackResult = NonNullList.withSize(1, ItemStack.EMPTY);
 
     public int getSizeInventory()
     {
-        return this.stackList.size();
+        return 1;
     }
 
     public boolean isEmpty()
     {
-        for (ItemStack itemstack : this.stackList)
+        for (ItemStack itemstack : this.stackResult)
         {
             if (!itemstack.isEmpty()) return false;
         }
-
         return true;
     }
 
     public ItemStack getStackInSlot(int index)
     {
-        return index >= this.getSizeInventory() ? ItemStack.EMPTY : this.stackList.get(index);
+        return this.stackResult.get(0);
     }
 
     public String getName()
     {
-        return "container.crafting";
+        return "Result";
     }
 
     public boolean hasCustomName()
@@ -60,27 +47,19 @@ public class InventoryBetterCraftingInput implements IInventory
         return (this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName()));
     }
 
-    public ItemStack removeStackFromSlot(int index)
-    {
-        return ItemStackHelper.getAndRemove(this.stackList, index);
-    }
-
     public ItemStack decrStackSize(int index, int count)
     {
-        ItemStack itemstack = ItemStackHelper.getAndSplit(this.stackList, index, count);
+        return ItemStackHelper.getAndRemove(this.stackResult, 0);
+    }
 
-        if (!itemstack.isEmpty())
-        {
-            this.container.onCraftMatrixChanged(this);
-        }
-
-        return itemstack;
+    public ItemStack removeStackFromSlot(int index)
+    {
+        return ItemStackHelper.getAndRemove(this.stackResult, 0);
     }
 
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        this.stackList.set(index, stack);
-        this.container.onCraftMatrixChanged(this);
+        this.stackResult.set(0, stack);
     }
 
     public int getInventoryStackLimit()
@@ -126,16 +105,6 @@ public class InventoryBetterCraftingInput implements IInventory
 
     public void clear()
     {
-        this.stackList.clear();
-    }
-
-    public int getHeight()
-    {
-        return this.inventoryHeight;
-    }
-
-    public int getWidth()
-    {
-        return this.inventoryWidth;
+        this.stackResult.clear();
     }
 }

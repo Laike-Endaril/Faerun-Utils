@@ -1,8 +1,8 @@
 package com.fantasticsource.faerunutils;
 
-import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
-import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
-import com.fantasticsource.faerunutils.bettercrafting.table.ContainerBetterCraftingTable;
+import com.fantasticsource.faerunutils.assembler.recipe.BetterRecipe;
+import com.fantasticsource.faerunutils.assembler.recipe.Recipes;
+import com.fantasticsource.faerunutils.assembler.table.ContainerAssembler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -73,9 +73,9 @@ public class Network
                     if (player == null) return;
 
                     Container container = player.openContainer;
-                    if (!(container instanceof ContainerBetterCraftingTable)) return;
+                    if (!(container instanceof ContainerAssembler)) return;
 
-                    ((ContainerBetterCraftingTable) container).invOutput.getStackInSlot(0).setCount(packet.count);
+                    ((ContainerAssembler) container).invOutput.getStackInSlot(0).setCount(packet.count);
                 });
             }
 
@@ -124,9 +124,9 @@ public class Network
                     if (playerMP == null) return;
 
                     Container container = playerMP.openContainer;
-                    if (!(container instanceof ContainerBetterCraftingTable)) return;
+                    if (!(container instanceof ContainerAssembler)) return;
 
-                    ((ContainerBetterCraftingTable) container).switchRecipe(packet.offset);
+                    ((ContainerAssembler) container).switchRecipe(packet.offset);
                 });
             }
 
@@ -177,9 +177,9 @@ public class Network
                     if (player == null) return;
 
                     Container container = player.openContainer;
-                    if (!(container instanceof ContainerBetterCraftingTable)) return;
+                    if (!(container instanceof ContainerAssembler)) return;
 
-                    ((ContainerBetterCraftingTable) container).setClientRecipe(packet.recipe);
+                    ((ContainerAssembler) container).setClientRecipe(packet.recipe);
                 });
             }
 

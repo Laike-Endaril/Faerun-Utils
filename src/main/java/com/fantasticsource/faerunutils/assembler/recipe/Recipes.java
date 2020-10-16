@@ -1,8 +1,8 @@
-package com.fantasticsource.faerunutils.bettercrafting.recipe;
+package com.fantasticsource.faerunutils.assembler.recipe;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
-import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
-import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
+import com.fantasticsource.faerunutils.assembler.table.InventoryAssemblerInput;
+import com.fantasticsource.faerunutils.assembler.table.InventoryAssemblerOutput;
 import com.fantasticsource.tools.datastructures.Color;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.item.ItemStack;
@@ -29,19 +29,19 @@ public class Recipes
         }
 
         @Override
-        public boolean matches(InventoryBetterCraftingInput inv)
+        public boolean matches(InventoryAssemblerInput inv)
         {
             return false;
         }
 
         @Override
-        public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in)
+        public Pair<ItemStack, ItemStack> prepareToCraft(InventoryAssemblerInput in)
         {
             return new Pair<>(ItemStack.EMPTY, ItemStack.EMPTY);
         }
 
         @Override
-        public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, ItemStack grabbedStack)
+        public ArrayList<ItemStack> craft(InventoryAssemblerInput in, InventoryAssemblerOutput out, ItemStack grabbedStack)
         {
             return new ArrayList<>();
         }

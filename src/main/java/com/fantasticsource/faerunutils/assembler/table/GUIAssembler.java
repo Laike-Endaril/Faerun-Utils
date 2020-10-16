@@ -1,9 +1,9 @@
-package com.fantasticsource.faerunutils.bettercrafting.table;
+package com.fantasticsource.faerunutils.assembler.table;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.faerunutils.Network;
-import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
-import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
+import com.fantasticsource.faerunutils.assembler.recipe.BetterRecipe;
+import com.fantasticsource.faerunutils.assembler.recipe.Recipes;
 import com.fantasticsource.tools.Collision;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -20,16 +20,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.IOException;
 
 @SideOnly(Side.CLIENT)
-public class GUIBetterCrafting extends GuiContainer
+public class GUIAssembler extends GuiContainer
 {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(FaerunUtils.MODID, "textures/gui/bettercraftingtable.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(FaerunUtils.MODID, "textures/gui/assembler.png");
 
     private static final double ARROW_V1 = 240d / 256, ARROW_V2 = 250d / 256;
     private static final double UP_INACTIVE_U1 = 224d / 256, UP_ACTIVE_U1 = 232d / 256, DOWN_INACTIVE_U1 = 240d / 256, DOWN_ACTIVE_U1 = 248d / 256;
 
-    public GUIBetterCrafting()
+    public GUIAssembler()
     {
-        super(new ContainerBetterCraftingTable(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world, BlockPos.ORIGIN));
+        super(new ContainerAssembler(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world, BlockPos.ORIGIN));
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
@@ -45,7 +45,7 @@ public class GUIBetterCrafting extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         //Recipe name
-        BetterRecipe recipe = ((ContainerBetterCraftingTable) inventorySlots).getRecipe();
+        BetterRecipe recipe = ((ContainerAssembler) inventorySlots).getRecipe();
         if (recipe == null) recipe = Recipes.NULL;
 
         fontRenderer.drawString(I18n.format(recipe.translationKey()), 88, 16, recipe.color().toARGB());

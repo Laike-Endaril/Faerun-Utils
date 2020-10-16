@@ -1,9 +1,9 @@
-package com.fantasticsource.faerunutils.bettercrafting.recipes;
+package com.fantasticsource.faerunutils.assembler.recipes;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
-import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
-import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
-import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingOutput;
+import com.fantasticsource.faerunutils.assembler.recipe.BetterRecipe;
+import com.fantasticsource.faerunutils.assembler.table.InventoryAssemblerInput;
+import com.fantasticsource.faerunutils.assembler.table.InventoryAssemblerOutput;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Color;
 import com.fantasticsource.tools.datastructures.Pair;
@@ -64,7 +64,7 @@ public class RecipeRepair extends BetterRecipe
     }
 
     @Override
-    public boolean matches(InventoryBetterCraftingInput inv)
+    public boolean matches(InventoryAssemblerInput inv)
     {
         boolean found = false;
         for (ItemStack stack : inv.stackList)
@@ -112,7 +112,7 @@ public class RecipeRepair extends BetterRecipe
     }
 
     @Override
-    public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in)
+    public Pair<ItemStack, ItemStack> prepareToCraft(InventoryAssemblerInput in)
     {
         for (ItemStack stack : in.stackList)
         {
@@ -192,7 +192,7 @@ public class RecipeRepair extends BetterRecipe
     }
 
     @Override
-    public ArrayList<ItemStack> craft(InventoryBetterCraftingInput in, InventoryBetterCraftingOutput out, ItemStack grabbedStack)
+    public ArrayList<ItemStack> craft(InventoryAssemblerInput in, InventoryAssemblerOutput out, ItemStack grabbedStack)
     {
         for (int i = in.getSizeInventory() - 1; i >= 0; i--)
         {

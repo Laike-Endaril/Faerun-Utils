@@ -1,6 +1,6 @@
-package com.fantasticsource.faerunutils.bettercrafting.recipes;
+package com.fantasticsource.faerunutils.assembler.recipes;
 
-import com.fantasticsource.faerunutils.bettercrafting.table.InventoryBetterCraftingInput;
+import com.fantasticsource.faerunutils.assembler.table.InventoryAssemblerInput;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.item.ItemStack;
@@ -92,7 +92,7 @@ public class RecipeRepairObfResult extends RecipeRepair
 
 
     @Override
-    public Pair<ItemStack, ItemStack> prepareToCraft(InventoryBetterCraftingInput in)
+    public Pair<ItemStack, ItemStack> prepareToCraft(InventoryAssemblerInput in)
     {
         for (ItemStack stack : in.stackList)
         {

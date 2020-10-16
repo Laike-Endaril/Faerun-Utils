@@ -1,7 +1,7 @@
 package com.fantasticsource.faerunutils;
 
-import com.fantasticsource.faerunutils.bettercrafting.table.BlockBetterCraftingTable;
-import com.fantasticsource.faerunutils.bettercrafting.table.ItemBetterCraftingTable;
+import com.fantasticsource.faerunutils.assembler.table.BlockAssembler;
+import com.fantasticsource.faerunutils.assembler.table.ItemAssembler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
@@ -17,10 +17,10 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class BlocksAndItems
 {
-    @GameRegistry.ObjectHolder("faerunutils:bettercraftingtable")
-    public static BlockBetterCraftingTable blockBetterCraftingTable;
-    @GameRegistry.ObjectHolder("faerunutils:bettercraftingtable")
-    public static ItemBetterCraftingTable itemBetterCraftingTable;
+    @GameRegistry.ObjectHolder("faerunutils:assembler")
+    public static BlockAssembler blockAssembler;
+    @GameRegistry.ObjectHolder("faerunutils:assembler")
+    public static ItemAssembler itemAssembler;
 
 
     public static CreativeTabs creativeTab = new CreativeTabs(FaerunUtils.MODID)
@@ -28,7 +28,7 @@ public class BlocksAndItems
         @Override
         public ItemStack getTabIconItem()
         {
-            return new ItemStack(blockBetterCraftingTable);
+            return new ItemStack(blockAssembler);
         }
 
         @Override
@@ -44,19 +44,19 @@ public class BlocksAndItems
     {
         IForgeRegistry<Block> registry = event.getRegistry();
 
-        registry.register(new BlockBetterCraftingTable());
+        registry.register(new BlockAssembler());
     }
 
     @SubscribeEvent
     public static void itemRegistry(RegistryEvent.Register<Item> event)
     {
         IForgeRegistry<Item> registry = event.getRegistry();
-        registry.register(new ItemBetterCraftingTable());
+        registry.register(new ItemAssembler());
     }
 
     @SubscribeEvent
     public static void modelRegistry(ModelRegistryEvent event)
     {
-        ModelLoader.setCustomModelResourceLocation(itemBetterCraftingTable, 0, new ModelResourceLocation("minecraft:crafting_table", "inventory"));
+        ModelLoader.setCustomModelResourceLocation(itemAssembler, 0, new ModelResourceLocation("minecraft:crafting_table", "inventory"));
     }
 }

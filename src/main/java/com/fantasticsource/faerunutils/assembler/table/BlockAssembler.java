@@ -1,4 +1,4 @@
-package com.fantasticsource.faerunutils.bettercrafting.table;
+package com.fantasticsource.faerunutils.assembler.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.ClientProxy;
@@ -22,15 +22,15 @@ import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 
-public class BlockBetterCraftingTable extends Block
+public class BlockAssembler extends Block
 {
-    public BlockBetterCraftingTable()
+    public BlockAssembler()
     {
         super(Material.WOOD);
 
         setCreativeTab(BlocksAndItems.creativeTab);
-        setUnlocalizedName(FaerunUtils.MODID + ":bettercraftingtable");
-        setRegistryName("bettercraftingtable");
+        setUnlocalizedName(FaerunUtils.MODID + ":assembler");
+        setRegistryName("assembler");
 
         setHardness(2.5F);
         setSoundType(SoundType.WOOD);
@@ -38,10 +38,10 @@ public class BlockBetterCraftingTable extends Block
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        if (worldIn.isRemote) ClientProxy.showBetterCraftingGUI();
+        if (worldIn.isRemote) ClientProxy.showAssemblerGUI();
         else
         {
-            InterfaceBetterCraftingTable iface = new InterfaceBetterCraftingTable(worldIn, pos);
+            InterfaceAssembler iface = new InterfaceAssembler(worldIn, pos);
 
             EntityPlayerMP player = (EntityPlayerMP) playerIn;
             player.getNextWindowId();
@@ -58,12 +58,12 @@ public class BlockBetterCraftingTable extends Block
         return true;
     }
 
-    public static class InterfaceBetterCraftingTable implements IInteractionObject
+    public static class InterfaceAssembler implements IInteractionObject
     {
         private final World world;
         private final BlockPos position;
 
-        public InterfaceBetterCraftingTable(World world, BlockPos pos)
+        public InterfaceAssembler(World world, BlockPos pos)
         {
             this.world = world;
             this.position = pos;
@@ -71,7 +71,7 @@ public class BlockBetterCraftingTable extends Block
 
         public String getName()
         {
-            return "bettercraftingtable";
+            return "assembler";
         }
 
         public boolean hasCustomName()
@@ -81,17 +81,17 @@ public class BlockBetterCraftingTable extends Block
 
         public ITextComponent getDisplayName()
         {
-            return new TextComponentTranslation(BlocksAndItems.blockBetterCraftingTable.getUnlocalizedName() + ".name");
+            return new TextComponentTranslation(BlocksAndItems.blockAssembler.getUnlocalizedName() + ".name");
         }
 
         public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
         {
-            return new ContainerBetterCraftingTable(playerIn, this.world, this.position);
+            return new ContainerAssembler(playerIn, this.world, this.position);
         }
 
         public String getGuiID()
         {
-            return FaerunUtils.MODID + ":bettercraftingtable";
+            return FaerunUtils.MODID + ":assembler";
         }
     }
 }

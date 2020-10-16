@@ -9,10 +9,4 @@ faerunutils.config.cnpcResetDistance.tooltip=If a CNPC roams this far or more fr
 
 itemGroup.faerunutils=Faerun Utils
 
-tile.faerunutils:bettercraftingtable.name=Better Crafting Table
-
-faerunutils:recipe.null=No Recipe
-
-faerunutils:recipe.salvage=Salvage
-faerunutils:recipe.repair=Repair
-faerunutils:recipe.sell=Sell
+tile.faerunutils:assembler.name=Assembler

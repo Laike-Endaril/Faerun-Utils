@@ -1,10 +1,10 @@
-package com.fantasticsource.faerunutils.bettercrafting.table;
+package com.fantasticsource.faerunutils.assembler.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.Network;
-import com.fantasticsource.faerunutils.bettercrafting.recipe.BetterRecipe;
-import com.fantasticsource.faerunutils.bettercrafting.recipe.Recipes;
-import com.fantasticsource.faerunutils.bettercrafting.recipes.RecipeSell;
+import com.fantasticsource.faerunutils.assembler.recipe.BetterRecipe;
+import com.fantasticsource.faerunutils.assembler.recipe.Recipes;
+import com.fantasticsource.faerunutils.assembler.recipes.RecipeSell;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ContainerBetterCraftingTable extends Container
+public class ContainerAssembler extends Container
 {
     private static final boolean DEBUG = false;
 
@@ -32,13 +32,13 @@ public class ContainerBetterCraftingTable extends Container
     public final int outputIndex, craftingGridStartIndex, craftingGridSize, playerInventoryStartIndex, playerInventorySize, hotbarStartIndex, hotbarSize;
     public final int fullInventoryStart, fullInventoryEnd;
 
-    public InventoryBetterCraftingInput invInput = new InventoryBetterCraftingInput(this, 3, 3);
-    public InventoryBetterCraftingOutput invOutput = new InventoryBetterCraftingOutput();
+    public InventoryAssemblerInput invInput = new InventoryAssemblerInput(this, 3, 3);
+    public InventoryAssemblerOutput invOutput = new InventoryAssemblerOutput();
     private BetterRecipe recipe = null;
     private ItemStack[] previousItems;
 
 
-    public ContainerBetterCraftingTable(EntityPlayer player, World world, BlockPos position)
+    public ContainerAssembler(EntityPlayer player, World world, BlockPos position)
     {
         this.player = player;
         this.world = world;
@@ -64,13 +64,13 @@ public class ContainerBetterCraftingTable extends Container
 
 
         //Crafting slots
-        addSlotToContainer(new BetterCraftingResultSlot(this, 0, 124, 35));
+        addSlotToContainer(new AssemblerResultSlot(this, 0, 124, 35));
 
         for (int y = 0; y < invInput.inventoryWidth; ++y)
         {
             for (int x = 0; x < invInput.inventoryHeight; ++x)
             {
-                addSlotToContainer(new BetterCraftingGridSlot(invInput, x + y * 3, 30 + x * 18, 17 + y * 18));
+                addSlotToContainer(new AssemblerGridSlot(invInput, x + y * 3, 30 + x * 18, 17 + y * 18));
             }
         }
 
@@ -190,7 +190,7 @@ public class ContainerBetterCraftingTable extends Container
     {
         if (player.world != world) return false;
 
-        if (player.world.getBlockState(position).getBlock() != BlocksAndItems.blockBetterCraftingTable) return false;
+        if (player.world.getBlockState(position).getBlock() != BlocksAndItems.blockAssembler) return false;
 
         return player.getDistanceSq((double) position.getX() + 0.5, (double) position.getY() + 0.5, (double) position.getZ() + 0.5) <= 64;
     }
@@ -228,7 +228,7 @@ public class ContainerBetterCraftingTable extends Container
         ItemStack itemstack1 = slot.getStack();
         itemstack = itemstack1.copy();
 
-        if (slot instanceof BetterCraftingResultSlot) //From output
+        if (slot instanceof AssemblerResultSlot) //From output
         {
             if (recipe instanceof RecipeSell) recipe.craft(invInput, invOutput, itemstack1);
             else
@@ -243,7 +243,7 @@ public class ContainerBetterCraftingTable extends Container
                 if (!world.isRemote) for (int i : indices) syncSlot(i);
             }
         }
-        else if (slot instanceof BetterCraftingGridSlot) //From crafting grid / input
+        else if (slot instanceof AssemblerGridSlot) //From crafting grid / input
         {
             //To inventory or hotbar
             if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
