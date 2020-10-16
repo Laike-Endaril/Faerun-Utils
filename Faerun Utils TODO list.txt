@@ -1,1 +1,1 @@
-Improve GCMessageFixer by allowing it to run before server start
+Add 4-slot assembler (1 main item, 3 parts) which calls Tiamat Items assembly
