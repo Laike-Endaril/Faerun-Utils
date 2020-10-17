@@ -72,33 +72,29 @@ public class ContainerAssembler extends Container
                     "Brigandine Boots",
             };
 
-    protected static final String[] PRIMARY_PART_ITEM_TYPES = new String[]
+    protected static final String[] PART_ITEM_TYPES = new String[]
             {
                     "Dagger Blade",
-                    "Sword Blade",
-                    "Greatsword Blade",
-                    "Axehead",
-                    "Fist Blade",
-                    "Spearhead",
-                    "Staff Head",
-                    "Bowlimbs",
-                    "Mace Head",
-                    "Shield Center",
-                    "Focus Head",
-            };
-
-    protected static final String[] SECONDARY_PART_ITEM_TYPES = new String[]
-            {
                     "Dagger Hilt",
+                    "Sword Blade",
                     "Sword Hilt",
+                    "Greatsword Blade",
                     "Greatsword Hilt",
+                    "Axehead",
                     "Axe Handle",
                     "Fist Blade",
+                    "Fist Handle",
+                    "Spearhead",
                     "Spearshaft",
+                    "Staff Head",
                     "Staff Shaft",
+                    "Bowlimbs",
                     "Bowstring",
+                    "Mace Head",
                     "Mace Handle",
+                    "Shield Center",
                     "Shield Rim",
+                    "Focus Head",
                     "Focus Handle",
             };
 
@@ -149,12 +145,12 @@ public class ContainerAssembler extends Container
         addSlotToContainer(new PartSlot(invInput, 2, 56, 35, 240, 240, stack ->
         {
             String typename = MiscTags.getItemTypeName(stack);
-            return typename.contains("Core") || Tools.contains(PRIMARY_PART_ITEM_TYPES, typename);
+            return typename.contains("Core") || Tools.contains(PART_ITEM_TYPES, typename);
         }));
         addSlotToContainer(new PartSlot(invInput, 3, 74, 35, 240, 240, stack ->
         {
             String typename = MiscTags.getItemTypeName(stack);
-            return typename.contains("Trim") || Tools.contains(SECONDARY_PART_ITEM_TYPES, typename);
+            return typename.contains("Trim") || Tools.contains(PART_ITEM_TYPES, typename);
         }));
 
 

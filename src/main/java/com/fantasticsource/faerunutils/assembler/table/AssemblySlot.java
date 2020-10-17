@@ -19,11 +19,6 @@ public class AssemblySlot extends FilteredSlot
         this.container = container;
     }
 
-    public boolean isItemValid(ItemStack stack)
-    {
-        return false;
-    }
-
     public ItemStack onTake(EntityPlayer player, ItemStack grabbedStack)
     {
         if (container.getRecipe() == null) return ItemStack.EMPTY;
