@@ -7,13 +7,15 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.function.Predicate;
 
-public class AssemblerResultSlot extends FilteredSlot
+import static com.fantasticsource.faerunutils.assembler.table.GUIAssembler.TEXTURE;
+
+public class AssemblySlot extends FilteredSlot
 {
     private final ContainerAssembler container;
 
-    public AssemblerResultSlot(ContainerAssembler container, int slotIndex, int x, int y, int u, int v, Predicate<ItemStack> predicate)
+    public AssemblySlot(ContainerAssembler container, int slotIndex, int x, int y, int u, int v, Predicate<ItemStack> predicate)
     {
-        super(container.invOutput, slotIndex, x, y, u, v, false, 1, predicate);
+        super(container.invOutput, slotIndex, x, y, TEXTURE, 256, 256, u, v, false, 1, predicate);
         this.container = container;
     }
 

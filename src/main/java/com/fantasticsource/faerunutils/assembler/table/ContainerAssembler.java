@@ -142,16 +142,16 @@ public class ContainerAssembler extends Container
 
 
         //Crafting slots
-        addSlotToContainer(new AssemblerResultSlot(this, 0, 132, 35, 176, 0, stack -> Tools.contains(FULL_ITEM_TYPES, MiscTags.getItemTypeName(stack))));
+        addSlotToContainer(new AssemblySlot(this, 0, 132, 35, 176, 0, stack -> Tools.contains(FULL_ITEM_TYPES, MiscTags.getItemTypeName(stack))));
 
-        addSlotToContainer(new AssemblerGridSlot(invInput, 0, 20, 35, 208, 240, stack -> MiscTags.getItemTypeName(stack).contains("Blueprint")));
-        addSlotToContainer(new AssemblerGridSlot(invInput, 1, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
-        addSlotToContainer(new AssemblerGridSlot(invInput, 2, 56, 35, 240, 240, stack ->
+        addSlotToContainer(new PartSlot(invInput, 0, 20, 35, 208, 240, stack -> MiscTags.getItemTypeName(stack).contains("Blueprint")));
+        addSlotToContainer(new PartSlot(invInput, 1, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
+        addSlotToContainer(new PartSlot(invInput, 2, 56, 35, 240, 240, stack ->
         {
             String typename = MiscTags.getItemTypeName(stack);
             return typename.contains("Core") || Tools.contains(PRIMARY_PART_ITEM_TYPES, typename);
         }));
-        addSlotToContainer(new AssemblerGridSlot(invInput, 3, 74, 35, 240, 240, stack ->
+        addSlotToContainer(new PartSlot(invInput, 3, 74, 35, 240, 240, stack ->
         {
             String typename = MiscTags.getItemTypeName(stack);
             return typename.contains("Trim") || Tools.contains(SECONDARY_PART_ITEM_TYPES, typename);
@@ -311,7 +311,7 @@ public class ContainerAssembler extends Container
         ItemStack itemstack1 = slot.getStack();
         itemstack = itemstack1.copy();
 
-        if (slot instanceof AssemblerResultSlot) //From output
+        if (slot instanceof AssemblySlot) //From output
         {
             if (recipe instanceof RecipeSell) recipe.craft(invInput, invOutput, itemstack1);
             else
@@ -326,7 +326,7 @@ public class ContainerAssembler extends Container
                 if (!world.isRemote) for (int i : indices) syncSlot(i);
             }
         }
-        else if (slot instanceof AssemblerGridSlot) //From crafting grid / input
+        else if (slot instanceof PartSlot) //From crafting grid / input
         {
             //To inventory or hotbar
             if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
