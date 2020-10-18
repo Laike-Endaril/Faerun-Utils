@@ -5,6 +5,8 @@ import com.fantasticsource.faerunutils.Network;
 import com.fantasticsource.faerunutils.assembler.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.assembler.recipe.Recipes;
 import com.fantasticsource.faerunutils.assembler.recipes.RecipeSell;
+import com.fantasticsource.tiamatitems.api.IPartSlot;
+import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
@@ -16,6 +18,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -140,17 +143,44 @@ public class ContainerAssembler extends Container
         //Crafting slots
         addSlotToContainer(new AssemblySlot(this, 0, 132, 35, 176, 0, stack -> Tools.contains(FULL_ITEM_TYPES, MiscTags.getItemTypeName(stack))));
 
-        addSlotToContainer(new PartSlot(invInput, 0, 20, 35, 208, 240, stack -> MiscTags.getItemTypeName(stack).contains("Blueprint")));
-        addSlotToContainer(new PartSlot(invInput, 1, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
+        addSlotToContainer(new PartSlot(invInput, 0, 20, 35, 208, 240, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_EMPTY));
+        addSlotToContainer(new PartSlot(invInput, 1, 38, 35, 224, 240, stack ->
+        {
+            System.out.println();
+            ItemStack coreItem = invInput.getStackInSlot(0);
+            System.out.println(coreItem.getDisplayName());
+            if (coreItem.isEmpty()) return false;
+
+            ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(coreItem);
+            System.out.println(partSlots.size());
+            for (IPartSlot partSlot : partSlots)
+            {
+                System.out.println(TextFormatting.LIGHT_PURPLE + partSlot.getSlotType());
+                for (String s : partSlot.getValidItemTypes()) System.out.println(TextFormatting.AQUA + s);
+            }
+            if (partSlots.size() < 1) return false;
+
+            return partSlots.get(0).partIsValidForSlot(stack);
+        }));
         addSlotToContainer(new PartSlot(invInput, 2, 56, 35, 240, 240, stack ->
         {
-            String typename = MiscTags.getItemTypeName(stack);
-            return typename.contains("Core") || Tools.contains(PART_ITEM_TYPES, typename);
+            ItemStack coreItem = invInput.getStackInSlot(0);
+            if (coreItem.isEmpty()) return false;
+
+            ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(coreItem);
+            if (partSlots.size() < 2) return false;
+
+            return partSlots.get(1).partIsValidForSlot(stack);
         }));
         addSlotToContainer(new PartSlot(invInput, 3, 74, 35, 240, 240, stack ->
         {
-            String typename = MiscTags.getItemTypeName(stack);
-            return typename.contains("Trim") || Tools.contains(PART_ITEM_TYPES, typename);
+            ItemStack coreItem = invInput.getStackInSlot(0);
+            if (coreItem.isEmpty()) return false;
+
+            ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(coreItem);
+            if (partSlots.size() < 3) return false;
+
+            return partSlots.get(2).partIsValidForSlot(stack);
         }));
 
 
