@@ -5,7 +5,6 @@ import com.fantasticsource.faerunutils.Network;
 import com.fantasticsource.faerunutils.assembler.recipe.BetterRecipe;
 import com.fantasticsource.faerunutils.assembler.recipe.Recipes;
 import com.fantasticsource.faerunutils.assembler.recipes.RecipeSell;
-import com.fantasticsource.tiamatitems.api.IPartSlot;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.Tools;
@@ -18,7 +17,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -28,76 +26,33 @@ public class ContainerAssembler extends Container
 {
     private static final boolean DEBUG = false;
 
-    protected static final String[] FULL_ITEM_TYPES = new String[]
-            {
-                    "Dagger",
-                    "Sword",
-                    "Greatsword",
-                    "Axe",
-                    "Fist",
-                    "Spear",
-                    "Staff",
-                    "Bow",
-                    "Mace",
-                    "Shield",
-                    "Focus",
-                    "Cape",
-                    "Wrap",
-                    "Cloth Helm",
-                    "Cloth Shoulders",
-                    "Cloth Chest",
-                    "Cloth Leggings",
-                    "Cloth Boots",
-                    "Leather Helm",
-                    "Leather Shoulders",
-                    "Leather Chest",
-                    "Leather Leggings",
-                    "Leather Boots",
-                    "Chain Helm",
-                    "Chain Shoulders",
-                    "Chain Chest",
-                    "Chain Leggings",
-                    "Chain Boots",
-                    "Scale Helm",
-                    "Scale Shoulders",
-                    "Scale Chest",
-                    "Scale Leggings",
-                    "Scale Boots",
-                    "Plate Helm",
-                    "Plate Shoulders",
-                    "Plate Chest",
-                    "Plate Leggings",
-                    "Plate Boots",
-                    "Brigandine Helm",
-                    "Brigandine Shoulders",
-                    "Brigandine Chest",
-                    "Brigandine Leggings",
-                    "Brigandine Boots",
-            };
-
-    protected static final String[] PART_ITEM_TYPES = new String[]
+    protected static final String[] PRIMARY_PART_ITEM_TYPES = new String[]
             {
                     "Dagger Blade",
-                    "Dagger Hilt",
                     "Sword Blade",
-                    "Sword Hilt",
                     "Greatsword Blade",
-                    "Greatsword Hilt",
                     "Axehead",
-                    "Axe Handle",
                     "Fist Blade",
-                    "Fist Handle",
                     "Spearhead",
-                    "Spearshaft",
                     "Staff Head",
-                    "Staff Shaft",
                     "Bowlimbs",
-                    "Bowstring",
                     "Mace Head",
-                    "Mace Handle",
                     "Shield Center",
-                    "Shield Rim",
                     "Focus Head",
+            };
+
+    protected static final String[] SECONDARY_PART_ITEM_TYPES = new String[]
+            {
+                    "Dagger Hilt",
+                    "Sword Hilt",
+                    "Greatsword Hilt",
+                    "Axe Handle",
+                    "Fist Handle",
+                    "Spearshaft",
+                    "Staff Shaft",
+                    "Bowstring",
+                    "Mace Handle",
+                    "Shield Rim",
                     "Focus Handle",
             };
 
@@ -105,8 +60,7 @@ public class ContainerAssembler extends Container
     public final World world;
     public final BlockPos position;
 
-    public final int playerInventoryWidth;
-    public final int outputIndex, craftingGridStartIndex, craftingGridSize, playerInventoryStartIndex, playerInventorySize, hotbarStartIndex, hotbarSize;
+    public final int craftingGridSize, playerInventoryStartIndex, cargoInventorySize, hotbarStartIndex;
     public final int fullInventoryStart, fullInventoryEnd;
 
     public InventoryAssemblerInput invInput = new InventoryAssemblerInput(this);
@@ -123,78 +77,45 @@ public class ContainerAssembler extends Container
 
 
         //Slot indices
-        outputIndex = 0;
-
         craftingGridSize = invInput.getSizeInventory();
-        craftingGridStartIndex = outputIndex + 1;
 
-        playerInventoryWidth = 9;
-        hotbarSize = 9;
+        cargoInventorySize = player.inventory.mainInventory.size() - 9;
 
-        playerInventorySize = player.inventory.mainInventory.size() - hotbarSize;
-
-        hotbarStartIndex = craftingGridStartIndex + craftingGridSize;
-        playerInventoryStartIndex = hotbarStartIndex + hotbarSize;
+        hotbarStartIndex = craftingGridSize + 1;
+        playerInventoryStartIndex = hotbarStartIndex + 9;
 
         fullInventoryStart = hotbarStartIndex;
-        fullInventoryEnd = fullInventoryStart + hotbarSize + playerInventorySize - 1;
+        fullInventoryEnd = fullInventoryStart + 9 + cargoInventorySize - 1;
 
 
         //Crafting slots
-        addSlotToContainer(new AssemblySlot(this, 0, 132, 35, 176, 0, stack -> Tools.contains(FULL_ITEM_TYPES, MiscTags.getItemTypeName(stack))));
+        addSlotToContainer(new AssemblySlot(this, 0, 132, 35, 176, 0, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_FULL && AssemblyTags.getPartSlots(stack).size() > 0));
 
         addSlotToContainer(new PartSlot(invInput, 0, 20, 35, 208, 240, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_EMPTY));
-        addSlotToContainer(new PartSlot(invInput, 1, 38, 35, 224, 240, stack ->
-        {
-            System.out.println();
-            ItemStack coreItem = invInput.getStackInSlot(0);
-            System.out.println(coreItem.getDisplayName());
-            if (coreItem.isEmpty()) return false;
-
-            ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(coreItem);
-            System.out.println(partSlots.size());
-            for (IPartSlot partSlot : partSlots)
-            {
-                System.out.println(TextFormatting.LIGHT_PURPLE + partSlot.getSlotType());
-                for (String s : partSlot.getValidItemTypes()) System.out.println(TextFormatting.AQUA + s);
-            }
-            if (partSlots.size() < 1) return false;
-
-            return partSlots.get(0).partIsValidForSlot(stack);
-        }));
+        addSlotToContainer(new PartSlot(invInput, 1, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
         addSlotToContainer(new PartSlot(invInput, 2, 56, 35, 240, 240, stack ->
         {
-            ItemStack coreItem = invInput.getStackInSlot(0);
-            if (coreItem.isEmpty()) return false;
-
-            ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(coreItem);
-            if (partSlots.size() < 2) return false;
-
-            return partSlots.get(1).partIsValidForSlot(stack);
+            String type = MiscTags.getItemTypeName(stack);
+            return type.contains("Core") || Tools.contains(PRIMARY_PART_ITEM_TYPES, type);
         }));
         addSlotToContainer(new PartSlot(invInput, 3, 74, 35, 240, 240, stack ->
         {
-            ItemStack coreItem = invInput.getStackInSlot(0);
-            if (coreItem.isEmpty()) return false;
-
-            ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(coreItem);
-            if (partSlots.size() < 3) return false;
-
-            return partSlots.get(2).partIsValidForSlot(stack);
+            String type = MiscTags.getItemTypeName(stack);
+            return type.contains("Trim") || Tools.contains(SECONDARY_PART_ITEM_TYPES, type);
         }));
 
 
         //Inventory
-        for (int i = 0; i < playerInventorySize; i++)
+        for (int i = 0; i < cargoInventorySize; i++)
         {
-            addSlotToContainer(new Slot(player.inventory, hotbarSize + i, 8 + (i % playerInventoryWidth) * 18, 84 + (i / playerInventoryWidth) * 18));
+            addSlotToContainer(new Slot(player.inventory, 9 + i, 8 + (i % 9) * 18, 84 + (i / 9) * 18));
         }
 
 
         //Hotbar
-        int hotbarY = 88 + ((playerInventorySize + playerInventoryWidth - 1) / playerInventoryWidth) * 18; //Pseudo-ceil function
+        int hotbarY = 88 + ((cargoInventorySize + 9 - 1) / 9) * 18; //Pseudo-ceil function
 
-        for (int x = 0; x < hotbarSize; x++)
+        for (int x = 0; x < 9; x++)
         {
             addSlotToContainer(new Slot(player.inventory, x, 8 + x * 18, hotbarY));
         }
@@ -360,7 +281,7 @@ public class ContainerAssembler extends Container
         else if (index >= fullInventoryStart && index <= fullInventoryEnd) //From inventory or hotbar
         {
             //To crafting grid / input
-            if (!mergeItemStack(itemstack1, craftingGridStartIndex, craftingGridStartIndex + craftingGridSize, false)) return ItemStack.EMPTY;
+            if (!mergeItemStack(itemstack1, 1, 1 + craftingGridSize, false)) return ItemStack.EMPTY;
         }
         else
         {
