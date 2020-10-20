@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.assembler.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatitems.assembly.ItemAssembly;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
@@ -60,6 +61,7 @@ public class ContainerAssembler extends Container
     public InventoryAssembler inventory = new InventoryAssembler(this);
 
     protected boolean updating = false;
+    protected ItemStack[] previous = new ItemStack[5];
 
 
     public ContainerAssembler(EntityPlayer player, World world, BlockPos position)
@@ -79,6 +81,10 @@ public class ContainerAssembler extends Container
 
         fullInventoryStart = hotbarStartIndex;
         fullInventoryEnd = fullInventoryStart + 9 + cargoInventorySize - 1;
+
+
+        //Set previous
+        for (int i = 0; i < previous.length; i++) previous[i] = ItemStack.EMPTY;
 
 
         //Crafting slots
@@ -289,9 +295,9 @@ public class ContainerAssembler extends Container
 
     public void update(int slotNumber)
     {
-        if (updating || player.world.isRemote) return;
-        updating = true;
+        if (updating || player.world.isRemote || ItemMatcher.stacksMatch(previous[slotNumber], inventorySlots.get(slotNumber).getStack())) return;
 
+        updating = true;
 
         if (slotNumber == 0) //Assembly changed by player
         {
@@ -330,6 +336,7 @@ public class ContainerAssembler extends Container
         }
 
 
+        for (int i = 0; i < previous.length; i++) previous[i] = MCTools.cloneItemStack(inventorySlots.get(i).getStack());
         updating = false;
     }
 }
