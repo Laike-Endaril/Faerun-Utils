@@ -1,14 +1,11 @@
 package com.fantasticsource.faerunutils.assembler.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
-import com.fantasticsource.faerunutils.Network;
-import com.fantasticsource.faerunutils.assembler.recipe.BetterRecipe;
-import com.fantasticsource.faerunutils.assembler.recipe.Recipes;
-import com.fantasticsource.faerunutils.assembler.recipes.RecipeSell;
+import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.tiamatitems.assembly.ItemAssembly;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.Tools;
-import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -20,12 +17,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ContainerAssembler extends Container
 {
-    private static final boolean DEBUG = false;
-
     protected static final String[] PRIMARY_PART_ITEM_TYPES = new String[]
             {
                     "Dagger Blade",
@@ -63,10 +57,9 @@ public class ContainerAssembler extends Container
     public final int craftingGridSize, playerInventoryStartIndex, cargoInventorySize, hotbarStartIndex;
     public final int fullInventoryStart, fullInventoryEnd;
 
-    public InventoryAssemblerInput invInput = new InventoryAssemblerInput(this);
-    public InventoryAssemblerOutput invOutput = new InventoryAssemblerOutput();
-    private BetterRecipe recipe = null;
-    private ItemStack[] previousItems;
+    public InventoryAssembler inventory = new InventoryAssembler(this);
+
+    protected boolean updating = false;
 
 
     public ContainerAssembler(EntityPlayer player, World world, BlockPos position)
@@ -77,7 +70,7 @@ public class ContainerAssembler extends Container
 
 
         //Slot indices
-        craftingGridSize = invInput.getSizeInventory();
+        craftingGridSize = inventory.getSizeInventory();
 
         cargoInventorySize = player.inventory.mainInventory.size() - 9;
 
@@ -89,16 +82,16 @@ public class ContainerAssembler extends Container
 
 
         //Crafting slots
-        addSlotToContainer(new AssemblySlot(this, 0, 132, 35, 176, 0, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_FULL && AssemblyTags.getPartSlots(stack).size() > 0));
+        addSlotToContainer(new AssemblerSlot(this, 0, 132, 35, 176, 0, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_FULL && AssemblyTags.getPartSlots(stack).size() > 0));
 
-        addSlotToContainer(new PartSlot(invInput, 0, 20, 35, 208, 240, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_EMPTY));
-        addSlotToContainer(new PartSlot(invInput, 1, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
-        addSlotToContainer(new PartSlot(invInput, 2, 56, 35, 240, 240, stack ->
+        addSlotToContainer(new AssemblerSlot(this, 1, 20, 35, 208, 240, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_EMPTY));
+        addSlotToContainer(new AssemblerSlot(this, 2, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
+        addSlotToContainer(new AssemblerSlot(this, 3, 56, 35, 240, 240, stack ->
         {
             String type = MiscTags.getItemTypeName(stack);
             return type.contains("Core") || Tools.contains(PRIMARY_PART_ITEM_TYPES, type);
         }));
-        addSlotToContainer(new PartSlot(invInput, 3, 74, 35, 240, 240, stack ->
+        addSlotToContainer(new AssemblerSlot(this, 4, 74, 35, 240, 240, stack ->
         {
             String type = MiscTags.getItemTypeName(stack);
             return type.contains("Trim") || Tools.contains(SECONDARY_PART_ITEM_TYPES, type);
@@ -119,10 +112,6 @@ public class ContainerAssembler extends Container
         {
             addSlotToContainer(new Slot(player.inventory, x, 8 + x * 18, hotbarY));
         }
-
-
-        previousItems = new ItemStack[invInput.getSizeInventory()];
-        Arrays.fill(previousItems, ItemStack.EMPTY);
     }
 
     protected ArrayList<Integer> mergeItemStackBetter(ItemStack stack, int startIndex, int endIndex)
@@ -211,7 +200,7 @@ public class ContainerAssembler extends Container
 
         if (!player.world.isRemote)
         {
-            clearContainer(player, player.world, invInput);
+            clearContainer(player, player.world, inventory);
         }
     }
 
@@ -258,22 +247,18 @@ public class ContainerAssembler extends Container
         ItemStack itemstack1 = slot.getStack();
         itemstack = itemstack1.copy();
 
-        if (slot instanceof AssemblySlot) //From output
+        if (slot.slotNumber == 0) //From output
         {
-            if (recipe instanceof RecipeSell) recipe.craft(invInput, invOutput, itemstack1);
-            else
-            {
-                itemstack1.getItem().onCreated(itemstack1, player.world, player);
+            itemstack1.getItem().onCreated(itemstack1, player.world, player);
 
-                //To inventory or hotbar
-                ArrayList<Integer> indices = mergeItemStackBetter(itemstack1, fullInventoryStart, fullInventoryEnd + 1);
-                if (indices.size() == 0) return ItemStack.EMPTY;
+            //To inventory or hotbar
+            ArrayList<Integer> indices = mergeItemStackBetter(itemstack1, fullInventoryStart, fullInventoryEnd + 1);
+            if (indices.size() == 0) return ItemStack.EMPTY;
 
-                slot.onSlotChange(itemstack1, itemstack);
-                if (!world.isRemote) for (int i : indices) syncSlot(i);
-            }
+            slot.onSlotChange(itemstack1, itemstack);
+            if (!world.isRemote) for (int i : indices) syncSlot(i);
         }
-        else if (slot instanceof PartSlot) //From crafting grid / input
+        else if (slot instanceof AssemblerSlot) //From crafting grid / input
         {
             //To inventory or hotbar
             if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
@@ -302,145 +287,49 @@ public class ContainerAssembler extends Container
         return itemstack;
     }
 
-    @Override
-    public boolean canMergeSlot(ItemStack stack, Slot slotIn)
+    public void update(int slotNumber)
     {
-        return slotIn.inventory != invOutput && super.canMergeSlot(stack, slotIn);
-    }
-
-    public void update()
-    {
-        update(false);
-    }
-
-    public void update(boolean actionChange)
-    {
-        if (player.world.isRemote) return;
+        if (updating || player.world.isRemote) return;
+        updating = true;
 
 
-        //Check previous item snapshot
-        //If same, return
-        //If different, track changed indices and update item snapshot
-        ArrayList<Integer> changedIndices = new ArrayList<>();
-        if (actionChange)
+        if (slotNumber == 0) //Assembly changed by player
         {
-            if (DEBUG) System.out.println("Action Change");
-        }
-        else
-        {
-            int i = 0;
-            for (ItemStack stack : invInput.stackList)
+            //Set server-side parts
+            ItemStack core = MCTools.cloneItemStack(inventorySlots.get(0).getStack());
+            ArrayList<ItemStack> parts = ItemAssembly.disassemble(core);
+
+
+            inventorySlots.get(1).putStack(core);
+            syncSlot(1);
+            for (int i = 2; i < 5; i++)
             {
-                ItemStack previous = previousItems[i];
-                if (previous.isEmpty() && stack.isEmpty())
+                Slot slot = inventorySlots.get(i);
+                slot.putStack(ItemStack.EMPTY);
+                for (ItemStack part : parts)
                 {
-                    i++;
-                    continue;
+                    if (slot.isItemValid(part))
+                    {
+                        slot.putStack(part);
+                        break;
+                    }
                 }
-
-                if (previous.getItem() != stack.getItem() || previous.getCount() != stack.getCount() || previous.getItemDamage() != stack.getItemDamage() || !previous.getDisplayName().equals(stack.getDisplayName()) || !previous.serializeNBT().toString().equals(stack.serializeNBT().toString()))
-                {
-                    changedIndices.add(i);
-                    if (DEBUG) System.out.println(i + ": " + previous + " -> " + stack);
-                    previousItems[i] = stack.copy();
-                }
-                i++;
-            }
-            if (changedIndices.size() == 0)
-            {
-                if (DEBUG) System.out.println("Unchanged");
-                return;
-            }
-            if (DEBUG) System.out.println("Changed");
-        }
-
-
-        //Determine which recipe to use
-        if (recipe != null)
-        {
-            if (!recipe.matches(invInput)) setServerRecipe(null);
-        }
-
-        if (recipe == null)
-        {
-            for (BetterRecipe recipe : Recipes.recipeList.values())
-            {
-                if (recipe.matches(invInput))
-                {
-                    setServerRecipe(recipe);
-                    break;
-                }
+                syncSlot(i);
             }
         }
-
-
-        //Set server-side output via recipe method
-        Pair<ItemStack, ItemStack> result = recipe == null ? new Pair<>(ItemStack.EMPTY, ItemStack.EMPTY) : recipe.prepareToCraft(invInput);
-        invOutput.setInventorySlotContents(0, result.getKey());
-
-
-        //Update all changed slots for client
-        for (int index : changedIndices)
+        else //Part changed by player
         {
-            ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, index + 1, invInput.stackList.get(index)));
-        }
-        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, 0, result.getValue()));
+            //Set server-side assembly
+            ItemStack assembly = MCTools.cloneItemStack(inventorySlots.get(1).getStack());
+            ArrayList<ItemStack> unusedParts = ItemAssembly.assemble(assembly, MCTools.cloneItemStack(inventorySlots.get(2).getStack()), MCTools.cloneItemStack(inventorySlots.get(3).getStack()), MCTools.cloneItemStack(inventorySlots.get(4).getStack()));
+            inventorySlots.get(0).putStack(unusedParts.size() > 0 ? ItemStack.EMPTY : assembly);
 
-        //For higher-than-byte stack sizes in output
-        int count = result.getValue().getCount();
-        if (count > 127) Network.WRAPPER.sendTo(new Network.RecipeOutputCountPacket(result.getValue().getCount()), (EntityPlayerMP) player);
-    }
 
-    public void switchRecipe(int offset)
-    {
-        ArrayList<BetterRecipe> validRecipes = new ArrayList<>();
-        for (BetterRecipe r : Recipes.recipeList.values())
-        {
-            if (r.matches(invInput)) validRecipes.add(r);
+            //Update assembly for client
+            syncSlot(0);
         }
 
 
-        if (validRecipes.size() == 0) return;
-
-        if (validRecipes.size() == 1)
-        {
-            setServerRecipe(validRecipes.get(0));
-            return;
-        }
-
-
-        int index = validRecipes.indexOf(recipe);
-        if (index >= 0) index += offset;
-        else
-        {
-            if (offset > 0) offset--;
-            index = offset;
-        }
-
-        setServerRecipe(validRecipes.get(Tools.posMod(index, validRecipes.size())));
-        update(true);
-    }
-
-    public BetterRecipe getRecipe()
-    {
-        return recipe;
-    }
-
-    public void setServerRecipe(BetterRecipe recipe)
-    {
-        if (!world.isRemote)
-        {
-            this.recipe = recipe;
-            Network.WRAPPER.sendTo(new Network.SetRecipePacket(recipe), (EntityPlayerMP) player);
-        }
-    }
-
-    public void setClientRecipe(BetterRecipe recipe)
-    {
-        if (world.isRemote)
-        {
-            if (recipe == null) recipe = Recipes.NULL;
-            this.recipe = recipe;
-        }
+        updating = false;
     }
 }

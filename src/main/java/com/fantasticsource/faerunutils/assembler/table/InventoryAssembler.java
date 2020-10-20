@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils.assembler.table;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
@@ -9,32 +10,40 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
-public class InventoryAssemblerOutput implements IInventory
+public class InventoryAssembler implements IInventory
 {
-    private final NonNullList<ItemStack> stackResult = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> stackList;
+    public final Container container;
+
+    public InventoryAssembler(Container eventHandlerIn)
+    {
+        this.stackList = NonNullList.withSize(5, ItemStack.EMPTY);
+        this.container = eventHandlerIn;
+    }
 
     public int getSizeInventory()
     {
-        return 1;
+        return this.stackList.size();
     }
 
     public boolean isEmpty()
     {
-        for (ItemStack itemstack : this.stackResult)
+        for (ItemStack itemstack : this.stackList)
         {
             if (!itemstack.isEmpty()) return false;
         }
+
         return true;
     }
 
     public ItemStack getStackInSlot(int index)
     {
-        return this.stackResult.get(0);
+        return index >= this.getSizeInventory() ? ItemStack.EMPTY : this.stackList.get(index);
     }
 
     public String getName()
     {
-        return "Result";
+        return "container.crafting";
     }
 
     public boolean hasCustomName()
@@ -47,19 +56,27 @@ public class InventoryAssemblerOutput implements IInventory
         return (this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName()));
     }
 
-    public ItemStack decrStackSize(int index, int count)
-    {
-        return ItemStackHelper.getAndRemove(this.stackResult, 0);
-    }
-
     public ItemStack removeStackFromSlot(int index)
     {
-        return ItemStackHelper.getAndRemove(this.stackResult, 0);
+        return ItemStackHelper.getAndRemove(this.stackList, index);
+    }
+
+    public ItemStack decrStackSize(int index, int count)
+    {
+        ItemStack itemstack = ItemStackHelper.getAndSplit(this.stackList, index, count);
+
+        if (!itemstack.isEmpty())
+        {
+            this.container.onCraftMatrixChanged(this);
+        }
+
+        return itemstack;
     }
 
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        this.stackResult.set(0, stack);
+        this.stackList.set(index, stack);
+        this.container.onCraftMatrixChanged(this);
     }
 
     public int getInventoryStackLimit()
@@ -105,6 +122,6 @@ public class InventoryAssemblerOutput implements IInventory
 
     public void clear()
     {
-        this.stackResult.clear();
+        this.stackList.clear();
     }
 }
