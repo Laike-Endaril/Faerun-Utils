@@ -17,18 +17,18 @@ public class InventoryAssembler implements IInventory
 
     public InventoryAssembler(Container eventHandlerIn)
     {
-        this.stackList = NonNullList.withSize(5, ItemStack.EMPTY);
-        this.container = eventHandlerIn;
+        stackList = NonNullList.withSize(5, ItemStack.EMPTY);
+        container = eventHandlerIn;
     }
 
     public int getSizeInventory()
     {
-        return this.stackList.size();
+        return stackList.size();
     }
 
     public boolean isEmpty()
     {
-        for (ItemStack itemstack : this.stackList)
+        for (ItemStack itemstack : stackList)
         {
             if (!itemstack.isEmpty()) return false;
         }
@@ -38,7 +38,7 @@ public class InventoryAssembler implements IInventory
 
     public ItemStack getStackInSlot(int index)
     {
-        return index >= this.getSizeInventory() ? ItemStack.EMPTY : this.stackList.get(index);
+        return index >= getSizeInventory() ? ItemStack.EMPTY : stackList.get(index);
     }
 
     public String getName()
@@ -53,30 +53,22 @@ public class InventoryAssembler implements IInventory
 
     public ITextComponent getDisplayName()
     {
-        return (this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName()));
+        return (hasCustomName() ? new TextComponentString(getName()) : new TextComponentTranslation(getName()));
     }
 
     public ItemStack removeStackFromSlot(int index)
     {
-        return ItemStackHelper.getAndRemove(this.stackList, index);
+        return ItemStackHelper.getAndRemove(stackList, index);
     }
 
     public ItemStack decrStackSize(int index, int count)
     {
-        ItemStack itemstack = ItemStackHelper.getAndSplit(this.stackList, index, count);
-
-        if (!itemstack.isEmpty())
-        {
-            this.container.onCraftMatrixChanged(this);
-        }
-
-        return itemstack;
+        return ItemStackHelper.getAndSplit(stackList, index, count);
     }
 
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        this.stackList.set(index, stack);
-        this.container.onCraftMatrixChanged(this);
+        stackList.set(index, stack);
     }
 
     public int getInventoryStackLimit()
@@ -122,6 +114,6 @@ public class InventoryAssembler implements IInventory
 
     public void clear()
     {
-        this.stackList.clear();
+        stackList.clear();
     }
 }

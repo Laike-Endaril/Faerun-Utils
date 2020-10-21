@@ -9,6 +9,7 @@ import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -55,7 +56,7 @@ public class ContainerAssembler extends Container
     public final World world;
     public final BlockPos position;
 
-    public final int craftingGridSize, playerInventoryStartIndex, cargoInventorySize, hotbarStartIndex;
+    public final int assemblerInventorySize, playerInventoryStartIndex, cargoInventorySize, hotbarStartIndex;
     public final int fullInventoryStart, fullInventoryEnd;
 
     public InventoryAssembler inventory = new InventoryAssembler(this);
@@ -72,11 +73,11 @@ public class ContainerAssembler extends Container
 
 
         //Slot indices
-        craftingGridSize = inventory.getSizeInventory();
+        assemblerInventorySize = inventory.getSizeInventory();
 
         cargoInventorySize = player.inventory.mainInventory.size() - 9;
 
-        hotbarStartIndex = craftingGridSize + 1;
+        hotbarStartIndex = assemblerInventorySize;
         playerInventoryStartIndex = hotbarStartIndex + 9;
 
         fullInventoryStart = hotbarStartIndex;
@@ -195,11 +196,6 @@ public class ContainerAssembler extends Container
     }
 
     @Override
-    public void onCraftMatrixChanged(IInventory ignored)
-    {
-    }
-
-    @Override
     public void onContainerClosed(EntityPlayer ignored)
     {
         super.onContainerClosed(player);
@@ -207,6 +203,47 @@ public class ContainerAssembler extends Container
         if (!player.world.isRemote)
         {
             clearContainer(player, player.world, inventory);
+        }
+    }
+
+    @Override
+    protected void clearContainer(EntityPlayer player, World world, IInventory inventory)
+    {
+        if (!player.isEntityAlive() || player instanceof EntityPlayerMP && ((EntityPlayerMP) player).hasDisconnected())
+        {
+            if (inventory.getStackInSlot(0).isEmpty())
+            {
+                for (int i = 1; i < inventory.getSizeInventory(); i++)
+                {
+                    player.dropItem(inventory.removeStackFromSlot(i), false);
+                }
+            }
+            else
+            {
+                player.dropItem(inventory.removeStackFromSlot(0), false);
+                for (int i = 1; i < inventory.getSizeInventory(); i++)
+                {
+                    inventory.removeStackFromSlot(i);
+                }
+            }
+        }
+        else
+        {
+            if (inventory.getStackInSlot(0).isEmpty())
+            {
+                for (int i = 1; i < inventory.getSizeInventory(); i++)
+                {
+                    player.inventory.placeItemBackInInventory(world, inventory.removeStackFromSlot(i));
+                }
+            }
+            else
+            {
+                player.inventory.placeItemBackInInventory(world, inventory.removeStackFromSlot(0));
+                for (int i = 1; i < inventory.getSizeInventory(); i++)
+                {
+                    inventory.removeStackFromSlot(i);
+                }
+            }
         }
     }
 
@@ -246,25 +283,13 @@ public class ContainerAssembler extends Container
         Slot slot = inventorySlots.get(index);
         if (slot == null) return ItemStack.EMPTY;
 
-        ItemStack itemstack = slot.getStack();
-        if (itemstack.isEmpty()) return ItemStack.EMPTY;
-
-
         ItemStack itemstack1 = slot.getStack();
-        itemstack = itemstack1.copy();
+        if (itemstack1.isEmpty()) return ItemStack.EMPTY;
 
-        if (slot.slotNumber == 0) //From output
-        {
-            itemstack1.getItem().onCreated(itemstack1, player.world, player);
 
-            //To inventory or hotbar
-            ArrayList<Integer> indices = mergeItemStackBetter(itemstack1, fullInventoryStart, fullInventoryEnd + 1);
-            if (indices.size() == 0) return ItemStack.EMPTY;
+        ItemStack itemstack = itemstack1.copy();
 
-            slot.onSlotChange(itemstack1, itemstack);
-            if (!world.isRemote) for (int i : indices) syncSlot(i);
-        }
-        else if (slot instanceof AssemblerSlot) //From crafting grid / input
+        if (slot instanceof AssemblerSlot) //From part or assembly slot
         {
             //To inventory or hotbar
             if (!mergeItemStack(itemstack1, fullInventoryStart, fullInventoryEnd + 1, false)) return ItemStack.EMPTY;
@@ -272,7 +297,7 @@ public class ContainerAssembler extends Container
         else if (index >= fullInventoryStart && index <= fullInventoryEnd) //From inventory or hotbar
         {
             //To crafting grid / input
-            if (!mergeItemStack(itemstack1, 1, 1 + craftingGridSize, false)) return ItemStack.EMPTY;
+            if (!mergeItemStack(itemstack1, 0, assemblerInventorySize, false)) return ItemStack.EMPTY;
         }
         else
         {
@@ -290,7 +315,7 @@ public class ContainerAssembler extends Container
         if (index == 0) player.dropItem(itemstack2, false);
 
 
-        return itemstack;
+        return new ItemStack(Items.BOW);
     }
 
     public void update(int slotNumber)
