@@ -16,7 +16,7 @@ public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
     public static final String NAME = "Faerun Utils";
-    public static final String VERSION = "1.12.2.Era2.000a";
+    public static final String VERSION = "1.12.2.Era2.000b";
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event)
