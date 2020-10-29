@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 
 import java.util.function.Predicate;
 
-import static com.fantasticsource.faerunutils.assembler.table.GUIAssembler.TEXTURE;
+import static com.fantasticsource.faerunutils.assembler.table.ContainerAssembler.TEXTURE;
 
 public class AssemblerSlot extends FilteredSlot
 {

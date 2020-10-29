@@ -12,11 +12,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static com.fantasticsource.faerunutils.assembler.table.ContainerAssembler.TEXTURE;
+
 @SideOnly(Side.CLIENT)
 public class GUIAssembler extends BetterContainerGUI
 {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(FaerunUtils.MODID, "textures/gui/assembler.png");
-
     public GUIAssembler()
     {
         super(new ContainerAssembler(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world, BlockPos.ORIGIN));

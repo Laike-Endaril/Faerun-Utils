@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils.assembler.table;
 
 import com.fantasticsource.faerunutils.BlocksAndItems;
+import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatitems.assembly.ItemAssembly;
@@ -15,6 +16,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -22,6 +24,8 @@ import java.util.ArrayList;
 
 public class ContainerAssembler extends Container
 {
+    public static final ResourceLocation TEXTURE = new ResourceLocation(FaerunUtils.MODID, "textures/gui/assembler.png");
+
     protected static final String[] PRIMARY_PART_ITEM_TYPES = new String[]
             {
                     "Dagger Blade",
