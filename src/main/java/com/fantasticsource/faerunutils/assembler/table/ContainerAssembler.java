@@ -125,80 +125,6 @@ public class ContainerAssembler extends Container
         }
     }
 
-    protected ArrayList<Integer> mergeItemStackBetter(ItemStack stack, int startIndex, int endIndex)
-    {
-        ArrayList<Integer> result = new ArrayList<>();
-
-        int i = startIndex;
-
-        if (stack.isStackable())
-        {
-            while (!stack.isEmpty())
-            {
-                if (i >= endIndex) break;
-
-                Slot slot = inventorySlots.get(i);
-                ItemStack itemstack = slot.getStack();
-
-                if (!itemstack.isEmpty() && itemstack.getItem() == stack.getItem() && (!stack.getHasSubtypes() || stack.getMetadata() == itemstack.getMetadata()) && ItemStack.areItemStackTagsEqual(stack, itemstack))
-                {
-                    int j = itemstack.getCount() + stack.getCount();
-                    int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
-
-                    if (j <= maxSize)
-                    {
-                        stack.setCount(0);
-                        itemstack.setCount(j);
-                        slot.onSlotChanged();
-                        result.add(i);
-                    }
-                    else if (itemstack.getCount() < maxSize)
-                    {
-                        stack.shrink(maxSize - itemstack.getCount());
-                        itemstack.setCount(maxSize);
-                        slot.onSlotChanged();
-                        result.add(i);
-                    }
-                }
-
-                ++i;
-            }
-        }
-
-        if (!stack.isEmpty())
-        {
-            i = startIndex;
-
-            while (true)
-            {
-                if (i >= endIndex) break;
-
-                Slot slot1 = inventorySlots.get(i);
-                ItemStack itemstack1 = slot1.getStack();
-
-                if (itemstack1.isEmpty() && slot1.isItemValid(stack))
-                {
-                    if (stack.getCount() > slot1.getSlotStackLimit())
-                    {
-                        slot1.putStack(stack.splitStack(slot1.getSlotStackLimit()));
-                    }
-                    else
-                    {
-                        slot1.putStack(stack.splitStack(stack.getCount()));
-                    }
-
-                    slot1.onSlotChanged();
-                    result.add(i);
-                    break;
-                }
-
-                ++i;
-            }
-        }
-
-        return result;
-    }
-
     @Override
     public void onContainerClosed(EntityPlayer ignored)
     {
@@ -274,11 +200,6 @@ public class ContainerAssembler extends Container
     protected void syncSlot(int slotIndex)
     {
         ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, slotIndex, inventorySlots.get(slotIndex).getStack()));
-    }
-
-    protected void syncSlot(Slot slot)
-    {
-        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, getSlotIndex(slot), slot.getStack()));
     }
 
     @Override
