@@ -33,12 +33,9 @@ public class CmdDie extends CommandBase
     @Override
     public String getUsage(ICommandSender sender)
     {
-        if (sender.canUseCommand(2, getName()))
-        {
-            return AQUA + "/" + getName() + WHITE + " - " + I18n.translateToLocalFormatted(MODID + ".cmd.die.comment");
-        }
+        if (sender.canUseCommand(getRequiredPermissionLevel(), getName())) return MODID + ".cmd." + getName() + ".usage";
 
-        return I18n.translateToLocalFormatted("commands.generic.permission");
+        return "commands.generic.permission";
     }
 
     public void execute(MinecraftServer server, ICommandSender sender, String[] args)

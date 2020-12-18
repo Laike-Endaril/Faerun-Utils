@@ -23,6 +23,7 @@ public class FaerunUtils
     {
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
+        Network.init();
     }
 
     @SubscribeEvent
@@ -35,6 +36,7 @@ public class FaerunUtils
     public static void serverStarting(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new CmdDie());
+        event.registerServerCommand(new CmdInteract());
     }
 
     @SubscribeEvent

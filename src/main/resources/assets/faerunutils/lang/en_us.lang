@@ -10,3 +10,8 @@ faerunutils.config.cnpcResetDistance.tooltip=If a CNPC roams this far or more fr
 itemGroup.faerunutils=Faerun Utils
 
 tile.faerunutils:assembler.name=Assembler
+
+
+
+faerunutils.cmd.die.usage=I kill you!
+faerunutils.cmd.interact.usage=Make a player interact with a block (x, y, z, [player])
