@@ -95,7 +95,19 @@ public class ContainerAssembler extends Container
 
 
         //Crafting slots
-        addSlotToContainer(new AssemblerSlot(this, 0, 132, 35, 176, 0, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_FULL && AssemblyTags.getPartSlots(stack).size() > 0));
+        addSlotToContainer(new AssemblerSlot(this, 0, 132, 35, 176, 0, stack ->
+        {
+            if (AssemblyTags.getState(stack) != AssemblyTags.STATE_FULL || AssemblyTags.getPartSlots(stack).size() <= 0) return false;
+            if (inventorySlots.get(0).getStack().isEmpty())
+            {
+                boolean empty = inventorySlots.get(1).getStack().isEmpty();
+                for (int i = 2; i <= 4; i++)
+                {
+                    if (inventorySlots.get(i).getStack().isEmpty() != empty) return false;
+                }
+            }
+            return true;
+        }));
 
         addSlotToContainer(new AssemblerSlot(this, 1, 20, 35, 208, 240, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_EMPTY));
         addSlotToContainer(new AssemblerSlot(this, 2, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
