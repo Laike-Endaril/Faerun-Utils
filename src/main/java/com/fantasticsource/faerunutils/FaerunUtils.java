@@ -1,17 +1,23 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.instances.server.Teleport;
+import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.038i,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000ze,)")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044q,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zz,);required-after:tiamatinventory@[1.12.2.000zt,)")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
@@ -44,5 +50,22 @@ public class FaerunUtils
     public static void cancelHPRegen(LivingHealEvent event)
     {
         if (event.getEntity() instanceof EntityPlayer) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void playerDeath(LivingHurtEvent event)
+    {
+        if (event.getSource().damageType.equals("outOfWorld")) return;
+
+
+        Entity entity = event.getEntity();
+        if (entity instanceof EntityPlayerMP && event.getAmount() >= ((EntityPlayerMP) entity).getHealth() - 1)
+        {
+            EntityPlayerMP player = (EntityPlayerMP) entity;
+            event.setAmount(player.getHealth() - 1);
+            player.inventory.dropAllItems();
+            TiamatPlayerInventory.tiamatServerInventories.get(player.getUniqueID()).dropAllItems();
+            Teleport.escape(entity);
+        }
     }
 }
