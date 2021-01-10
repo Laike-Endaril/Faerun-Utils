@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.038i,);required-after:tiamatitems@[1.12.2.000ze,)")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.038i,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000ze,)")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
@@ -37,6 +37,7 @@ public class FaerunUtils
     {
         event.registerServerCommand(new CmdDie());
         event.registerServerCommand(new CmdInteract());
+        event.registerServerCommand(new CmdJoinInstanceType());
     }
 
     @SubscribeEvent
