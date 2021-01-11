@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 @Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044q,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zz,);required-after:tiamatinventory@[1.12.2.000zt,)")
 public class FaerunUtils
@@ -66,5 +67,11 @@ public class FaerunUtils
             EscapePoint.setEscapePoint(player, destination);
             Teleport.escape(player);
         });
+    }
+
+    @SubscribeEvent
+    public static void playerTick(TickEvent.PlayerTickEvent event)
+    {
+        event.player.getFoodStats().setFoodLevel(20);
     }
 }
