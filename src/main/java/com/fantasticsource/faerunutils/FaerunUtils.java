@@ -1,15 +1,16 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
-import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
-import net.minecraft.entity.Entity;
+import com.fantasticsource.instances.tags.entity.EscapePoint;
+import com.fantasticsource.mctools.ServerTickTimer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -53,19 +54,17 @@ public class FaerunUtils
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void playerDeath(LivingHurtEvent event)
+    public static void playerDeath(PlayerEvent.Clone event)
     {
-        if (event.getSource().damageType.equals("outOfWorld")) return;
+        if (!event.isWasDeath()) return;
 
-
-        Entity entity = event.getEntity();
-        if (entity instanceof EntityPlayerMP && event.getAmount() >= ((EntityPlayerMP) entity).getHealth() - 1)
+        Destination destination = EscapePoint.getEscapePoint(event.getEntityPlayer());
+        ServerTickTimer.schedule(1, () ->
         {
-            EntityPlayerMP player = (EntityPlayerMP) entity;
-            event.setAmount(player.getHealth() - 1);
-            player.inventory.dropAllItems();
-            TiamatPlayerInventory.tiamatServerInventories.get(player.getUniqueID()).dropAllItems();
-            Teleport.escape(entity);
-        }
+            EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
+            player.setHealth(1);
+            EscapePoint.setEscapePoint(player, destination);
+            Teleport.escape(player);
+        });
     }
 }
