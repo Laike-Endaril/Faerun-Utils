@@ -4,11 +4,16 @@ import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
 import com.fantasticsource.mctools.ServerTickTimer;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -73,10 +78,25 @@ public class FaerunUtils
     public static void playerTick(TickEvent.PlayerTickEvent event)
     {
         EntityPlayer player = event.player;
+
+        //Prevent hunger
         player.getFoodStats().setFoodLevel(20);
-        if (player.world.isRemote)
+
+        //Prevent others from nudging you (via client hack...because Minecraft)
+        if (player.world.isRemote) player.entityCollisionReduction = 1;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void entityJoin(EntityJoinWorldEvent eventName)
+    {
+        Entity entity = eventName.getEntity();
+        if (entity instanceof EntityLivingBase)
         {
-            player.entityCollisionReduction = 1;
+            EntityLivingBase livingBase = (EntityLivingBase) entity;
+
+            //Remove knockback
+            AttributeMap attributeMap = (AttributeMap) livingBase.getAttributeMap();
+            attributeMap.getAttributeInstance(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         }
     }
 }
