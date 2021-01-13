@@ -102,7 +102,6 @@ public class CmdJoinInstanceType extends CommandBase
         {
             targetPos = Tools.choose(possiblePositions);
             server.commandManager.executeCommand(server, "instances joinTempCopy Saved\\Template\\" + templateName + " " + player.getName() + " " + targetPos.x + " " + targetPos.y + " " + targetPos.z);
-            System.out.println(player.world.provider);
             if (player.world.provider instanceof InstanceWorldProvider)
             {
                 FaerunInstanceData data = new FaerunInstanceData((WorldServer) player.world);
