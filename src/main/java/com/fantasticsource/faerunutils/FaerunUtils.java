@@ -72,6 +72,11 @@ public class FaerunUtils
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent event)
     {
-        event.player.getFoodStats().setFoodLevel(20);
+        EntityPlayer player = event.player;
+        player.getFoodStats().setFoodLevel(20);
+        if (player.world.isRemote)
+        {
+            player.entityCollisionReduction = 1;
+        }
     }
 }
