@@ -201,16 +201,6 @@ public class ContainerAssembler extends Container
         return player.getDistanceSq((double) position.getX() + 0.5, (double) position.getY() + 0.5, (double) position.getZ() + 0.5) <= 64;
     }
 
-    public int getSlotIndex(Slot slot)
-    {
-        for (int i = 0; i < inventorySlots.size(); i++)
-        {
-            if (inventorySlots.get(i) == slot) return i;
-        }
-
-        return -1;
-    }
-
     protected void syncSlot(int slotIndex)
     {
         ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, slotIndex, inventorySlots.get(slotIndex).getStack()));

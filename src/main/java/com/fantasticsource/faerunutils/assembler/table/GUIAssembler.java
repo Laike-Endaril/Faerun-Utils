@@ -1,18 +1,14 @@
 package com.fantasticsource.faerunutils.assembler.table;
 
-import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.mctools.inventory.gui.BetterContainerGUI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import static com.fantasticsource.faerunutils.assembler.table.ContainerAssembler.TEXTURE;
 
 @SideOnly(Side.CLIENT)
 public class GUIAssembler extends BetterContainerGUI
@@ -26,7 +22,7 @@ public class GUIAssembler extends BetterContainerGUI
     {
         GlStateManager.color(1, 1, 1, 1);
 
-        mc.getTextureManager().bindTexture(TEXTURE);
+        mc.getTextureManager().bindTexture(ContainerAssembler.TEXTURE);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();

@@ -11,8 +11,11 @@ itemGroup.faerunutils=Faerun Utils
 
 tile.faerunutils:assembler.name=Assembler
 
+faerunutils.bag=Bag
+
 
 
 faerunutils.cmd.die.usage=I kill you!
 faerunutils.cmd.interact.usage=Make a player interact with a block (x, y, z, [player])
 faerunutils.cmd.joinInstanceType.usage=Join an instance based on a saved template name (player, templateName, maxPlayers, minHostiles, minDist, x1, y1, z1, [x2, y2, z2], [x3, y3, z3]...)
+faerunutils.cmd.openBag.usage=Make a player attempt to open a bag in their main- or off-hand (player, [itemType])

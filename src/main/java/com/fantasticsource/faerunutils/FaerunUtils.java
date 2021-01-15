@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.faerunutils.bag.CmdOpenBag;
 import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
@@ -51,6 +52,7 @@ public class FaerunUtils
         event.registerServerCommand(new CmdDie());
         event.registerServerCommand(new CmdInteract());
         event.registerServerCommand(new CmdJoinInstanceType());
+        event.registerServerCommand(new CmdOpenBag());
     }
 
     @SubscribeEvent
