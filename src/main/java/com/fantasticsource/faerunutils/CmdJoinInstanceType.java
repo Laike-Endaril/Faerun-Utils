@@ -77,7 +77,7 @@ public class CmdJoinInstanceType extends CommandBase
         ArrayList<Vec3d> possiblePositions = new ArrayList<>();
         for (int i = 5; i + 2 < args.length; i += 3)
         {
-            possiblePositions.add(new Vec3d(Integer.parseInt(args[i]), Integer.parseInt(args[i + 1]), Integer.parseInt(args[i + 2])));
+            possiblePositions.add(new Vec3d(Integer.parseInt(args[i]) + 0.5, Integer.parseInt(args[i + 1]), Integer.parseInt(args[i + 2]) + 0.5));
         }
 
         instanceDatasets.removeIf(data2 -> data2.instance.playerEntities.size() == 0);
