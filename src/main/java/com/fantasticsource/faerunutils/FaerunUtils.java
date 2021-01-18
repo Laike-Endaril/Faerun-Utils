@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeMap;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
@@ -89,10 +90,11 @@ public class FaerunUtils
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void entityJoin(EntityJoinWorldEvent eventName)
+    public static void entityJoin(EntityJoinWorldEvent event)
     {
-        Entity entity = eventName.getEntity();
-        if (entity instanceof EntityLivingBase)
+        Entity entity = event.getEntity();
+        if (entity instanceof EntityItem) entity.setEntityInvulnerable(true);
+        else if (entity instanceof EntityLivingBase)
         {
             EntityLivingBase livingBase = (EntityLivingBase) entity;
 
