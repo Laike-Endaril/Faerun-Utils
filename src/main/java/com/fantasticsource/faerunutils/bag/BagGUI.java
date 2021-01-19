@@ -11,9 +11,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GUIBag extends BetterContainerGUI
+public class BagGUI extends BetterContainerGUI
 {
-    public GUIBag(String itemType, int size, ItemStack bag)
+    public BagGUI(String itemType, int size, ItemStack bag)
     {
         super(new ContainerBag(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world, itemType, size, bag));
     }

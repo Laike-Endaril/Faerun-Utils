@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.faerunutils.interaction.trading.Trading;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.mctools.component.CItemStack;
 import io.netty.buffer.ByteBuf;
@@ -10,8 +11,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -21,8 +20,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
-import java.util.HashMap;
-
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public class Network
@@ -30,13 +27,14 @@ public class Network
     public static final SimpleNetworkWrapper WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
 
     protected static int discriminator = 0;
-    protected static final HashMap<EntityPlayerMP, EntityPlayerMP> TRADE_REQUESTS = new HashMap<>();
 
     public static void init()
     {
         WRAPPER.registerMessage(InteractPacketHandler.class, InteractPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(BagPacketHandler.class, BagPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(RequestTradePacketHandler.class, RequestTradePacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(LockTradePacketHandler.class, LockTradePacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(CompleteTradePacketHandler.class, CompleteTradePacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -172,26 +170,83 @@ public class Network
         @Override
         public IMessage onMessage(RequestTradePacket packet, MessageContext ctx)
         {
-            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() ->
-            {
-                EntityPlayerMP player = ctx.getServerHandler().player, other = (EntityPlayerMP) PlayerData.getEntity(packet.playerName);
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> Trading.tryStart(ctx.getServerHandler().player, (EntityPlayerMP) PlayerData.getEntity(packet.playerName)));
+            return null;
+        }
+    }
 
-                if (player.dimension != 0) player.sendMessage(new TextComponentString(TextFormatting.RED + "You can only trade in town"));
-                else if (other == null) player.sendMessage(new TextComponentString(TextFormatting.RED + packet.playerName + " seems to have vanished"));
-                else if (other.world != player.world || other.getDistanceSq(player) > 16) player.sendMessage(new TextComponentString(TextFormatting.RED + packet.playerName + " is too far away to trade"));
-                else if (TRADE_REQUESTS.get(other) == player)
-                {
-                    TRADE_REQUESTS.remove(player);
-                    TRADE_REQUESTS.remove(other);
 
-                    //TODO initiate trade
-                }
-                else
-                {
-                    TRADE_REQUESTS.put(player, other);
-                    other.sendMessage(new TextComponentString(TextFormatting.AQUA + player.getName() + " requests a trade"));
-                }
-            });
+    public static class LockTradePacket implements IMessage
+    {
+        public boolean lock;
+
+        public LockTradePacket()
+        {
+            //Required
+        }
+
+        public LockTradePacket(boolean lock)
+        {
+            this.lock = lock;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeBoolean(lock);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            lock = buf.readBoolean();
+        }
+    }
+
+    public static class LockTradePacketHandler implements IMessageHandler<LockTradePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(LockTradePacket packet, MessageContext ctx)
+        {
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> Trading.tryLock(ctx.getServerHandler().player, packet.lock));
+            return null;
+        }
+    }
+
+
+    public static class CompleteTradePacket implements IMessage
+    {
+        public boolean complete;
+
+        public CompleteTradePacket()
+        {
+            //Required
+        }
+
+        public CompleteTradePacket(boolean complete)
+        {
+            this.complete = complete;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeBoolean(complete);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            complete = buf.readBoolean();
+        }
+    }
+
+    public static class CompleteTradePacketHandler implements IMessageHandler<CompleteTradePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(CompleteTradePacket packet, MessageContext ctx)
+        {
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> Trading.tryComplete(ctx.getServerHandler().player, packet.complete));
             return null;
         }
     }

@@ -12,6 +12,7 @@ itemGroup.faerunutils=Faerun Utils
 tile.faerunutils:assembler.name=Assembler
 
 faerunutils.bag=Bag
+faerunutils.trade=Trade
 
 
 

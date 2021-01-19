@@ -1,75 +1,73 @@
 package com.fantasticsource.faerunutils.interaction.trading;
 
-import com.fantasticsource.mctools.gui.GUIScreen;
-import com.fantasticsource.mctools.gui.element.GUIElement;
-import com.fantasticsource.mctools.gui.element.other.GUIButton;
-import com.fantasticsource.mctools.gui.element.text.GUIText;
-import com.fantasticsource.mctools.gui.element.textured.GUIImage;
-import com.fantasticsource.tools.datastructures.Color;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
+import com.fantasticsource.faerunutils.bag.ContainerBag;
+import com.fantasticsource.mctools.inventory.gui.BetterContainerGUI;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
-
-public class TradeGUI extends GUIScreen
+@SideOnly(Side.CLIENT)
+public class TradeGUI extends BetterContainerGUI
 {
-    public static final ResourceLocation
-            TEX_LABEL = new ResourceLocation(MODID, "image/label.png"),
-            TEX_BUTTON_IDLE = new ResourceLocation(MODID, "image/button_idle.png"),
-            TEX_BUTTON_HOVER = new ResourceLocation(MODID, "image/button_hover.png"),
-            TEX_BUTTON_ACTIVE = new ResourceLocation(MODID, "image/button_active.png");
-
-    protected static final Color
-            hoverButtonColor = new Color("BBBBBB", true),
-            idleButtonColor = new Color("777777", true);
-
-    protected double internalScaling;
-
-    public Entity other;
-
-    public TradeGUI(Entity other)
+    public TradeGUI(String itemType, int size, ItemStack bag)
     {
-        super(0.5);
+        super(new ContainerBag(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world, itemType, size, bag));
+    }
 
-//        if (other instanceof EntityPlayer)
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
+    {
+        GlStateManager.color(1, 1, 1, 1);
+
+        mc.getTextureManager().bindTexture(ContainerBag.TEXTURE);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+
+
+        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+
+        //Main background
+        int x1 = (width >> 1) - (xSize >> 1);
+        int y1 = (height >> 1) - (ySize >> 1);
+        int x2 = x1 + xSize;
+        int y2 = y1 + ySize;
+        bufferbuilder.pos(x1, y2, zLevel).tex(0, (double) ySize / 256).endVertex();
+        bufferbuilder.pos(x2, y2, zLevel).tex((double) xSize / 256, (double) ySize / 256).endVertex();
+        bufferbuilder.pos(x2, y1, zLevel).tex((double) xSize / 256, 0).endVertex();
+        bufferbuilder.pos(x1, y1, zLevel).tex(0, 0).endVertex();
+
+        //Slots
+        int i = 0, size = ((ContainerBag) inventorySlots).bagInventorySize;
+        for (int y = 0; y < 3; y++)
         {
-            this.other = other;
-            internalScaling = textScale * 0.5;
-
-            showUnstacked();
-
+            for (int x = 0; x < 9; x++)
+            {
+                x1 = guiLeft + 7 + 18 * (i % 9);
+                y1 = guiTop + 7 + 18 * (i / 9);
+                x2 = x1 + 18;
+                y2 = y1 + 18;
+                if (i++ < size)
+                {
+                    bufferbuilder.pos(x1, y2, zLevel).tex(0, 1).endVertex();
+                    bufferbuilder.pos(x2, y2, zLevel).tex((double) 18 / 256, 1).endVertex();
+                    bufferbuilder.pos(x2, y1, zLevel).tex((double) 18 / 256, (double) 238 / 256).endVertex();
+                    bufferbuilder.pos(x1, y1, zLevel).tex(0, (double) 238 / 256).endVertex();
+                }
+                else
+                {
+                    bufferbuilder.pos(x1, y2, zLevel).tex((double) 18 / 256, 1).endVertex();
+                    bufferbuilder.pos(x2, y2, zLevel).tex((double) 36 / 256, 1).endVertex();
+                    bufferbuilder.pos(x2, y1, zLevel).tex((double) 36 / 256, (double) 238 / 256).endVertex();
+                    bufferbuilder.pos(x1, y1, zLevel).tex((double) 18 / 256, (double) 238 / 256).endVertex();
+                }
+            }
         }
-    }
 
-    protected GUIImage makeLabel(String text)
-    {
-        GUIImage label = new GUIImage(this, 128 * internalScaling, 32 * internalScaling, TEX_LABEL);
-        label.setSubElementAutoplaceMethod(GUIElement.AP_CENTER);
-        label.add(new GUIText(this, text, Color.WHITE));
-
-        return label;
-    }
-
-    protected GUIButton makeButton(String text)
-    {
-        GUIImage active = new GUIImage(this, 128 * internalScaling, 32 * internalScaling, TEX_BUTTON_ACTIVE);
-        active.setSubElementAutoplaceMethod(GUIElement.AP_CENTER);
-        active.add(new GUIText(this, text, Color.WHITE));
-
-        GUIImage hover = new GUIImage(this, 128 * internalScaling, 32 * internalScaling, TEX_BUTTON_HOVER);
-        hover.setSubElementAutoplaceMethod(GUIElement.AP_CENTER);
-        hover.add(new GUIText(this, text, hoverButtonColor));
-
-        GUIImage idle = new GUIImage(this, 128 * internalScaling, 32 * internalScaling, TEX_BUTTON_IDLE);
-        idle.setSubElementAutoplaceMethod(GUIElement.AP_CENTER);
-        idle.add(new GUIText(this, text, idleButtonColor));
-
-        return new GUIButton(this, idle, hover, active);
-    }
-
-    @Override
-    public String title()
-    {
-        return other.getName();
+        tessellator.draw();
     }
 }

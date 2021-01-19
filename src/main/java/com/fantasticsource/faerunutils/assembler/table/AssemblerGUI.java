@@ -11,9 +11,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GUIAssembler extends BetterContainerGUI
+public class AssemblerGUI extends BetterContainerGUI
 {
-    public GUIAssembler()
+    public AssemblerGUI()
     {
         super(new ContainerAssembler(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world, BlockPos.ORIGIN));
     }

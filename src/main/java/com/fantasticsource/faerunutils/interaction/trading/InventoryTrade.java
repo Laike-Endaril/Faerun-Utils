@@ -1,7 +1,5 @@
-package com.fantasticsource.faerunutils.bag;
+package com.fantasticsource.faerunutils.interaction.trading;
 
-import com.fantasticsource.tiamatitems.api.IPartSlot;
-import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -11,21 +9,15 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
-import java.util.ArrayList;
-
-public class InventoryBag implements IInventory
+public class InventoryTrade implements IInventory
 {
     public final NonNullList<ItemStack> stackList;
-    public final ContainerBag container;
-    public final String itemType;
+    public final ContainerTrade container;
 
-    public InventoryBag(ContainerBag containerBag, ArrayList<IPartSlot> partSlots)
+    public InventoryTrade(ContainerTrade containerTrade)
     {
-        container = containerBag;
-        stackList = NonNullList.withSize(partSlots.size(), ItemStack.EMPTY);
-        itemType = containerBag.itemType;
-
-        for (int i = 0; i < stackList.size(); i++) stackList.set(i, partSlots.get(i).getPart());
+        container = containerTrade;
+        stackList = NonNullList.withSize(18, ItemStack.EMPTY);
     }
 
     public int getSizeInventory()
@@ -50,7 +42,7 @@ public class InventoryBag implements IInventory
 
     public String getName()
     {
-        return "faerunutils.bag";
+        return "faerunutils.trade";
     }
 
     public boolean hasCustomName()
@@ -102,7 +94,7 @@ public class InventoryBag implements IInventory
 
     public boolean isItemValidForSlot(int index, ItemStack stack)
     {
-        return itemType == null || MiscTags.getItemTypeName(stack).equals(itemType);
+        return true;
     }
 
     public int getField(int id)
