@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
+import com.fantasticsource.faerunutils.interaction.InteractionGUI;
 import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
@@ -12,12 +13,14 @@ import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -25,8 +28,9 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044q,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zz,);required-after:tiamatinventory@[1.12.2.000zt,)")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044r,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zz,);required-after:tiamatinventory@[1.12.2.000zt,)")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
@@ -102,5 +106,13 @@ public class FaerunUtils
             AttributeMap attributeMap = (AttributeMap) livingBase.getAttributeMap();
             attributeMap.getAttributeInstance(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         }
+    }
+
+    @SubscribeEvent
+    public static void interact(PlayerInteractEvent.EntityInteractSpecific event)
+    {
+        if (event.getSide() != Side.CLIENT || event.getHand() != EnumHand.MAIN_HAND || event.getEntityPlayer().dimension != 0) return;
+
+        new InteractionGUI(event.getTarget());
     }
 }

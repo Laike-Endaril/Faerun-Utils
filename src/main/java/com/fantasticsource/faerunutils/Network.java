@@ -1,13 +1,18 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.mctools.component.CItemStack;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -16,18 +21,22 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.util.HashMap;
+
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public class Network
 {
     public static final SimpleNetworkWrapper WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
 
-    private static int discriminator = 0;
+    protected static int discriminator = 0;
+    protected static final HashMap<EntityPlayerMP, EntityPlayerMP> TRADE_REQUESTS = new HashMap<>();
 
     public static void init()
     {
         WRAPPER.registerMessage(InteractPacketHandler.class, InteractPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(BagPacketHandler.class, BagPacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(RequestTradePacketHandler.class, RequestTradePacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -126,6 +135,63 @@ public class Network
                 mc.addScheduledTask(() -> ClientProxy.showBagGUI(packet.itemType, packet.size, packet.bag));
             }
 
+            return null;
+        }
+    }
+
+
+    public static class RequestTradePacket implements IMessage
+    {
+        String playerName;
+
+        public RequestTradePacket()
+        {
+            //Required
+        }
+
+        public RequestTradePacket(String playerName)
+        {
+            this.playerName = playerName;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            ByteBufUtils.writeUTF8String(buf, playerName);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            playerName = ByteBufUtils.readUTF8String(buf);
+        }
+    }
+
+    public static class RequestTradePacketHandler implements IMessageHandler<RequestTradePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(RequestTradePacket packet, MessageContext ctx)
+        {
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() ->
+            {
+                EntityPlayerMP player = ctx.getServerHandler().player, other = (EntityPlayerMP) PlayerData.getEntity(packet.playerName);
+
+                if (player.dimension != 0) player.sendMessage(new TextComponentString(TextFormatting.RED + "You can only trade in town"));
+                else if (other == null) player.sendMessage(new TextComponentString(TextFormatting.RED + packet.playerName + " seems to have vanished"));
+                else if (other.world != player.world || other.getDistanceSq(player) > 16) player.sendMessage(new TextComponentString(TextFormatting.RED + packet.playerName + " is too far away to trade"));
+                else if (TRADE_REQUESTS.get(other) == player)
+                {
+                    TRADE_REQUESTS.remove(player);
+                    TRADE_REQUESTS.remove(other);
+
+                    //TODO initiate trade
+                }
+                else
+                {
+                    TRADE_REQUESTS.put(player, other);
+                    other.sendMessage(new TextComponentString(TextFormatting.AQUA + player.getName() + " requests a trade"));
+                }
+            });
             return null;
         }
     }
