@@ -1,8 +1,9 @@
 package com.fantasticsource.faerunutils.interaction.trading;
 
 import com.fantasticsource.faerunutils.FaerunUtils;
-import com.fantasticsource.mctools.inventory.slot.BetterSlot;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
+import com.fantasticsource.mctools.items.ItemMatcher;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -18,6 +19,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public class ContainerTrade extends Container
@@ -32,6 +35,8 @@ public class ContainerTrade extends Container
 
     public final InventoryTrade inventory;
 
+    protected final ArrayList<ItemStack> previous = new ArrayList<>();
+
 
     public ContainerTrade(EntityPlayer player, World world)
     {
@@ -40,6 +45,7 @@ public class ContainerTrade extends Container
 
 
         inventory = new InventoryTrade(this);
+        for (ItemStack stack : inventory.stackList) previous.add(MCTools.cloneItemStack(stack));
 
 
         //Slot indices
@@ -55,14 +61,14 @@ public class ContainerTrade extends Container
         //Your slots
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new FilteredSlot(inventory, x, 8 + x * 18, 8, TEXTURE, 256, 256, 240, 0, false, 64, stack -> false));
+            addSlotToContainer(new YourSlot(this, x, 8 + x * 18, 8, 240, 0));
         }
 
 
         //My slots
         for (int x = 0; x < 9; x++)
         {
-            addSlotToContainer(new BetterSlot(inventory, x + 9, 8 + x * 18, 44, TEXTURE, 256, 256, 240, 0));
+            addSlotToContainer(new MySlot(this, x + 9, 8 + x * 18, 44, 240, 0));
         }
 
 
@@ -103,14 +109,14 @@ public class ContainerTrade extends Container
     {
         if (!player.isEntityAlive() || player instanceof EntityPlayerMP && ((EntityPlayerMP) player).hasDisconnected())
         {
-            for (int i = 0; i < inventory.getSizeInventory(); i++)
+            for (int i = 9; i < inventory.getSizeInventory(); i++)
             {
                 player.dropItem(inventory.removeStackFromSlot(i), false);
             }
         }
         else
         {
-            for (int i = 0; i < inventory.getSizeInventory(); i++)
+            for (int i = 9; i < inventory.getSizeInventory(); i++)
             {
                 player.inventory.placeItemBackInInventory(world, inventory.removeStackFromSlot(i));
             }
@@ -121,11 +127,6 @@ public class ContainerTrade extends Container
     public boolean canInteractWith(EntityPlayer ignored)
     {
         return player.isEntityAlive() && player.world == world;
-    }
-
-    protected void syncSlot(int slotIndex)
-    {
-        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, slotIndex, inventorySlots.get(slotIndex).getStack()));
     }
 
     @Override
@@ -171,6 +172,32 @@ public class ContainerTrade extends Container
 
 
         return new ItemStack(Items.BOW);
+    }
+
+    public void update(int slot)
+    {
+        if (player instanceof EntityPlayerMP)
+        {
+            ItemStack newStack = inventory.stackList.get(slot);
+            if (!ItemMatcher.stacksMatch(newStack, previous.get(slot)))
+            {
+                if (slot < 9) syncSlot(slot);
+                else
+                {
+                    Trading.TradeData data = Trading.TRADE_DATA.get(player);
+                    EntityPlayerMP other = data.playerBesides((EntityPlayerMP) player);
+                    ContainerTrade otherContainer = (ContainerTrade) other.openContainer;
+                    otherContainer.inventorySlots.get(slot - 9).putStack(newStack);
+                }
+
+                previous.set(slot, MCTools.cloneItemStack(newStack));
+            }
+        }
+    }
+
+    protected void syncSlot(int slotIndex)
+    {
+        ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(windowId, slotIndex, inventorySlots.get(slotIndex).getStack()));
     }
 
 
