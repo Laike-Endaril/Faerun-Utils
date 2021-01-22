@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.faerunutils.interaction.trading.TradeGUI;
 import com.fantasticsource.faerunutils.interaction.trading.Trading;
 import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.mctools.component.CItemStack;
@@ -34,8 +35,9 @@ public class Network
         WRAPPER.registerMessage(BagPacketHandler.class, BagPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(RequestTradePacketHandler.class, RequestTradePacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(LockTradePacketHandler.class, LockTradePacket.class, discriminator++, Side.SERVER);
-        WRAPPER.registerMessage(CompleteTradePacketHandler.class, CompleteTradePacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(CompleteTradePacketHandler.class, ReadyTradePacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(TradePacketHandler.class, TradePacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(UpdateTradePacketHandler.class, UpdateTradePacket.class, discriminator++, Side.CLIENT);
     }
 
 
@@ -215,39 +217,39 @@ public class Network
     }
 
 
-    public static class CompleteTradePacket implements IMessage
+    public static class ReadyTradePacket implements IMessage
     {
-        public boolean complete;
+        public boolean ready;
 
-        public CompleteTradePacket()
+        public ReadyTradePacket()
         {
             //Required
         }
 
-        public CompleteTradePacket(boolean complete)
+        public ReadyTradePacket(boolean ready)
         {
-            this.complete = complete;
+            this.ready = ready;
         }
 
         @Override
         public void toBytes(ByteBuf buf)
         {
-            buf.writeBoolean(complete);
+            buf.writeBoolean(ready);
         }
 
         @Override
         public void fromBytes(ByteBuf buf)
         {
-            complete = buf.readBoolean();
+            ready = buf.readBoolean();
         }
     }
 
-    public static class CompleteTradePacketHandler implements IMessageHandler<CompleteTradePacket, IMessage>
+    public static class CompleteTradePacketHandler implements IMessageHandler<ReadyTradePacket, IMessage>
     {
         @Override
-        public IMessage onMessage(CompleteTradePacket packet, MessageContext ctx)
+        public IMessage onMessage(ReadyTradePacket packet, MessageContext ctx)
         {
-            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> Trading.tryComplete(ctx.getServerHandler().player, packet.complete));
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> Trading.tryReady(ctx.getServerHandler().player, packet.ready));
             return null;
         }
     }
@@ -280,6 +282,68 @@ public class Network
             {
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.addScheduledTask(ClientProxy::showTradeGUI);
+            }
+
+            return null;
+        }
+    }
+
+
+    public static class UpdateTradePacket implements IMessage
+    {
+        boolean locked, ready, otherLocked, otherReady;
+
+        public UpdateTradePacket() //Required; probably for when the packet is received
+        {
+        }
+
+        public UpdateTradePacket(boolean locked, boolean ready, boolean otherLocked, boolean otherReady)
+        {
+            this.locked = locked;
+            this.ready = ready;
+            this.otherLocked = otherLocked;
+            this.otherReady = otherReady;
+        }
+
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeBoolean(locked);
+            buf.writeBoolean(ready);
+            buf.writeBoolean(otherLocked);
+            buf.writeBoolean(otherReady);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            locked = buf.readBoolean();
+            ready = buf.readBoolean();
+            otherLocked = buf.readBoolean();
+            otherReady = buf.readBoolean();
+        }
+    }
+
+    public static class UpdateTradePacketHandler implements IMessageHandler<UpdateTradePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(UpdateTradePacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.addScheduledTask(() ->
+                {
+                    if (mc.currentScreen instanceof TradeGUI)
+                    {
+                        TradeGUI gui = (TradeGUI) mc.currentScreen;
+                        gui.locked = packet.locked;
+                        gui.ready = packet.ready;
+                        gui.otherLocked = packet.otherLocked;
+                        gui.otherReady = packet.otherReady;
+                    }
+                });
             }
 
             return null;

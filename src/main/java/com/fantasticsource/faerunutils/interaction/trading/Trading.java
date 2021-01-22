@@ -2,11 +2,14 @@ package com.fantasticsource.faerunutils.interaction.trading;
 
 import com.fantasticsource.faerunutils.Network;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketOpenWindow;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Trading
@@ -89,7 +92,7 @@ public class Trading
         if (data == null)
         {
             p1.sendMessage(new TextComponentString(TextFormatting.RED + "Something went wrong; closing trade GUI"));
-            //TODO close GUI
+            if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
         }
         else
         {
@@ -98,22 +101,22 @@ public class Trading
             if (p1 == p2)
             {
                 p1.sendMessage(new TextComponentString(TextFormatting.RED + "You attempt to trade with yourself, but fail"));
-                //TODO close GUI
+                if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
             }
             else if (p1.dimension != 0)
             {
                 p1.sendMessage(new TextComponentString(TextFormatting.RED + "You can only trade in town"));
-                //TODO close GUI
+                if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
             }
             else if (p2 == null)
             {
                 p1.sendMessage(new TextComponentString(TextFormatting.RED + "They seem to have vanished"));
-                //TODO close GUI
+                if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
             }
             else if (p2.world != p1.world || p2.getDistanceSq(p1) > 16)
             {
                 p1.sendMessage(new TextComponentString(TextFormatting.RED + p2.getName() + " is too far away to trade"));
-                //TODO close GUI
+                if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
             }
             else
             {
@@ -127,13 +130,13 @@ public class Trading
     }
 
 
-    public static void tryComplete(EntityPlayerMP p1, boolean complete)
+    public static void tryReady(EntityPlayerMP p1, boolean complete)
     {
         TradeData data = TRADE_DATA.get(p1);
         if (data == null)
         {
             p1.sendMessage(new TextComponentString(TextFormatting.RED + "Something went wrong; closing trade GUI"));
-            //TODO close GUI
+            if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
         }
         else
         {
@@ -142,22 +145,22 @@ public class Trading
             if (p1 == p2)
             {
                 p1.sendMessage(new TextComponentString(TextFormatting.RED + "You attempt to trade with yourself, but fail"));
-                //TODO close GUI
+                if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
             }
             else if (p1.dimension != 0)
             {
                 p1.sendMessage(new TextComponentString(TextFormatting.RED + "You can only trade in town"));
-                //TODO close GUI
+                if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
             }
             else if (p2 == null)
             {
                 p1.sendMessage(new TextComponentString(TextFormatting.RED + "They seem to have vanished"));
-                //TODO close GUI
+                if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
             }
             else if (p2.world != p1.world || p2.getDistanceSq(p1) > 16)
             {
                 p1.sendMessage(new TextComponentString(TextFormatting.RED + p2.getName() + " is too far away to trade"));
-                //TODO close GUI
+                if (p1.openContainer instanceof ContainerTrade) p1.closeScreen();
             }
             else if (data.p1Locked && data.p2Locked)
             {
@@ -177,12 +180,20 @@ public class Trading
 
     protected static void complete(TradeData data)
     {
-        //TODO MCTools.give() all items to respective players
+        NonNullList<ItemStack> p1Stacks = ((ContainerTrade) data.p1.openContainer).inventory.stackList;
+        NonNullList<ItemStack> p2Stacks = ((ContainerTrade) data.p2.openContainer).inventory.stackList;
+        ArrayList<ItemStack> swap = new ArrayList<>(p1Stacks);
+        for (int i = 0; i < swap.size(); i++)
+        {
+            p1Stacks.set(i, p2Stacks.get(i));
+            p2Stacks.set(i, swap.get(i));
+        }
 
         data.p1Locked = false;
         data.p2Locked = false;
         data.p1Ready = false;
         data.p2Ready = false;
+        data.sendUpdates();
     }
 
 
@@ -212,7 +223,8 @@ public class Trading
 
         public void sendUpdates()
         {
-            //TODO update GUIs for both players
+            Network.WRAPPER.sendTo(new Network.UpdateTradePacket(p1Locked, p1Ready, p2Locked, p2Ready), p1);
+            Network.WRAPPER.sendTo(new Network.UpdateTradePacket(p2Locked, p2Ready, p1Locked, p1Ready), p2);
         }
     }
 }

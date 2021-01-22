@@ -107,7 +107,9 @@ public class ContainerTrade extends Container
     @Override
     protected void clearContainer(EntityPlayer player, World world, IInventory inventory)
     {
-        if (!player.isEntityAlive() || player instanceof EntityPlayerMP && ((EntityPlayerMP) player).hasDisconnected())
+        if (!(player instanceof EntityPlayerMP)) return;
+
+        if (!player.isEntityAlive())
         {
             for (int i = 9; i < inventory.getSizeInventory(); i++)
             {
@@ -118,7 +120,7 @@ public class ContainerTrade extends Container
         {
             for (int i = 9; i < inventory.getSizeInventory(); i++)
             {
-                player.inventory.placeItemBackInInventory(world, inventory.removeStackFromSlot(i));
+                MCTools.give((EntityPlayerMP) player, inventory.removeStackFromSlot(i));
             }
         }
     }
@@ -188,6 +190,12 @@ public class ContainerTrade extends Container
                     EntityPlayerMP other = data.playerBesides((EntityPlayerMP) player);
                     ContainerTrade otherContainer = (ContainerTrade) other.openContainer;
                     otherContainer.inventorySlots.get(slot - 9).putStack(newStack);
+
+                    if (data.p1 == player) data.p1Locked = false;
+                    else data.p2Locked = false;
+                    data.p1Ready = false;
+                    data.p2Ready = false;
+                    data.sendUpdates();
                 }
 
                 previous.set(slot, MCTools.cloneItemStack(newStack));
