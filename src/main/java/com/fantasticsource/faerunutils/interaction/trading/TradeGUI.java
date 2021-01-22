@@ -1,34 +1,29 @@
 package com.fantasticsource.faerunutils.interaction.trading;
 
-import com.fantasticsource.faerunutils.bag.ContainerBag;
 import com.fantasticsource.mctools.inventory.gui.BetterContainerGUI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TradeGUI extends BetterContainerGUI
 {
-    public TradeGUI(String itemType, int size, ItemStack bag)
+    public TradeGUI()
     {
-        super(new ContainerBag(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world, itemType, size, bag));
+        super(new ContainerTrade(Minecraft.getMinecraft().player, Minecraft.getMinecraft().world));
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1, 1, 1, 1);
-
-        mc.getTextureManager().bindTexture(ContainerBag.TEXTURE);
+        mc.getTextureManager().bindTexture(ContainerTrade.TEXTURE);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
-
-
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
 
         //Main background
@@ -41,33 +36,9 @@ public class TradeGUI extends BetterContainerGUI
         bufferbuilder.pos(x2, y1, zLevel).tex((double) xSize / 256, 0).endVertex();
         bufferbuilder.pos(x1, y1, zLevel).tex(0, 0).endVertex();
 
-        //Slots
-        int i = 0, size = ((ContainerBag) inventorySlots).bagInventorySize;
-        for (int y = 0; y < 3; y++)
-        {
-            for (int x = 0; x < 9; x++)
-            {
-                x1 = guiLeft + 7 + 18 * (i % 9);
-                y1 = guiTop + 7 + 18 * (i / 9);
-                x2 = x1 + 18;
-                y2 = y1 + 18;
-                if (i++ < size)
-                {
-                    bufferbuilder.pos(x1, y2, zLevel).tex(0, 1).endVertex();
-                    bufferbuilder.pos(x2, y2, zLevel).tex((double) 18 / 256, 1).endVertex();
-                    bufferbuilder.pos(x2, y1, zLevel).tex((double) 18 / 256, (double) 238 / 256).endVertex();
-                    bufferbuilder.pos(x1, y1, zLevel).tex(0, (double) 238 / 256).endVertex();
-                }
-                else
-                {
-                    bufferbuilder.pos(x1, y2, zLevel).tex((double) 18 / 256, 1).endVertex();
-                    bufferbuilder.pos(x2, y2, zLevel).tex((double) 36 / 256, 1).endVertex();
-                    bufferbuilder.pos(x2, y1, zLevel).tex((double) 36 / 256, (double) 238 / 256).endVertex();
-                    bufferbuilder.pos(x1, y1, zLevel).tex((double) 18 / 256, (double) 238 / 256).endVertex();
-                }
-            }
-        }
-
         tessellator.draw();
+
+
+        drawCenteredString(fontRenderer, "MAKE SURE YOU HAVE SPACE!", guiLeft + 88, guiTop + 67, 0xffff0000);
     }
 }

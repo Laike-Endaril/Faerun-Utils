@@ -7,6 +7,7 @@ import com.fantasticsource.tiamatitems.api.IPartSlot;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -14,9 +15,14 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+
+import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public class ContainerBag extends Container
 {
@@ -164,5 +170,47 @@ public class ContainerBag extends Container
 
         for (int i = 0; i < previous.length; i++) previous[i] = MCTools.cloneItemStack(inventorySlots.get(i).getStack());
         updating = false;
+    }
+
+
+    public static class InterfaceBag implements IInteractionObject
+    {
+        private final World world;
+        private final String itemType;
+        private final int size;
+        private final ItemStack bag;
+
+        public InterfaceBag(World world, String itemType, int size, ItemStack bag)
+        {
+            this.world = world;
+            this.itemType = itemType;
+            this.size = size;
+            this.bag = bag;
+        }
+
+        public String getName()
+        {
+            return itemType == null ? "Bag" : itemType + " Bag";
+        }
+
+        public boolean hasCustomName()
+        {
+            return false;
+        }
+
+        public ITextComponent getDisplayName()
+        {
+            return new TextComponentString(itemType == null ? "Bag" : itemType + " Bag");
+        }
+
+        public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
+        {
+            return new ContainerBag(playerIn, world, itemType, size, bag);
+        }
+
+        public String getGuiID()
+        {
+            return MODID + ":bag";
+        }
     }
 }

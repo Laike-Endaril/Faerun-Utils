@@ -10,6 +10,7 @@ import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -18,6 +19,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -292,5 +296,43 @@ public class ContainerAssembler extends Container
 
         for (int i = 0; i < previous.length; i++) previous[i] = MCTools.cloneItemStack(inventorySlots.get(i).getStack());
         updating = false;
+    }
+
+
+    public static class InterfaceAssembler implements IInteractionObject
+    {
+        private final World world;
+        private final BlockPos position;
+
+        public InterfaceAssembler(World world, BlockPos pos)
+        {
+            this.world = world;
+            this.position = pos;
+        }
+
+        public String getName()
+        {
+            return "Assembler";
+        }
+
+        public boolean hasCustomName()
+        {
+            return false;
+        }
+
+        public ITextComponent getDisplayName()
+        {
+            return new TextComponentTranslation(BlocksAndItems.blockAssembler.getUnlocalizedName() + ".name");
+        }
+
+        public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
+        {
+            return new ContainerAssembler(playerIn, this.world, this.position);
+        }
+
+        public String getGuiID()
+        {
+            return FaerunUtils.MODID + ":assembler";
+        }
     }
 }

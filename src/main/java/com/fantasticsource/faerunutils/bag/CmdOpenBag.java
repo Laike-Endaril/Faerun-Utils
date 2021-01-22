@@ -6,18 +6,11 @@ import com.fantasticsource.tiamatitems.api.IPartSlot;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketOpenWindow;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.IInteractionObject;
-import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 
 import javax.annotation.Nullable;
@@ -78,7 +71,7 @@ public class CmdOpenBag extends CommandBase
 
         Network.WRAPPER.sendTo(new Network.BagPacket(type, partSlots.size(), stack), player);
 
-        InterfaceBag iface = new InterfaceBag(player.world, type, partSlots.size(), stack);
+        ContainerBag.InterfaceBag iface = new ContainerBag.InterfaceBag(player.world, type, partSlots.size(), stack);
 
         player.getNextWindowId();
         player.connection.sendPacket(new SPacketOpenWindow(player.currentWindowId, iface.getGuiID(), iface.getDisplayName()));
@@ -94,47 +87,5 @@ public class CmdOpenBag extends CommandBase
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos)
     {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames()) : Collections.emptyList();
-    }
-
-
-    public static class InterfaceBag implements IInteractionObject
-    {
-        private final World world;
-        private final String itemType;
-        private final int size;
-        private final ItemStack bag;
-
-        public InterfaceBag(World world, String itemType, int size, ItemStack bag)
-        {
-            this.world = world;
-            this.itemType = itemType;
-            this.size = size;
-            this.bag = bag;
-        }
-
-        public String getName()
-        {
-            return itemType == null ? "Bag" : itemType + " Bag";
-        }
-
-        public boolean hasCustomName()
-        {
-            return false;
-        }
-
-        public ITextComponent getDisplayName()
-        {
-            return new TextComponentString(itemType == null ? "Bag" : itemType + " Bag");
-        }
-
-        public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn)
-        {
-            return new ContainerBag(playerIn, world, itemType, size, bag);
-        }
-
-        public String getGuiID()
-        {
-            return MODID + ":bag";
-        }
     }
 }

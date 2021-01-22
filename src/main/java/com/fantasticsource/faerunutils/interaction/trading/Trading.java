@@ -1,8 +1,11 @@
 package com.fantasticsource.faerunutils.interaction.trading;
 
+import com.fantasticsource.faerunutils.Network;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.play.server.SPacketOpenWindow;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 
 import java.util.HashMap;
 
@@ -51,7 +54,32 @@ public class Trading
 
     protected static void start(TradeData data)
     {
-        //TODO open client GUIs and server container
+        EntityPlayerMP p1 = data.p1, p2 = data.p2;
+
+        Network.WRAPPER.sendTo(new Network.TradePacket(), p1);
+        Network.WRAPPER.sendTo(new Network.TradePacket(), p2);
+
+        ContainerTrade.InterfaceTrade iface1 = new ContainerTrade.InterfaceTrade(p1.world), iface2 = new ContainerTrade.InterfaceTrade(p2.world);
+        data.p1Interface = iface1;
+        data.p2Interface = iface2;
+
+        p1.getNextWindowId();
+        p2.getNextWindowId();
+
+        p1.connection.sendPacket(new SPacketOpenWindow(p1.currentWindowId, iface1.getGuiID(), iface1.getDisplayName()));
+        p2.connection.sendPacket(new SPacketOpenWindow(p2.currentWindowId, iface2.getGuiID(), iface2.getDisplayName()));
+
+        p1.openContainer = iface1.createContainer(p1.inventory, p1);
+        p2.openContainer = iface2.createContainer(p2.inventory, p2);
+
+        p1.openContainer.windowId = p1.currentWindowId;
+        p2.openContainer.windowId = p2.currentWindowId;
+
+        p1.openContainer.addListener(p1);
+        p2.openContainer.addListener(p2);
+
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(p1, p1.openContainer));
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(p2, p2.openContainer));
     }
 
 
@@ -162,6 +190,7 @@ public class Trading
     {
         public final EntityPlayerMP p1, p2;
         public boolean p1Locked = false, p2Locked = false, p1Ready = false, p2Ready = false;
+        public ContainerTrade.InterfaceTrade p1Interface = null, p2Interface = null;
 
         public TradeData(EntityPlayerMP p1, EntityPlayerMP p2)
         {

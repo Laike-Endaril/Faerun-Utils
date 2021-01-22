@@ -35,6 +35,7 @@ public class Network
         WRAPPER.registerMessage(RequestTradePacketHandler.class, RequestTradePacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(LockTradePacketHandler.class, LockTradePacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(CompleteTradePacketHandler.class, CompleteTradePacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(TradePacketHandler.class, TradePacket.class, discriminator++, Side.CLIENT);
     }
 
 
@@ -247,6 +248,40 @@ public class Network
         public IMessage onMessage(CompleteTradePacket packet, MessageContext ctx)
         {
             FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> Trading.tryComplete(ctx.getServerHandler().player, packet.complete));
+            return null;
+        }
+    }
+
+
+    public static class TradePacket implements IMessage
+    {
+        public TradePacket() //Required; probably for when the packet is received
+        {
+        }
+
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+        }
+    }
+
+    public static class TradePacketHandler implements IMessageHandler<TradePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(TradePacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.addScheduledTask(ClientProxy::showTradeGUI);
+            }
+
             return null;
         }
     }
