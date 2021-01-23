@@ -4,6 +4,7 @@ import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.items.ItemMatcher;
+import com.fantasticsource.tiamatitems.api.IPartSlot;
 import com.fantasticsource.tiamatitems.assembly.ItemAssembly;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
@@ -101,7 +102,7 @@ public class ContainerAssembler extends Container
         //Crafting slots
         addSlotToContainer(new AssemblerSlot(this, 0, 132, 35, 176, 0, stack ->
         {
-            if (AssemblyTags.getState(stack) != AssemblyTags.STATE_FULL || AssemblyTags.getPartSlots(stack).size() <= 0) return false;
+            if (!isValidAssembly(stack)) return false;
             if (inventorySlots.get(0).getStack().isEmpty())
             {
                 boolean empty = inventorySlots.get(1).getStack().isEmpty();
@@ -113,18 +114,10 @@ public class ContainerAssembler extends Container
             return true;
         }));
 
-        addSlotToContainer(new AssemblerSlot(this, 1, 20, 35, 208, 240, stack -> AssemblyTags.getState(stack) == AssemblyTags.STATE_EMPTY));
-        addSlotToContainer(new AssemblerSlot(this, 2, 38, 35, 224, 240, stack -> MiscTags.getItemTypeName(stack).contains("Soul")));
-        addSlotToContainer(new AssemblerSlot(this, 3, 56, 35, 240, 240, stack ->
-        {
-            String type = MiscTags.getItemTypeName(stack);
-            return type.contains("Core") || Tools.contains(PRIMARY_PART_ITEM_TYPES, type);
-        }));
-        addSlotToContainer(new AssemblerSlot(this, 4, 74, 35, 240, 240, stack ->
-        {
-            String type = MiscTags.getItemTypeName(stack);
-            return type.contains("Trim") || Tools.contains(SECONDARY_PART_ITEM_TYPES, type);
-        }));
+        addSlotToContainer(new AssemblerSlot(this, 1, 20, 35, 208, 240, ContainerAssembler::isValidEmptyBlueprint));
+        addSlotToContainer(new AssemblerSlot(this, 2, 38, 35, 224, 240, ContainerAssembler::isValidSoul));
+        addSlotToContainer(new AssemblerSlot(this, 3, 56, 35, 240, 240, ContainerAssembler::isValidPrimaryPart));
+        addSlotToContainer(new AssemblerSlot(this, 4, 74, 35, 240, 240, ContainerAssembler::isValidSecondaryPart));
 
 
         //Inventory
@@ -141,6 +134,51 @@ public class ContainerAssembler extends Container
         {
             addSlotToContainer(new Slot(player.inventory, x, 8 + x * 18, hotbarY));
         }
+    }
+
+    public static boolean isValidEmptyBlueprint(ItemStack stack)
+    {
+        ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
+        if (partSlots.size() != 3) return false;
+        for (IPartSlot partSlot : partSlots)
+        {
+            if (!partSlot.getRequired() || !partSlot.getPart().isEmpty()) return false;
+        }
+        return true;
+    }
+
+    public static boolean isValidAssembly(ItemStack stack)
+    {
+        ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
+        if (partSlots.size() == 0) return false;
+
+        for (IPartSlot partSlot : partSlots) if (!isValidPart(partSlot.getPart())) return false;
+        return true;
+    }
+
+    public static boolean isValidPart(ItemStack stack)
+    {
+        return isValidSoul(stack) || isValidPrimaryPart(stack) || isValidSecondaryPart(stack);
+    }
+
+    public static boolean isValidSoul(ItemStack stack)
+    {
+        if (AssemblyTags.getState(stack) != AssemblyTags.STATE_EMPTY) return false;
+        return MiscTags.getItemTypeName(stack).contains(" Soul");
+    }
+
+    public static boolean isValidPrimaryPart(ItemStack stack)
+    {
+        if (AssemblyTags.getState(stack) != AssemblyTags.STATE_EMPTY) return false;
+        String itemType = MiscTags.getItemTypeName(stack);
+        return itemType.contains(" Core") || Tools.contains(PRIMARY_PART_ITEM_TYPES, itemType);
+    }
+
+    public static boolean isValidSecondaryPart(ItemStack stack)
+    {
+        if (AssemblyTags.getState(stack) != AssemblyTags.STATE_EMPTY) return false;
+        String itemType = MiscTags.getItemTypeName(stack);
+        return itemType.contains(" Trim") || Tools.contains(SECONDARY_PART_ITEM_TYPES, itemType);
     }
 
     @Override
