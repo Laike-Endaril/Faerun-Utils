@@ -163,20 +163,20 @@ public class ContainerAssembler extends Container
 
     public static boolean isValidSoul(ItemStack stack)
     {
-        if (AssemblyTags.getState(stack) != AssemblyTags.STATE_EMPTY) return false;
+        if (AssemblyTags.getPartSlots(stack).size() > 0) return false;
         return MiscTags.getItemTypeName(stack).contains(" Soul");
     }
 
     public static boolean isValidPrimaryPart(ItemStack stack)
     {
-        if (AssemblyTags.getState(stack) != AssemblyTags.STATE_EMPTY) return false;
+        if (AssemblyTags.getPartSlots(stack).size() > 0) return false;
         String itemType = MiscTags.getItemTypeName(stack);
         return itemType.contains(" Core") || Tools.contains(PRIMARY_PART_ITEM_TYPES, itemType);
     }
 
     public static boolean isValidSecondaryPart(ItemStack stack)
     {
-        if (AssemblyTags.getState(stack) != AssemblyTags.STATE_EMPTY) return false;
+        if (AssemblyTags.getPartSlots(stack).size() > 0) return false;
         String itemType = MiscTags.getItemTypeName(stack);
         return itemType.contains(" Trim") || Tools.contains(SECONDARY_PART_ITEM_TYPES, itemType);
     }
