@@ -110,13 +110,18 @@ public class TradeGUI extends BetterContainerGUI
         tessellator.draw();
 
 
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableDepth();
+
         x1 = 7;
         x2 = 169;
         y1 = 43;
         y2 = 61;
         if (ready)
         {
-            GlStateManager.color(0, 1, 0, 0.5f);
+            GlStateManager.color(0, 1, 0, 0.2f);
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
 
 
@@ -129,7 +134,7 @@ public class TradeGUI extends BetterContainerGUI
         }
         else if (locked)
         {
-            GlStateManager.color(1, 1, 0, 0.5f);
+            GlStateManager.color(1, 1, 0, 0.2f);
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
 
 
@@ -145,7 +150,7 @@ public class TradeGUI extends BetterContainerGUI
         y2 = 25;
         if (otherReady)
         {
-            GlStateManager.color(0, 1, 0, 0.5f);
+            GlStateManager.color(0, 1, 0, 0.2f);
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
 
 
@@ -158,7 +163,7 @@ public class TradeGUI extends BetterContainerGUI
         }
         else if (otherLocked)
         {
-            GlStateManager.color(1, 1, 0, 0.5f);
+            GlStateManager.color(1, 1, 0, 0.2f);
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
 
 
@@ -171,6 +176,8 @@ public class TradeGUI extends BetterContainerGUI
         }
 
         GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableDepth();
     }
 
     @Override
