@@ -191,8 +191,8 @@ public class ContainerTrade extends Container
                     ContainerTrade otherContainer = (ContainerTrade) other.openContainer;
                     otherContainer.inventorySlots.get(slot - 9).putStack(newStack);
 
-                    if (data.p1 == player) data.p1Locked = false;
-                    else data.p2Locked = false;
+                    data.p1Locked = false;
+                    data.p2Locked = false;
                     data.p1Ready = false;
                     data.p2Ready = false;
                     data.sendUpdates();
