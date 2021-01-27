@@ -4,10 +4,6 @@ import com.fantasticsource.mctools.component.CItemStack;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -26,56 +22,7 @@ public class Network
 
     public static void init()
     {
-        WRAPPER.registerMessage(InteractPacketHandler.class, InteractPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(BagPacketHandler.class, BagPacket.class, discriminator++, Side.CLIENT);
-    }
-
-
-    public static class InteractPacket implements IMessage
-    {
-        BlockPos pos;
-
-        public InteractPacket() //Required; probably for when the packet is received
-        {
-        }
-
-        public InteractPacket(BlockPos pos)
-        {
-            this.pos = pos;
-        }
-
-
-        @Override
-        public void toBytes(ByteBuf buf)
-        {
-            buf.writeInt(pos.getX());
-            buf.writeInt(pos.getY());
-            buf.writeInt(pos.getZ());
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buf)
-        {
-            pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
-        }
-    }
-
-    public static class InteractPacketHandler implements IMessageHandler<InteractPacket, IMessage>
-    {
-        @Override
-        public IMessage onMessage(InteractPacket packet, MessageContext ctx)
-        {
-            if (ctx.side == Side.CLIENT)
-            {
-                Minecraft mc = Minecraft.getMinecraft();
-                mc.addScheduledTask(() ->
-                {
-                    mc.playerController.processRightClickBlock(mc.player, mc.world, packet.pos, EnumFacing.UP, new Vec3d(packet.pos), EnumHand.MAIN_HAND);
-                });
-            }
-
-            return null;
-        }
     }
 
 

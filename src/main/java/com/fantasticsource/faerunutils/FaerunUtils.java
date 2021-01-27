@@ -51,7 +51,6 @@ public class FaerunUtils
     public static void serverStarting(FMLServerStartingEvent event)
     {
         event.registerServerCommand(new CmdDie());
-        event.registerServerCommand(new CmdInteract());
         event.registerServerCommand(new CmdJoinInstanceType());
         event.registerServerCommand(new CmdOpenBag());
     }
