@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
+import com.fantasticsource.faerunutils.professions.Professions;
 import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
@@ -26,7 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044r,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zz,);required-after:tiamatinventory@[1.12.2.000zt,)")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044r,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzf,);required-after:tiamatinventory@[1.12.2.000zt,)")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
@@ -39,6 +40,7 @@ public class FaerunUtils
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
         Network.init();
+        Professions.init();
     }
 
     @SubscribeEvent
