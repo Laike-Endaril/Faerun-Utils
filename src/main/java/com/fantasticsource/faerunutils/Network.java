@@ -23,6 +23,7 @@ public class Network
     public static void init()
     {
         WRAPPER.registerMessage(BagPacketHandler.class, BagPacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(CraftPacketHandler.class, CraftPacket.class, discriminator++, Side.CLIENT);
     }
 
 
@@ -71,6 +72,49 @@ public class Network
             {
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.addScheduledTask(() -> ClientProxy.showBagGUI(packet.itemType, packet.size, packet.bag));
+            }
+
+            return null;
+        }
+    }
+
+
+    public static class CraftPacket implements IMessage
+    {
+        ItemStack professionItem;
+
+        public CraftPacket() //Required; probably for when the packet is received
+        {
+        }
+
+        public CraftPacket(ItemStack professionItem)
+        {
+            this.professionItem = professionItem;
+        }
+
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            new CItemStack(professionItem).write(buf);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            professionItem = new CItemStack().read(buf).value;
+        }
+    }
+
+    public static class CraftPacketHandler implements IMessageHandler<CraftPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(CraftPacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.addScheduledTask(() -> ClientProxy.showCraftGUI(packet.professionItem));
             }
 
             return null;

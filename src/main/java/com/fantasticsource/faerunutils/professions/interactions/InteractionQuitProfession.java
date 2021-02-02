@@ -4,7 +4,6 @@ import com.fantasticsource.faerunutils.professions.Professions;
 import com.fantasticsource.tiamatinteractions.api.AInteraction;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
-import com.fantasticsource.tiamatitems.settings.CSettings;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -13,13 +12,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 
-public class InteractionLearnProfession extends AInteraction
+public class InteractionQuitProfession extends AInteraction
 {
     public final String profession, type;
 
-    public InteractionLearnProfession(String profession, String type)
+    public InteractionQuitProfession(String profession, String type)
     {
-        super("Learn " + profession);
+        super("Quit " + profession);
         this.profession = profession;
         this.type = type;
     }
@@ -32,24 +31,15 @@ public class InteractionLearnProfession extends AInteraction
         ITiamatPlayerInventory inventory = TiamatInventoryAPI.getTiamatPlayerInventory(player);
         if (inventory == null) return false;
 
-        boolean emptyFound = false;
         if (type.equals("crafting"))
         {
-            for (ItemStack stack : inventory.getCraftingProfessions())
-            {
-                if (stack.isEmpty()) emptyFound = true;
-                else if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) return false;
-            }
+            for (ItemStack stack : inventory.getCraftingProfessions()) if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) return true;
         }
-        else if (type.equals("gathering"))
+        else
         {
-            for (ItemStack stack : inventory.getGatheringProfessions())
-            {
-                if (stack.isEmpty()) emptyFound = true;
-                else if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) return false;
-            }
+            for (ItemStack stack : inventory.getCraftingProfessions()) if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) return true;
         }
-        return emptyFound;
+        return false;
     }
 
     @Override
@@ -69,23 +59,15 @@ public class InteractionLearnProfession extends AInteraction
         {
             for (ItemStack stack : inventory.getCraftingProfessions())
             {
-                if (stack.isEmpty())
-                {
-                    inventory.setCraftingProfession(i, CSettings.LOCAL_SETTINGS.itemTypes.get(profession).generateItem(0, CSettings.LOCAL_SETTINGS.rarities.get("Crude")));
-                    return true;
-                }
+                if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) inventory.setCraftingProfession(i, ItemStack.EMPTY);
                 i++;
             }
         }
-        else if (type.equals("gathering"))
+        else
         {
             for (ItemStack stack : inventory.getGatheringProfessions())
             {
-                if (stack.isEmpty())
-                {
-                    inventory.setGatheringProfession(i, CSettings.LOCAL_SETTINGS.itemTypes.get(profession).generateItem(0, CSettings.LOCAL_SETTINGS.rarities.get("Crude")));
-                    return true;
-                }
+                if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) inventory.setGatheringProfession(i, ItemStack.EMPTY);
                 i++;
             }
         }
