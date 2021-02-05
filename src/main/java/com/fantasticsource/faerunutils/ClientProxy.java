@@ -20,6 +20,6 @@ public class ClientProxy
 
     public static void showCraftGUI(ItemStack professionItem)
     {
-        Minecraft.getMinecraft().displayGuiScreen(new CraftingGUI(professionItem));
+        new CraftingGUI(professionItem);
     }
 }
