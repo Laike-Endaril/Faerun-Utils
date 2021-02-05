@@ -6,6 +6,7 @@ import com.fantasticsource.mctools.gui.element.GUIElement;
 import com.fantasticsource.mctools.gui.element.other.GUIDarkenedBackground;
 import com.fantasticsource.mctools.gui.element.other.GUIGradientBorder;
 import com.fantasticsource.mctools.gui.element.text.GUIText;
+import com.fantasticsource.mctools.gui.element.text.GUITextSpacer;
 import com.fantasticsource.mctools.gui.element.textured.GUIItemStack;
 import com.fantasticsource.mctools.gui.element.view.GUIAutocroppedView;
 import com.fantasticsource.mctools.gui.element.view.GUIView;
@@ -41,29 +42,48 @@ public class CraftingGUI extends GUIScreen
             showUnstacked();
 
             root.setSubElementAutoplaceMethod(GUIElement.AP_CENTER);
-            GUIAutocroppedView view = new GUIAutocroppedView(this, 0.1);
-            root.add(view);
 
-            view.background = new GUIDarkenedBackground(this);
-            view.add(view.background);
+            GUIAutocroppedView mainView = new GUIAutocroppedView(this, 0.2);
+            mainView.setSubElementAutoplaceMethod(GUIElement.AP_CENTERED_H_TOP_TO_BOTTOM);
+            root.add(mainView);
 
-            GUIView subView = new GUIAutocroppedView(this);
-            subView.setSubElementAutoplaceMethod(GUIElement.AP_X_0_TOP_TO_BOTTOM);
-            view.add(subView);
+            mainView.background = new GUIDarkenedBackground(this);
+            mainView.add(mainView.background);
 
 
             //Recipe
-            subView.add(new GUIText(this, "", 0.5));
-            subView.add(new GUIText(this, "Recipe:"));
+            GUIView recipeView = new GUIAutocroppedView(this);
+            mainView.add(recipeView);
+
+            GUIView subView = new GUIAutocroppedView(this);
+            subView.setSubElementAutoplaceMethod(GUIElement.AP_X_0_TOP_TO_BOTTOM);
+            recipeView.add(subView);
+
+            GUIText recipeLabel = new GUIText(this, "Recipe:").setColor(getIdleColor(Color.WHITE), getHoverColor(Color.WHITE), Color.WHITE);
+            subView.addAll(new GUIText(this, "", 0.5), recipeLabel);
             ArrayList<ItemStack> recipes = inventory.getCraftingRecipes();
             recipes.removeIf(ItemStack::isEmpty);
             ItemStack recipe = recipes.size() > 0 ? recipes.get(0) : ItemStack.EMPTY;
             recipeElement = new GUIItemStack(this, 16, 16, recipe);
-            recipeElement.add(new GUIGradientBorder(this, 1, 1, 0.1, getIdleColor(Color.WHITE), Color.BLANK, getHoverColor(Color.WHITE), Color.BLANK, Color.WHITE, Color.BLANK));
-            view.add(recipeElement);
+            GUIGradientBorder recipeBorder = new GUIGradientBorder(this, 1, 1, 0.1, getIdleColor(Color.WHITE), Color.BLANK, getHoverColor(Color.WHITE), Color.BLANK, Color.WHITE, Color.BLANK);
+            recipeElement.add(recipeBorder);
+            recipeLabel.linkMouseActivity(recipeBorder);
+            recipeBorder.linkMouseActivity(recipeLabel);
+            recipeLabel.addClickActions(recipeElement::click);
+            recipeElement.addClickActions(() -> new ItemstackSelectionGUI(recipeElement, "Choose Recipe", recipes.toArray(new ItemStack[0])).addOnClosedActions(() ->
+            {
+                loadingOptions = true;
+                Network.WRAPPER.sendToServer(new Network.RequestCraftOptionsPacket(recipe));
+            }));
+            recipeView.addAll(recipeElement);
 
 
             //Target Trait
+            mainView.add(new GUITextSpacer(this, 0, 0.5));
+
+            GUIView traitView = new GUIAutocroppedView(this);
+            mainView.add(traitView);
+
             traitLabel = new GUIText(this, "").setColor(getIdleColor(Color.WHITE), getHoverColor(Color.WHITE), Color.WHITE);
             traitElement = new GUIText(this, "").setColor(getIdleColor(Color.WHITE), getHoverColor(Color.WHITE), Color.WHITE);
             traitLabel.linkMouseActivity(traitElement);
@@ -73,20 +93,12 @@ public class CraftingGUI extends GUIScreen
             {
                 if (!loadingOptions) new TextSelectionGUI(traitElement, "Select Target Trait", traitOptions.toArray(new String[0]));
             });
-            view.addAll(traitLabel, traitElement);
+            traitView.addAll(traitLabel, traitElement);
 
 
 //        3. Materials (3 slots)
 
 //        4. Craft button
-
-
-            //Actions
-            recipeElement.addClickActions(() -> new ItemstackSelectionGUI(recipeElement, "Choose Recipe", recipes.toArray(new ItemStack[0])).addOnClosedActions(() ->
-            {
-                loadingOptions = true;
-                Network.WRAPPER.sendToServer(new Network.RequestCraftOptionsPacket(recipe));
-            }));
 
 
             //Recalc for immediate render fix, then request options
