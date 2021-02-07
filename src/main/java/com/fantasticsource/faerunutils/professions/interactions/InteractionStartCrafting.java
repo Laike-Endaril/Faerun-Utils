@@ -51,7 +51,7 @@ public class InteractionStartCrafting extends AInteraction
         {
             if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName())))
             {
-                Network.WRAPPER.sendTo(new Network.CraftPacket(stack), player);
+                Network.WRAPPER.sendTo(new Network.OpenCraftingPacket(stack), player);
             }
         }
         return true;

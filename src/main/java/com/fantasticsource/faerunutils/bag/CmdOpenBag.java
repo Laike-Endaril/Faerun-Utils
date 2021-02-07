@@ -69,7 +69,7 @@ public class CmdOpenBag extends CommandBase
         if (partSlots.size() == 0 || !partSlots.get(0).getSlotType().equals(type)) return;
 
 
-        Network.WRAPPER.sendTo(new Network.BagPacket(type, partSlots.size(), stack), player);
+        Network.WRAPPER.sendTo(new Network.OpenBagPacket(type, partSlots.size(), stack), player);
 
         ContainerBag.InterfaceBag iface = new ContainerBag.InterfaceBag(player.world, type, partSlots.size(), stack);
 

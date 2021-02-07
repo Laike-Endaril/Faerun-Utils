@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils.professions.interactions;
 
+import com.fantasticsource.faerunutils.Network;
 import com.fantasticsource.faerunutils.professions.Professions;
 import com.fantasticsource.tiamatinteractions.api.AInteraction;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
@@ -51,8 +52,20 @@ public class InteractionQuitProfession extends AInteraction
     @Override
     public boolean execute(EntityPlayerMP player, Vec3d hitVec, Entity target)
     {
+        Network.WRAPPER.sendTo(new Network.RequestConfirmQuitPacket(profession, type), player);
+        return true;
+    }
+
+    @Override
+    public boolean execute(EntityPlayerMP player, Vec3d hitVec, BlockPos blockPos)
+    {
+        return false;
+    }
+
+    public static void forget(EntityPlayerMP player, String profession, String type)
+    {
         ITiamatPlayerInventory inventory = TiamatInventoryAPI.getTiamatPlayerInventory(player);
-        if (inventory == null) return true;
+        if (inventory == null) return;
 
         int i = 0;
         if (type.equals("crafting"))
@@ -60,6 +73,13 @@ public class InteractionQuitProfession extends AInteraction
             for (ItemStack stack : inventory.getCraftingProfessions())
             {
                 if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) inventory.setCraftingProfession(i, ItemStack.EMPTY);
+                i++;
+            }
+            i = 0;
+            for (ItemStack stack : inventory.getCraftingRecipes())
+            {
+                if (stack.isEmpty() || !stack.hasTagCompound()) continue;
+                if (profession.equals(stack.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString("profession"))) inventory.setCraftingRecipe(i, ItemStack.EMPTY);
                 i++;
             }
         }
@@ -71,12 +91,5 @@ public class InteractionQuitProfession extends AInteraction
                 i++;
             }
         }
-        return true;
-    }
-
-    @Override
-    public boolean execute(EntityPlayerMP player, Vec3d hitVec, BlockPos blockPos)
-    {
-        return false;
     }
 }
