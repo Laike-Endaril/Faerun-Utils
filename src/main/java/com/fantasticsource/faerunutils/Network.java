@@ -26,7 +26,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -38,6 +42,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import scala.actors.threadpool.Arrays;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
@@ -219,7 +224,7 @@ public class Network
 
     public static class CraftOptionsPacket implements IMessage
     {
-        ArrayList<String> options = new ArrayList<>();
+        ArrayList<String> options = new ArrayList<>(), optionRefs = new ArrayList<>();
 
         public CraftOptionsPacket() //Required; probably for when the packet is received
         {
@@ -263,6 +268,8 @@ public class Network
                                 else options.add(trait.name);
                             }
                             else options.add(trait.name);
+
+                            optionRefs.add(poolSet + ":" + poolName + ":" + trait.name);
                         }
                     }
                 }
@@ -274,13 +281,21 @@ public class Network
         public void toBytes(ByteBuf buf)
         {
             buf.writeInt(options.size());
-            for (String option : options) ByteBufUtils.writeUTF8String(buf, option);
+            for (String s : options) ByteBufUtils.writeUTF8String(buf, s);
+            for (String s : optionRefs) ByteBufUtils.writeUTF8String(buf, s);
         }
 
         @Override
         public void fromBytes(ByteBuf buf)
         {
-            for (int i = buf.readInt(); i > 0; i--) options.add(ByteBufUtils.readUTF8String(buf));
+            for (int i = buf.readInt(); i > 0; i--)
+            {
+                options.add(ByteBufUtils.readUTF8String(buf));
+            }
+            for (int i = options.size(); i > 0; i--)
+            {
+                optionRefs.add(ByteBufUtils.readUTF8String(buf));
+            }
         }
     }
 
@@ -294,7 +309,7 @@ public class Network
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.addScheduledTask(() ->
                 {
-                    if (mc.currentScreen instanceof CraftingGUI) ((CraftingGUI) mc.currentScreen).updateOptions(packet.options);
+                    if (mc.currentScreen instanceof CraftingGUI) ((CraftingGUI) mc.currentScreen).updateOptions(packet.options, packet.optionRefs);
                 });
             }
 
@@ -399,7 +414,7 @@ public class Network
 
     public static class CraftPacket implements IMessage
     {
-        public String profession, targetTrait;
+        public String profession, targetTraitRef;
         public ItemStack recipe, mats[];
 
         public CraftPacket()
@@ -407,10 +422,10 @@ public class Network
             //Required
         }
 
-        public CraftPacket(String profession, ItemStack recipe, String targetTrait, ItemStack... mats)
+        public CraftPacket(String profession, ItemStack recipe, String targetTraitRef, ItemStack... mats)
         {
             this.profession = profession;
-            this.targetTrait = targetTrait;
+            this.targetTraitRef = targetTraitRef;
             this.recipe = recipe;
             this.mats = mats;
         }
@@ -419,7 +434,7 @@ public class Network
         public void toBytes(ByteBuf buf)
         {
             ByteBufUtils.writeUTF8String(buf, profession);
-            ByteBufUtils.writeUTF8String(buf, targetTrait);
+            ByteBufUtils.writeUTF8String(buf, targetTraitRef);
             CItemStack cItemStack = new CItemStack(recipe).write(buf);
             buf.writeInt(mats.length);
             for (ItemStack stack : mats) cItemStack.set(stack).write(buf);
@@ -429,7 +444,7 @@ public class Network
         public void fromBytes(ByteBuf buf)
         {
             profession = ByteBufUtils.readUTF8String(buf);
-            targetTrait = ByteBufUtils.readUTF8String(buf);
+            targetTraitRef = ByteBufUtils.readUTF8String(buf);
             CItemStack cItemStack = new CItemStack();
             recipe = cItemStack.read(buf).value;
             mats = new ItemStack[buf.readInt()];
@@ -452,6 +467,25 @@ public class Network
                 //Check recipe product
                 CItemType productType = CSettings.LOCAL_SETTINGS.itemTypes.get(recipe.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString("product"));
                 if (productType == null) return;
+
+                //Check target trait
+                String targetTraitRef = packet.targetTraitRef;
+                String[] tokens = Tools.fixedSplit(targetTraitRef, ":");
+                if (tokens.length != 3) return;
+                LinkedHashSet<String> pools = productType.randomRecalculableTraitPoolSets.get(tokens[0]);
+                if (pools == null || !pools.contains(tokens[1])) return;
+                CRecalculableTraitPool pool = CSettings.LOCAL_SETTINGS.recalcTraitPools.get(tokens[1]);
+                if (pool == null) return;
+                CRecalculableTrait targetTrait = null;
+                for (CRecalculableTrait trait : pool.traitGenWeights.keySet())
+                {
+                    if (trait.name.equals(tokens[2]))
+                    {
+                        targetTrait = trait;
+                        break;
+                    }
+                }
+                if (targetTrait == null) return;
 
                 //Check materials (and queue mat rarities)
                 ItemStack[] mats = packet.mats;
@@ -561,15 +595,44 @@ public class Network
                 if (productRarity == null) return;
 
 
-                //Destroy materials
-                for (ItemStack stack : foundMats) MCTools.destroyItemStack(stack);
-
-
                 //Create item
                 ItemStack product = productType.generateItem(0, productRarity);
 
 
-                //TODO change one trait to target trait if successful
+                //Change one trait to target trait if successful, and queue exp gain amount based on crafting results
+                int expGain;
+                if (Math.random() < 0.55 + MiscTags.getItemLevel(recipe) * 0.08 - productRarity.ordering * 0.03)
+                {
+                    NBTTagList tagList = product.getTagCompound().getCompoundTag("tiamatrpg").getTagList("traits", Constants.NBT.TAG_STRING);
+                    ArrayList<String> traitRefs = new ArrayList<>();
+                    for (i = 0; i < tagList.tagCount(); i++)
+                    {
+                        traitRefs.add(tagList.getStringTagAt(i).replaceAll("(.*:.*:.*):.*", "$1"));
+                    }
+                    if (!traitRefs.contains(targetTraitRef))
+                    {
+                        String productString = product.serializeNBT().toString().replaceAll(Tools.choose(traitRefs), targetTraitRef).replaceAll("version:[0-9]+L", "version:-1L");
+                        try
+                        {
+                            product = new ItemStack(JsonToNBT.getTagFromJson(productString));
+                        }
+                        catch (NBTException e)
+                        {
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+
+                    expGain = (int) ((productRarity.ordering * 0.25) * 100);
+                }
+                else expGain = (int) ((productRarity.ordering * 0.25) * 50);
+
+
+                //Destroy materials
+                for (ItemStack stack : foundMats) MCTools.destroyItemStack(stack);
+
+
+                //TODO apply exp gain and level up recipe if it should (max lv5)
 
 
                 //Add item to inventory and send notice of crafted item

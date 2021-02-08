@@ -29,11 +29,11 @@ public class CraftingGUI extends GUIScreen
 {
     public final ItemStack professionItem;
     public final String profession;
-    GUIText traitLabel, traitElement;
-    GUIItemStack recipeElement, resultElement;
+    protected GUIText targetTraitLabel, targetTraitElement;
+    protected GUIItemStack recipeElement, resultElement;
     protected boolean loadingOptions = false;
-    protected ArrayList<String> traitOptions = new ArrayList<>();
-    GUIAutocroppedView materialView;
+    protected ArrayList<String> traitOptions = new ArrayList<>(), traitOptionRefs = new ArrayList<>();
+    protected GUIAutocroppedView materialView;
 
     public CraftingGUI(ItemStack professionItem)
     {
@@ -94,16 +94,16 @@ public class CraftingGUI extends GUIScreen
             traitView.setSubElementAutoplaceMethod(GUIElement.AP_Y_0_LEFT_TO_RIGHT);
             mainView.add(traitView);
 
-            traitLabel = new GUIText(this, "").setColor(getIdleColor(Color.WHITE), getHoverColor(Color.WHITE), Color.WHITE);
-            traitElement = new GUIText(this, "").setColor(getIdleColor(Color.WHITE), getHoverColor(Color.WHITE), Color.WHITE);
-            traitLabel.linkMouseActivity(traitElement);
-            traitElement.linkMouseActivity(traitLabel);
-            traitLabel.addClickActions(traitElement::click);
-            traitElement.addClickActions(() ->
+            targetTraitLabel = new GUIText(this, "").setColor(getIdleColor(Color.WHITE), getHoverColor(Color.WHITE), Color.WHITE);
+            targetTraitElement = new GUIText(this, "").setColor(getIdleColor(Color.WHITE), getHoverColor(Color.WHITE), Color.WHITE);
+            targetTraitLabel.linkMouseActivity(targetTraitElement);
+            targetTraitElement.linkMouseActivity(targetTraitLabel);
+            targetTraitLabel.addClickActions(targetTraitElement::click);
+            targetTraitElement.addClickActions(() ->
             {
-                if (!loadingOptions) new TextSelectionGUI(traitElement, "Select Target Trait", traitOptions.toArray(new String[0]));
+                if (!loadingOptions) new TextSelectionGUI(targetTraitElement, "Select Target Trait", traitOptions.toArray(new String[0]));
             });
-            traitView.addAll(traitLabel, traitElement);
+            traitView.addAll(targetTraitLabel, targetTraitElement);
 
 
             //Materials
@@ -126,7 +126,8 @@ public class CraftingGUI extends GUIScreen
                     mats[i] = ((GUIItemStack) element).getItemStack();
                     if (mats[i++].isEmpty()) return;
                 }
-                Network.WRAPPER.sendToServer(new Network.CraftPacket(profession, recipe, traitElement.getText(), mats));
+                i = traitOptions.indexOf(targetTraitElement.getText());
+                if (i > -1) Network.WRAPPER.sendToServer(new Network.CraftPacket(profession, recipe, traitOptionRefs.get(i), mats));
             }));
 
 
@@ -155,22 +156,23 @@ public class CraftingGUI extends GUIScreen
         }
     }
 
-    public void updateOptions(ArrayList<String> options)
+    public void updateOptions(ArrayList<String> possibleOptions, ArrayList<String> possibleTraitRefs)
     {
         //Trait options
         traitOptions.clear();
-        for (String option : options) traitOptions.add(I18n.translateToLocal(option));
-        if (options.size() == 0)
+        for (String option : possibleOptions) traitOptions.add(I18n.translateToLocal(option));
+        traitOptionRefs = possibleTraitRefs;
+        if (possibleTraitRefs.size() == 0)
         {
-            traitLabel.setText("");
-            traitElement.setText("");
+            targetTraitLabel.setText("");
+            targetTraitElement.setText("");
         }
         else
         {
-            traitLabel.setText("Target Trait: ");
-            if (!traitOptions.contains(traitElement.getText()))
+            targetTraitLabel.setText("Target Trait: ");
+            if (!traitOptions.contains(targetTraitElement.getText()))
             {
-                traitElement.setText(traitOptions.get(0));
+                targetTraitElement.setText(traitOptions.get(0));
             }
         }
 
@@ -222,6 +224,8 @@ public class CraftingGUI extends GUIScreen
     public void setPreviousResult(ItemStack result)
     {
         resultElement.setItemStack(result);
+
+        for (GUIElement element : materialView.children) ((GUIItemStack) element).setItemStack(ItemStack.EMPTY);
     }
 
     @Override
