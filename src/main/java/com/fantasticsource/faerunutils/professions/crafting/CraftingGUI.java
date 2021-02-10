@@ -127,7 +127,7 @@ public class CraftingGUI extends GUIScreen
                     if (mats[i++].isEmpty()) return;
                 }
                 i = traitOptions.indexOf(targetTraitElement.getText());
-                if (i > -1) Network.WRAPPER.sendToServer(new Network.CraftPacket(profession, recipe, traitOptionRefs.get(i), mats));
+                if (i > -1) Network.WRAPPER.sendToServer(new Network.CraftPacket(profession, recipeElement.getItemStack(), traitOptionRefs.get(i), mats));
             }));
 
 
@@ -221,8 +221,9 @@ public class CraftingGUI extends GUIScreen
         return validMats.toArray(new ItemStack[0]);
     }
 
-    public void setPreviousResult(ItemStack result)
+    public void setPreviousResult(ItemStack recipe, ItemStack result)
     {
+        recipeElement.setItemStack(recipe);
         resultElement.setItemStack(result);
 
         for (GUIElement element : materialView.children) ((GUIItemStack) element).setItemStack(ItemStack.EMPTY);

@@ -10,6 +10,7 @@ import com.fantasticsource.mctools.gui.screen.YesNoGUI;
 import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
+import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tiamatitems.settings.CRarity;
 import com.fantasticsource.tiamatitems.settings.CSettings;
@@ -28,6 +29,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.Constants;
@@ -493,13 +495,13 @@ public class Network
                 ArrayList<CRarity> matRarities = new ArrayList<>();
                 int i = 1;
                 String key = "mat" + i;
-                String value = recipe.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString(key);
-                while (!value.equals(""))
+                String matString = recipe.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString(key);
+                while (!matString.equals(""))
                 {
-                    matReqs.add(value);
+                    matReqs.add(matString);
 
                     key = "mat" + ++i;
-                    value = recipe.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString(key);
+                    matString = recipe.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString(key);
                 }
                 if (mats.length != matReqs.size()) return;
                 for (ItemStack mat : mats)
@@ -544,13 +546,14 @@ public class Network
                 }
                 if (!found) return;
 
-                //Make sure inventory contains recipe
+                //Make sure inventory contains recipe, and set recipe var to actual recipe
                 found = false;
                 for (ItemStack stack : inventory.getCraftingRecipes())
                 {
                     if (ItemMatcher.stacksMatch(stack, recipe))
                     {
                         found = true;
+                        recipe = stack;
                         break;
                     }
                 }
@@ -599,8 +602,8 @@ public class Network
                 ItemStack product = productType.generateItem(0, productRarity);
 
 
-                //Change one trait to target trait if successful, and queue exp gain amount based on crafting results
-                int expGain;
+                //Change one trait to target trait if successful, and calc new exp
+                int exp = recipe.getTagCompound().getCompoundTag(MODID).getInteger("exp");
                 if (Math.random() < 0.55 + MiscTags.getItemLevel(recipe) * 0.08 - productRarity.ordering * 0.03)
                 {
                     NBTTagList tagList = product.getTagCompound().getCompoundTag("tiamatrpg").getTagList("traits", Constants.NBT.TAG_STRING);
@@ -623,21 +626,87 @@ public class Network
                         }
                     }
 
-                    expGain = (int) ((productRarity.ordering * 0.25) * 100);
+                    exp += 200 * (1 + (productRarity.ordering * 0.25));
+                    //Success...
+                    //200
+                    //250
+                    //300
+                    //350
+                    //400
+                    //450
+                    //500
                 }
-                else expGain = (int) ((productRarity.ordering * 0.25) * 50);
+                else exp += 100 * (1 + (productRarity.ordering * 0.25));
+                //Failure...
+                //100
+                //125
+                //150
+                //175
+                //200
+                //225
+                //250
 
 
                 //Destroy materials
                 for (ItemStack stack : foundMats) MCTools.destroyItemStack(stack);
 
 
-                //TODO apply exp gain and level up recipe if it should (max lv5)
+                //Apply new exp and level up recipe if it should (max lv5)
+                //Leveling reqs...
+                //2200
+                //2800
+                //3800
+                //5200
+                int level = MiscTags.getItemLevel(recipe);
+                int req = 2000 + 200 * level * level;
+                boolean levelChanged = false;
+                while (level < 5 && exp >= req)
+                {
+                    exp -= req;
+                    level++;
+                    req = 2000 + 200 * level * level;
+                    levelChanged = true;
+                }
+                NBTTagCompound compound = recipe.getTagCompound();
+                if (level == 5)
+                {
+                    if (compound.hasKey(MODID))
+                    {
+                        NBTTagCompound compound2 = compound.getCompoundTag(MODID);
+                        compound2.removeTag("exp");
+                        if (compound2.hasNoTags()) compound.removeTag(MODID);
+                    }
+
+                    if (AssemblyTags.hasInternalCore(recipe))
+                    {
+                        compound = compound.getCompoundTag("tiamatrpg").getCompoundTag("core");
+
+                        if (compound.hasKey(MODID))
+                        {
+                            NBTTagCompound compound2 = compound.getCompoundTag(MODID);
+                            compound2.removeTag("exp");
+                            if (compound2.hasNoTags()) compound.removeTag(MODID);
+                        }
+                    }
+                }
+                else
+                {
+                    MCTools.getOrGenerateSubCompound(compound, MODID).setInteger("exp", exp);
+
+                    if (AssemblyTags.hasInternalCore(recipe))
+                    {
+                        MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID).setInteger("exp", exp);
+                    }
+                }
+                if (levelChanged)
+                {
+                    MiscTags.setItemLevelRecursiveAndRecalc(player, recipe, level);
+                }
 
 
                 //Add item to inventory and send notice of crafted item
                 MCTools.give(player, product);
-                WRAPPER.sendTo(new CraftResultPacket(product), player);
+                WRAPPER.sendTo(new CraftResultPacket(recipe, product), player);
             });
             return null;
         }
@@ -646,14 +715,15 @@ public class Network
 
     public static class CraftResultPacket implements IMessage
     {
-        public ItemStack result;
+        public ItemStack recipe, result;
 
         public CraftResultPacket() //Required; probably for when the packet is received
         {
         }
 
-        public CraftResultPacket(ItemStack result)
+        public CraftResultPacket(ItemStack recipe, ItemStack result)
         {
+            this.recipe = recipe;
             this.result = result;
         }
 
@@ -661,13 +731,15 @@ public class Network
         @Override
         public void toBytes(ByteBuf buf)
         {
-            new CItemStack(result).write(buf);
+            new CItemStack().set(recipe).write(buf).set(result).write(buf);
         }
 
         @Override
         public void fromBytes(ByteBuf buf)
         {
-            result = new CItemStack().read(buf).value;
+            CItemStack cStack = new CItemStack();
+            recipe = cStack.read(buf).value;
+            result = cStack.read(buf).value;
         }
     }
 
@@ -681,7 +753,7 @@ public class Network
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.addScheduledTask(() ->
                 {
-                    if (mc.currentScreen instanceof CraftingGUI) ((CraftingGUI) mc.currentScreen).setPreviousResult(packet.result);
+                    if (mc.currentScreen instanceof CraftingGUI) ((CraftingGUI) mc.currentScreen).setPreviousResult(packet.recipe, packet.result);
                 });
             }
 
