@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.professions.Professions;
 import com.fantasticsource.faerunutils.professions.crafting.CraftingGUI;
+import com.fantasticsource.faerunutils.professions.interactions.InteractionForgetRecipe;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionQuitProfession;
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
@@ -64,6 +65,8 @@ public class Network
         WRAPPER.registerMessage(ConfirmQuitPacketHandler.class, ConfirmQuitPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(CraftPacketHandler.class, CraftPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(CraftResultPacketHandler.class, CraftResultPacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(RequestConfirmForgetPacketHandler.class, RequestConfirmForgetPacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(ConfirmForgetPacketHandler.class, ConfirmForgetPacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -360,7 +363,7 @@ public class Network
                 Minecraft mc = Minecraft.getMinecraft();
                 mc.addScheduledTask(() ->
                 {
-                    YesNoGUI gui = new YesNoGUI("Quit " + packet.profession + "?", "This will remmove the " + packet.profession + " profession and any crafting recipes for it (including levels gained)!  Are you sure you want to quit this profession?");
+                    YesNoGUI gui = new YesNoGUI("Quit " + packet.profession + "?", "This will remove the " + packet.profession + " profession and any crafting recipes for it (including levels gained)!\r\nAre you sure you want to quit this profession?");
                     gui.addOnClosedActions(() ->
                     {
                         if (gui.pressedYes) WRAPPER.sendToServer(new ConfirmQuitPacket(packet.profession, packet.type));
@@ -408,7 +411,7 @@ public class Network
         @Override
         public IMessage onMessage(ConfirmQuitPacket packet, MessageContext ctx)
         {
-            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> InteractionQuitProfession.forget(ctx.getServerHandler().player, packet.profession, packet.type));
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> InteractionQuitProfession.quit(ctx.getServerHandler().player, packet.profession, packet.type));
             return null;
         }
     }
@@ -758,6 +761,94 @@ public class Network
                 });
             }
 
+            return null;
+        }
+    }
+
+
+    public static class RequestConfirmForgetPacket implements IMessage
+    {
+        public String recipe;
+
+        public RequestConfirmForgetPacket() //Required; probably for when the packet is received
+        {
+        }
+
+        public RequestConfirmForgetPacket(String recipe)
+        {
+            this.recipe = recipe;
+        }
+
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            ByteBufUtils.writeUTF8String(buf, recipe);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            recipe = ByteBufUtils.readUTF8String(buf);
+        }
+    }
+
+    public static class RequestConfirmForgetPacketHandler implements IMessageHandler<RequestConfirmForgetPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(RequestConfirmForgetPacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.addScheduledTask(() ->
+                {
+                    YesNoGUI gui = new YesNoGUI("Forget " + packet.recipe + "?", "This will remove the lowest level/exp " + packet.recipe + " recipe (including levels gained)!  Are you sure you want to forget this recipe?");
+                    gui.addOnClosedActions(() ->
+                    {
+                        if (gui.pressedYes) WRAPPER.sendToServer(new ConfirmForgetPacket(packet.recipe));
+                    });
+                });
+            }
+
+            return null;
+        }
+    }
+
+
+    public static class ConfirmForgetPacket implements IMessage
+    {
+        public String recipe;
+
+        public ConfirmForgetPacket()
+        {
+            //Required
+        }
+
+        public ConfirmForgetPacket(String recipe)
+        {
+            this.recipe = recipe;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            ByteBufUtils.writeUTF8String(buf, recipe);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            recipe = ByteBufUtils.readUTF8String(buf);
+        }
+    }
+
+    public static class ConfirmForgetPacketHandler implements IMessageHandler<ConfirmForgetPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(ConfirmForgetPacket packet, MessageContext ctx)
+        {
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> InteractionForgetRecipe.forget(ctx.getServerHandler().player, packet.recipe));
             return null;
         }
     }

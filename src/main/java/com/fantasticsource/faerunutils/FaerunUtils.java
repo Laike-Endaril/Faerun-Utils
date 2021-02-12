@@ -22,6 +22,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -40,7 +41,6 @@ public class FaerunUtils
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
         Network.init();
-        Professions.init();
     }
 
     @SubscribeEvent
@@ -55,6 +55,12 @@ public class FaerunUtils
         event.registerServerCommand(new CmdDie());
         event.registerServerCommand(new CmdJoinInstanceType());
         event.registerServerCommand(new CmdOpenBag());
+    }
+
+    @Mod.EventHandler
+    public static void serverStarted(FMLServerStartedEvent event)
+    {
+        Professions.init();
     }
 
     @SubscribeEvent

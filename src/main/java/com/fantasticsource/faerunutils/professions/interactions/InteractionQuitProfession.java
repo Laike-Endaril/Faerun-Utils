@@ -62,7 +62,7 @@ public class InteractionQuitProfession extends AInteraction
         return false;
     }
 
-    public static void forget(EntityPlayerMP player, String profession, String type)
+    public static void quit(EntityPlayerMP player, String profession, String type)
     {
         ITiamatPlayerInventory inventory = TiamatInventoryAPI.getTiamatPlayerInventory(player);
         if (inventory == null) return;
