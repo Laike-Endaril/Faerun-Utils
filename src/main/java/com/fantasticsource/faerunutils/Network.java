@@ -610,7 +610,8 @@ public class Network
                     ArrayList<String> traitRefs = new ArrayList<>();
                     for (i = 0; i < tagList.tagCount(); i++)
                     {
-                        traitRefs.add(tagList.getStringTagAt(i).replaceAll("(.*:.*:.*):.*", "$1"));
+                        String traitRef = tagList.getStringTagAt(i).replaceAll("(.*:.*:.*):.*", "$1");
+                        if (traitRef.replaceAll(":.*", "").equals(tokens[0])) traitRefs.add(traitRef);
                     }
                     if (!traitRefs.contains(targetTraitRef))
                     {
