@@ -678,6 +678,7 @@ public class Network
                     {
                         NBTTagCompound compound2 = compound.getCompoundTag(MODID);
                         compound2.removeTag("exp");
+                        compound2.removeTag("expReq");
                         if (compound2.hasNoTags()) compound.removeTag(MODID);
                     }
 
@@ -689,17 +690,22 @@ public class Network
                         {
                             NBTTagCompound compound2 = compound.getCompoundTag(MODID);
                             compound2.removeTag("exp");
+                            compound2.removeTag("expReq");
                             if (compound2.hasNoTags()) compound.removeTag(MODID);
                         }
                     }
                 }
                 else
                 {
-                    MCTools.getOrGenerateSubCompound(compound, MODID).setInteger("exp", exp);
+                    NBTTagCompound compound2 = MCTools.getOrGenerateSubCompound(compound, MODID);
+                    compound2.setInteger("exp", exp);
+                    compound2.setInteger("expReq", req);
 
                     if (AssemblyTags.hasInternalCore(recipe))
                     {
-                        MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID).setInteger("exp", exp);
+                        compound2 = MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID);
+                        compound2.setInteger("exp", exp);
+                        compound2.setInteger("expReq", req);
                     }
                 }
                 if (levelChanged)
