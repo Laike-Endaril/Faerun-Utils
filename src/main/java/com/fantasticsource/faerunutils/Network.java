@@ -475,22 +475,26 @@ public class Network
 
                 //Check target trait
                 String targetTraitRef = packet.targetTraitRef;
-                String[] tokens = Tools.fixedSplit(targetTraitRef, ":");
-                if (tokens.length != 3) return;
-                LinkedHashSet<String> pools = productType.randomRecalculableTraitPoolSets.get(tokens[0]);
-                if (pools == null || !pools.contains(tokens[1])) return;
-                CRecalculableTraitPool pool = CSettings.LOCAL_SETTINGS.recalcTraitPools.get(tokens[1]);
-                if (pool == null) return;
-                CRecalculableTrait targetTrait = null;
-                for (CRecalculableTrait trait : pool.traitGenWeights.keySet())
+                String tokens[] = null;
+                if (!targetTraitRef.equals(""))
                 {
-                    if (trait.name.equals(tokens[2]))
+                    tokens = Tools.fixedSplit(targetTraitRef, ":");
+                    if (tokens.length != 3) return;
+                    LinkedHashSet<String> pools = productType.randomRecalculableTraitPoolSets.get(tokens[0]);
+                    if (pools == null || !pools.contains(tokens[1])) return;
+                    CRecalculableTraitPool pool = CSettings.LOCAL_SETTINGS.recalcTraitPools.get(tokens[1]);
+                    if (pool == null) return;
+                    CRecalculableTrait targetTrait = null;
+                    for (CRecalculableTrait trait : pool.traitGenWeights.keySet())
                     {
-                        targetTrait = trait;
-                        break;
+                        if (trait.name.equals(tokens[2]))
+                        {
+                            targetTrait = trait;
+                            break;
+                        }
                     }
+                    if (targetTrait == null) return;
                 }
-                if (targetTrait == null) return;
 
                 //Check materials (and queue mat rarities)
                 ItemStack[] mats = packet.mats;
@@ -609,24 +613,27 @@ public class Network
                 int exp = recipe.getTagCompound().getCompoundTag(MODID).getInteger("exp");
                 if (Math.random() < 0.55 + MiscTags.getItemLevel(recipe) * 0.08 - productRarity.ordering * 0.03)
                 {
-                    NBTTagList tagList = product.getTagCompound().getCompoundTag("tiamatrpg").getTagList("traits", Constants.NBT.TAG_STRING);
-                    ArrayList<String> traitRefs = new ArrayList<>();
-                    for (i = 0; i < tagList.tagCount(); i++)
+                    if (tokens != null)
                     {
-                        String traitRef = tagList.getStringTagAt(i).replaceAll("(.*:.*:.*):.*", "$1");
-                        if (traitRef.replaceAll(":.*", "").equals(tokens[0])) traitRefs.add(traitRef);
-                    }
-                    if (!traitRefs.contains(targetTraitRef))
-                    {
-                        String productString = product.serializeNBT().toString().replaceAll(Tools.choose(traitRefs), targetTraitRef).replaceAll("version:[0-9]+L", "version:-1L");
-                        try
+                        NBTTagList tagList = product.getTagCompound().getCompoundTag("tiamatrpg").getTagList("traits", Constants.NBT.TAG_STRING);
+                        ArrayList<String> traitRefs = new ArrayList<>();
+                        for (i = 0; i < tagList.tagCount(); i++)
                         {
-                            product = new ItemStack(JsonToNBT.getTagFromJson(productString));
+                            String traitRef = tagList.getStringTagAt(i).replaceAll("(.*:.*:.*):.*", "$1");
+                            if (traitRef.replaceAll(":.*", "").equals(tokens[0])) traitRefs.add(traitRef);
                         }
-                        catch (NBTException e)
+                        if (!traitRefs.contains(targetTraitRef))
                         {
-                            e.printStackTrace();
-                            return;
+                            String productString = product.serializeNBT().toString().replaceAll(Tools.choose(traitRefs), targetTraitRef).replaceAll("version:[0-9]+L", "version:-1L");
+                            try
+                            {
+                                product = new ItemStack(JsonToNBT.getTagFromJson(productString));
+                            }
+                            catch (NBTException e)
+                            {
+                                e.printStackTrace();
+                                return;
+                            }
                         }
                     }
 

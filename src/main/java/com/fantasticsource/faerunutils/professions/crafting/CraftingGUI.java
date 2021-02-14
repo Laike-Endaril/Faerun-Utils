@@ -126,8 +126,13 @@ public class CraftingGUI extends GUIScreen
                     mats[i] = ((GUIItemStack) element).getItemStack();
                     if (mats[i++].isEmpty()) return;
                 }
-                i = traitOptions.indexOf(targetTraitElement.getText());
-                if (i > -1) Network.WRAPPER.sendToServer(new Network.CraftPacket(profession, recipeElement.getItemStack(), traitOptionRefs.get(i), mats));
+
+                if (traitOptions.size() == 0) Network.WRAPPER.sendToServer(new Network.CraftPacket(profession, recipeElement.getItemStack(), "", mats));
+                else
+                {
+                    i = traitOptions.indexOf(targetTraitElement.getText());
+                    if (i > -1) Network.WRAPPER.sendToServer(new Network.CraftPacket(profession, recipeElement.getItemStack(), traitOptionRefs.get(i), mats));
+                }
             }));
 
 
