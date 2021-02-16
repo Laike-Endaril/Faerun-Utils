@@ -5,6 +5,7 @@ import com.fantasticsource.faerunutils.professions.interactions.InteractionLearn
 import com.fantasticsource.faerunutils.professions.interactions.InteractionQuitProfession;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionStartCrafting;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
@@ -110,7 +111,7 @@ public class Professions
     {
         for (ItemStack stack : event.newInventory.allNonSkin)
         {
-            if (!MiscTags.getItemTypeName(stack).equals("Tiamat Recipe")) continue;
+            if (!Slottings.getItemSlotting(stack).equals("Tiamat Recipe")) continue;
 
             int level = MiscTags.getItemLevel(stack);
             if (level >= 5) continue;
