@@ -32,6 +32,7 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -678,6 +679,11 @@ public class Network
                     req = Professions.getExpReq(level);
                     levelChanged = true;
                 }
+
+                //This somehow removes exp and expReq tags from item (including core)
+                //Idk how that's even possible, but having it above the setters for those tags fixes it
+                if (levelChanged) MiscTags.setItemLevelRecursiveAndRecalc(player, recipe, level);
+
                 NBTTagCompound compound = recipe.getTagCompound(), compound2;
                 if (level == 5)
                 {
@@ -714,10 +720,6 @@ public class Network
                         compound2.setInteger("exp", exp);
                         compound2.setInteger("expReq", req);
                     }
-                }
-                if (levelChanged)
-                {
-                    MiscTags.setItemLevelRecursiveAndRecalc(player, recipe, level);
                 }
 
 
