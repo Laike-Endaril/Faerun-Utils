@@ -116,19 +116,19 @@ public class Professions
             int level = MiscTags.getItemLevel(stack);
             if (level >= 5) continue;
 
-            NBTTagCompound compound = MCTools.getOrGenerateSubCompound(stack.getTagCompound(), MODID);
-            if (compound.hasKey("exp")) continue;
+            NBTTagCompound compound = stack.getTagCompound(), compound2 = MCTools.getOrGenerateSubCompound(compound, MODID);
+            if (compound2.hasKey("exp")) continue;
 
 
             int req = getExpReq(level);
-            compound.setInteger("exp", 0);
-            compound.setInteger("expReq", req);
+            compound2.setInteger("exp", 0);
+            compound2.setInteger("expReq", req);
 
             if (AssemblyTags.hasInternalCore(stack))
             {
-                compound = MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID);
-                compound.setInteger("exp", 0);
-                compound.setInteger("expReq", req);
+                compound2 = MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID);
+                compound2.setInteger("exp", 0);
+                compound2.setInteger("expReq", req);
             }
         }
     }

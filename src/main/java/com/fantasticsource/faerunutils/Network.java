@@ -678,12 +678,12 @@ public class Network
                     req = Professions.getExpReq(level);
                     levelChanged = true;
                 }
-                NBTTagCompound compound = recipe.getTagCompound();
+                NBTTagCompound compound = recipe.getTagCompound(), compound2;
                 if (level == 5)
                 {
                     if (compound.hasKey(MODID))
                     {
-                        NBTTagCompound compound2 = compound.getCompoundTag(MODID);
+                        compound2 = compound.getCompoundTag(MODID);
                         compound2.removeTag("exp");
                         compound2.removeTag("expReq");
                         if (compound2.hasNoTags()) compound.removeTag(MODID);
@@ -695,7 +695,7 @@ public class Network
 
                         if (compound.hasKey(MODID))
                         {
-                            NBTTagCompound compound2 = compound.getCompoundTag(MODID);
+                            compound2 = compound.getCompoundTag(MODID);
                             compound2.removeTag("exp");
                             compound2.removeTag("expReq");
                             if (compound2.hasNoTags()) compound.removeTag(MODID);
@@ -704,7 +704,7 @@ public class Network
                 }
                 else
                 {
-                    NBTTagCompound compound2 = MCTools.getOrGenerateSubCompound(compound, MODID);
+                    compound2 = MCTools.getOrGenerateSubCompound(compound, MODID);
                     compound2.setInteger("exp", exp);
                     compound2.setInteger("expReq", req);
 
