@@ -669,13 +669,13 @@ public class Network
                 //3800
                 //5200
                 int level = MiscTags.getItemLevel(recipe);
-                int req = 2000 + 200 * level * level;
+                int req = Professions.getExpReq(level);
                 boolean levelChanged = false;
                 while (level < 5 && exp >= req)
                 {
                     exp -= req;
                     level++;
-                    req = 2000 + 200 * level * level;
+                    req = Professions.getExpReq(level);
                     levelChanged = true;
                 }
                 NBTTagCompound compound = recipe.getTagCompound();

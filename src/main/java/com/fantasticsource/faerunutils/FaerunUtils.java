@@ -40,6 +40,7 @@ public class FaerunUtils
     {
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
+        MinecraftForge.EVENT_BUS.register(Professions.class);
         Network.init();
     }
 

@@ -4,11 +4,20 @@ import com.fantasticsource.faerunutils.professions.interactions.InteractionForge
 import com.fantasticsource.faerunutils.professions.interactions.InteractionLearnProfession;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionQuitProfession;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionStartCrafting;
+import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.event.InventoryChangedEvent;
+import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
+import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tiamatitems.settings.CSettings;
 import com.fantasticsource.tiamatitems.trait.CItemType;
 import com.fantasticsource.tiamatitems.trait.recalculable.CRecalculableTrait;
 import com.fantasticsource.tiamatitems.trait.recalculable.CRecalculableTraitElement;
 import com.fantasticsource.tiamatitems.trait.recalculable.element.CRTraitElement_GenericString;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public class Professions
 {
@@ -85,6 +94,40 @@ public class Professions
                 }
 
                 if (found) break;
+            }
+        }
+    }
+
+
+    public static int getExpReq(int level)
+    {
+        return 2000 + 200 * level * level;
+    }
+
+
+    @SubscribeEvent
+    public static void inventoryChanged(InventoryChangedEvent event)
+    {
+        for (ItemStack stack : event.newInventory.allNonSkin)
+        {
+            if (!MiscTags.getItemTypeName(stack).equals("Tiamat Recipe")) continue;
+
+            int level = MiscTags.getItemLevel(stack);
+            if (level >= 5) continue;
+
+            NBTTagCompound compound = MCTools.getOrGenerateSubCompound(stack.getTagCompound(), MODID);
+            if (compound.hasKey("exp")) continue;
+
+
+            int req = getExpReq(level);
+            compound.setInteger("exp", 0);
+            compound.setInteger("expReq", req);
+
+            if (AssemblyTags.hasInternalCore(stack))
+            {
+                compound = MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID);
+                compound.setInteger("exp", 0);
+                compound.setInteger("expReq", req);
             }
         }
     }
