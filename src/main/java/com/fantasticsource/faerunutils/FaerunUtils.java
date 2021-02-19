@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044z,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzh,);required-after:tiamatinventory@[1.12.2.000zu,);required-after:tiamatinteractions@[1.12.2.000a,)")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zf,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzh,);required-after:tiamatinventory@[1.12.2.000zu,);required-after:tiamatinteractions@[1.12.2.000b,)")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
