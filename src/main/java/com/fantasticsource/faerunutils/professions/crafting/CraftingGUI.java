@@ -79,11 +79,17 @@ public class CraftingGUI extends GUIScreen
             recipeLabel.linkMouseActivity(recipeBorder);
             recipeBorder.linkMouseActivity(recipeLabel);
             recipeLabel.addClickActions(recipeElement::click);
-            recipeElement.addClickActions(() -> new ItemstackSelectionGUI(recipeElement, "Choose Recipe", recipes.toArray(new ItemStack[0])).addOnClosedActions(() ->
+            recipeElement.addClickActions(() ->
             {
-                loadingOptions = true;
-                Network.WRAPPER.sendToServer(new Network.RequestCraftOptionsPacket(recipe));
-            }));
+                if (Minecraft.getMinecraft().currentScreen == this)
+                {
+                    new ItemstackSelectionGUI(recipeElement, "Choose Recipe", recipes.toArray(new ItemStack[0])).addOnClosedActions(() ->
+                    {
+                        loadingOptions = true;
+                        Network.WRAPPER.sendToServer(new Network.RequestCraftOptionsPacket(recipe));
+                    });
+                }
+            });
             recipeView.addAll(recipeElement);
 
 
