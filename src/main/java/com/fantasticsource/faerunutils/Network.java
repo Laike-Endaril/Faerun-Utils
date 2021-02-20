@@ -32,7 +32,6 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -721,6 +720,12 @@ public class Network
                         compound2.setInteger("expReq", req);
                     }
                 }
+
+
+                //Add crafter tag to product
+                compound = product.getTagCompound();
+                MCTools.getOrGenerateSubCompound(compound, MODID).setUniqueId("maker", player.getUniqueID());
+                if (AssemblyTags.hasInternalCore(product)) MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID).setUniqueId("maker", player.getUniqueID());
 
 
                 //Add item to inventory and send notice of crafted item
