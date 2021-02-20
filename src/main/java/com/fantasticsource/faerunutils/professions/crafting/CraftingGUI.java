@@ -86,7 +86,7 @@ public class CraftingGUI extends GUIScreen
                     new ItemstackSelectionGUI(recipeElement, "Choose Recipe", recipes.toArray(new ItemStack[0])).addOnClosedActions(() ->
                     {
                         loadingOptions = true;
-                        Network.WRAPPER.sendToServer(new Network.RequestCraftOptionsPacket(recipe));
+                        Network.WRAPPER.sendToServer(new Network.RequestCraftOptionsPacket(recipeElement.getItemStack()));
                     });
                 }
             });
@@ -163,7 +163,7 @@ public class CraftingGUI extends GUIScreen
 
             //Recalc for immediate render fix, then request options
             recalc();
-            Network.WRAPPER.sendToServer(new Network.RequestCraftOptionsPacket(recipe));
+            Network.WRAPPER.sendToServer(new Network.RequestCraftOptionsPacket(recipeElement.getItemStack()));
         }
     }
 
