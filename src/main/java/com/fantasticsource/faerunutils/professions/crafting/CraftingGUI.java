@@ -196,7 +196,7 @@ public class CraftingGUI extends GUIScreen
                 materialView.add(materialElement);
                 materialElement.add(new GUIGradientBorder(this, 1, 1, 0.1, getIdleColor(Color.WHITE), Color.BLANK, getHoverColor(Color.WHITE), Color.BLANK, Color.WHITE, Color.BLANK));
                 String type = value;
-                materialElement.addClickActions(() -> new ItemstackSelectionGUI(materialElement, "Choose Material", getValidMats(materialElement, type)));
+                materialElement.addClickActions(() -> new ItemstackSelectionGUI(materialElement, "Choose " + type, getValidMats(materialElement, type)));
 
 
                 key = "mat" + ++i;
