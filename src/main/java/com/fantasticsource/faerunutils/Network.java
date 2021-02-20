@@ -724,8 +724,8 @@ public class Network
 
                 //Add crafter tag to product
                 compound = product.getTagCompound();
-                MCTools.getOrGenerateSubCompound(compound, MODID).setUniqueId("maker", player.getUniqueID());
-                if (AssemblyTags.hasInternalCore(product)) MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID).setUniqueId("maker", player.getUniqueID());
+                MCTools.getOrGenerateSubCompound(compound, MODID).setString("maker", player.getName());
+                if (AssemblyTags.hasInternalCore(product)) MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID).setString("maker", player.getName());
 
 
                 //Add item to inventory and send notice of crafted item
