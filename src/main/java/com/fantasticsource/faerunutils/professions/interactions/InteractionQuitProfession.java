@@ -78,8 +78,7 @@ public class InteractionQuitProfession extends AInteraction
             i = 0;
             for (ItemStack stack : inventory.getCraftingRecipes())
             {
-                if (stack.isEmpty() || !stack.hasTagCompound()) continue;
-                if (profession.equals(stack.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString("profession"))) inventory.setCraftingRecipe(i, ItemStack.EMPTY);
+                if (!stack.isEmpty() && stack.hasTagCompound() && profession.equals(stack.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString("profession"))) inventory.setCraftingRecipe(i, ItemStack.EMPTY);
                 i++;
             }
         }
