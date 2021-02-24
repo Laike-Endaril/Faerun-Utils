@@ -56,9 +56,11 @@ public class CmdJoinInstanceType extends CommandBase
 
     public void execute(MinecraftServer server, ICommandSender sender, String[] args)
     {
+        server.profiler.startSection("joinInstanceType");
         if (args.length < 7)
         {
             notifyCommandListener(sender, this, getUsage(sender));
+            server.profiler.endSection();
             return;
         }
 
@@ -66,6 +68,7 @@ public class CmdJoinInstanceType extends CommandBase
         if (player == null)
         {
             notifyCommandListener(sender, this, getUsage(sender));
+            server.profiler.endSection();
             return;
         }
 
@@ -109,6 +112,8 @@ public class CmdJoinInstanceType extends CommandBase
                 instanceDatasets.add(data);
             }
         }
+
+        server.profiler.endSection();
     }
 
     @Override
