@@ -696,7 +696,7 @@ public class Network
 
                     if (AssemblyTags.hasInternalCore(recipe))
                     {
-                        compound = compound.getCompoundTag("tiamatrpg").getCompoundTag("core");
+                        compound = compound.getCompoundTag("tiamatrpg").getCompoundTag("core").getCompoundTag("tag");
 
                         if (compound.hasKey(MODID))
                         {
@@ -715,7 +715,7 @@ public class Network
 
                     if (AssemblyTags.hasInternalCore(recipe))
                     {
-                        compound2 = MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID);
+                        compound2 = MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", "tag", MODID);
                         compound2.setInteger("exp", exp);
                         compound2.setInteger("expReq", req);
                     }
@@ -725,7 +725,7 @@ public class Network
                 //Add crafter tag to product
                 compound = product.getTagCompound();
                 MCTools.getOrGenerateSubCompound(compound, MODID).setString("maker", player.getName());
-                if (AssemblyTags.hasInternalCore(product)) MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID).setString("maker", player.getName());
+                if (AssemblyTags.hasInternalCore(product)) MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", "tag", MODID).setString("maker", player.getName());
 
 
                 //Add item to inventory and send notice of crafted item

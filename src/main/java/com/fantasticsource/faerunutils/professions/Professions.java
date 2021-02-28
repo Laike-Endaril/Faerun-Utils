@@ -126,7 +126,7 @@ public class Professions
 
             if (AssemblyTags.hasInternalCore(stack))
             {
-                compound2 = MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", MODID);
+                compound2 = MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", "tag", MODID);
                 compound2.setInteger("exp", 0);
                 compound2.setInteger("expReq", req);
             }
