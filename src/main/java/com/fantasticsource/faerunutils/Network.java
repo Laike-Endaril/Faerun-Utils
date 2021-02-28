@@ -1,6 +1,6 @@
 package com.fantasticsource.faerunutils;
 
-import com.fantasticsource.faerunutils.professions.Professions;
+import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
 import com.fantasticsource.faerunutils.professions.crafting.CraftingGUI;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionForgetRecipe;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionQuitProfession;
@@ -521,11 +521,11 @@ public class Network
                 }
 
                 //Check for NPC
-                int index = Tools.indexOf(Professions.CRAFTING_PROFESSIONS, profession);
+                int index = Tools.indexOf(ProfessionsAndInteractions.CRAFTING_PROFESSIONS, profession);
                 if (index == -1) return;
 
                 EntityPlayerMP player = ctx.getServerHandler().player;
-                String npcName = Professions.CRAFTING_PROFESSION_NPCS[index];
+                String npcName = ProfessionsAndInteractions.CRAFTING_PROFESSION_NPCS[index];
                 boolean found = false;
                 for (Entity entity : player.world.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().grow(4)))
                 {
@@ -669,13 +669,13 @@ public class Network
                 //3800
                 //5200
                 int level = MiscTags.getItemLevel(recipe);
-                int req = Professions.getExpReq(level);
+                int req = ProfessionsAndInteractions.getExpReq(level);
                 boolean levelChanged = false;
                 while (level < 5 && exp >= req)
                 {
                     exp -= req;
                     level++;
-                    req = Professions.getExpReq(level);
+                    req = ProfessionsAndInteractions.getExpReq(level);
                     levelChanged = true;
                 }
 

@@ -1,9 +1,6 @@
 package com.fantasticsource.faerunutils.professions;
 
-import com.fantasticsource.faerunutils.professions.interactions.InteractionForgetRecipe;
-import com.fantasticsource.faerunutils.professions.interactions.InteractionLearnProfession;
-import com.fantasticsource.faerunutils.professions.interactions.InteractionQuitProfession;
-import com.fantasticsource.faerunutils.professions.interactions.InteractionStartCrafting;
+import com.fantasticsource.faerunutils.professions.interactions.*;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.event.InventoryChangedEvent;
@@ -20,8 +17,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
-public class Professions
+public class ProfessionsAndInteractions
 {
+    public static final String MASTER_SMITH = "Watts";
+
     public static final String[] CRAFTING_PROFESSIONS = new String[]
             {
                     "Weaponsmith",
@@ -52,6 +51,8 @@ public class Professions
 
     public static void init()
     {
+        new InteractionTemper(true);
+        new InteractionTemper(false);
 
 
         for (String profession : CRAFTING_PROFESSIONS)

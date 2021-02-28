@@ -1,6 +1,6 @@
 package com.fantasticsource.faerunutils.professions.interactions;
 
-import com.fantasticsource.faerunutils.professions.Professions;
+import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
 import com.fantasticsource.tiamatinteractions.api.AInteraction;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
@@ -25,12 +25,12 @@ public class InteractionLearnProfession extends AInteraction
     }
 
     @Override
-    public boolean available(EntityPlayerMP player, Vec3d hitVec, Entity target)
+    public String titleIfAvailable(EntityPlayerMP player, Vec3d hitVec, Entity target)
     {
-        if (!target.getName().equals(Professions.CRAFTING_PROFESSION_NPCS[Tools.indexOf(Professions.CRAFTING_PROFESSIONS, profession)])) return false;
+        if (!target.getName().equals(ProfessionsAndInteractions.CRAFTING_PROFESSION_NPCS[Tools.indexOf(ProfessionsAndInteractions.CRAFTING_PROFESSIONS, profession)])) return null;
 
         ITiamatPlayerInventory inventory = TiamatInventoryAPI.getTiamatPlayerInventory(player);
-        if (inventory == null) return false;
+        if (inventory == null) return null;
 
         boolean emptyFound = false;
         if (type.equals("crafting"))
@@ -38,7 +38,7 @@ public class InteractionLearnProfession extends AInteraction
             for (ItemStack stack : inventory.getCraftingProfessions())
             {
                 if (stack.isEmpty()) emptyFound = true;
-                else if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) return false;
+                else if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) return null;
             }
         }
         else if (type.equals("gathering"))
@@ -46,16 +46,16 @@ public class InteractionLearnProfession extends AInteraction
             for (ItemStack stack : inventory.getGatheringProfessions())
             {
                 if (stack.isEmpty()) emptyFound = true;
-                else if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) return false;
+                else if (profession.equals(TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()))) return null;
             }
         }
-        return emptyFound;
+        return emptyFound ? name : null;
     }
 
     @Override
-    public boolean available(EntityPlayerMP player, Vec3d hitVec, BlockPos blockPos)
+    public String titleIfAvailable(EntityPlayerMP player, Vec3d hitVec, BlockPos blockPos)
     {
-        return false;
+        return null;
     }
 
     @Override
