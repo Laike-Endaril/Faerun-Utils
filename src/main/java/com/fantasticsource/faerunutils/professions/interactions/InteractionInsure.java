@@ -62,20 +62,23 @@ public class InteractionInsure extends AInteraction
     public boolean execute(EntityPlayerMP player, Vec3d hitVec, Entity target)
     {
         //Reduce funds or reject attempt if too poor
-        int totalCost = 0;
         ArrayList<ItemStack> stacks = getNonEmptyItems(player);
-        for (ItemStack stack : stacks.toArray(new ItemStack[0])) totalCost += insuranceCostRecursive(player.getUniqueID(), stack);
-        totalCost = adjustedCost(totalCost);
-        ICurrency[] currencies = RpgEconomyAPI.getCurrencyManager().getCurrencies();
-        ICurrency currency = currencies[0];
-        IWallet wallet = player.getCapability(CURRENCY_CAPABILITY, null).getWallet(currency);
-        int money = wallet.getAmount();
-        if (totalCost > money)
+        if (!player.isCreative())
         {
-            player.sendMessage(new TextComponentString(TextFormatting.RED + "You don't have enough money!"));
-            return false;
+            int totalCost = 0;
+            for (ItemStack stack : stacks.toArray(new ItemStack[0])) totalCost += insuranceCostRecursive(player.getUniqueID(), stack);
+            totalCost = adjustedCost(totalCost);
+            ICurrency[] currencies = RpgEconomyAPI.getCurrencyManager().getCurrencies();
+            ICurrency currency = currencies[0];
+            IWallet wallet = player.getCapability(CURRENCY_CAPABILITY, null).getWallet(currency);
+            int money = wallet.getAmount();
+            if (totalCost > money)
+            {
+                player.sendMessage(new TextComponentString(TextFormatting.RED + "You don't have enough money!"));
+                return false;
+            }
+            wallet.setAmount(money - totalCost);
         }
-        wallet.setAmount(money - totalCost);
 
 
         //NBT alterations

@@ -80,16 +80,19 @@ public class InteractionTemper extends AInteraction
     {
         //Reduce funds or reject attempt if too poor
         ItemStack stack = mainhand ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
-        ICurrency[] currencies = RpgEconomyAPI.getCurrencyManager().getCurrencies();
-        ICurrency currency = currencies[0];
-        IWallet wallet = player.getCapability(CURRENCY_CAPABILITY, null).getWallet(currency);
-        int money = wallet.getAmount(), cost = getCost(stack);
-        if (cost > money)
+        if (!player.isCreative())
         {
-            player.sendMessage(new TextComponentString(TextFormatting.RED + "You don't have enough money!"));
-            return false;
+            ICurrency[] currencies = RpgEconomyAPI.getCurrencyManager().getCurrencies();
+            ICurrency currency = currencies[0];
+            IWallet wallet = player.getCapability(CURRENCY_CAPABILITY, null).getWallet(currency);
+            int money = wallet.getAmount(), cost = getCost(stack);
+            if (cost > money)
+            {
+                player.sendMessage(new TextComponentString(TextFormatting.RED + "You don't have enough money!"));
+                return false;
+            }
+            wallet.setAmount(money - cost);
         }
-        wallet.setAmount(money - cost);
 
 
         //Roll
