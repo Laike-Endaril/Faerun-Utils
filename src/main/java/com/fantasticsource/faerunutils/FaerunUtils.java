@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
 import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
+import com.fantasticsource.faerunutils.professions.interactions.InteractionInsure;
 import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
@@ -41,6 +42,7 @@ public class FaerunUtils
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
         MinecraftForge.EVENT_BUS.register(ProfessionsAndInteractions.class);
+        MinecraftForge.EVENT_BUS.register(InteractionInsure.class);
         Network.init();
     }
 

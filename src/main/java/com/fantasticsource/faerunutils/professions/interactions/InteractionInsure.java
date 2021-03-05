@@ -1,34 +1,47 @@
 package com.fantasticsource.faerunutils.professions.interactions;
 
 import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
+import com.fantasticsource.instances.InstanceData;
+import com.fantasticsource.instances.world.WorldInstance;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.PlayerData;
 import com.fantasticsource.tiamatinteractions.api.AInteraction;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
 import com.fantasticsource.tiamatitems.api.IPartSlot;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
+import com.mojang.authlib.GameProfile;
 import moe.plushie.rpg_framework.api.RpgEconomyAPI;
 import moe.plushie.rpg_framework.api.currency.ICurrency;
 import moe.plushie.rpg_framework.api.currency.IWallet;
+import moe.plushie.rpg_framework.mail.common.MailMessage;
+import moe.plushie.rpg_framework.mail.common.MailSystem;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.item.ItemExpireEvent;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 import static com.fantasticsource.tiamatinventory.TiamatInventory.CURRENCY_CAPABILITY;
 import static com.fantasticsource.tiamatinventory.TiamatInventory.MODID;
 
 public class InteractionInsure extends AInteraction
 {
+    protected static final HashMap<World, HashMap<UUID, ItemStack>> TRACKED_ITEMS = new HashMap<>();
+
     protected String type;
 
     public InteractionInsure(String type)
@@ -94,11 +107,6 @@ public class InteractionInsure extends AInteraction
         return false;
     }
 
-
-    protected int adjustedCost(int rawCost)
-    {
-        return rawCost >> 3;
-    }
 
     public ArrayList<ItemStack> getNonEmptyItems(EntityPlayerMP player)
     {
@@ -171,7 +179,12 @@ public class InteractionInsure extends AInteraction
     }
 
 
-    public int insuranceCostRecursive(UUID ownerID, ItemStack stack)
+    protected static int adjustedCost(int rawCost)
+    {
+        return rawCost >> 3;
+    }
+
+    public static int insuranceCostRecursive(UUID ownerID, ItemStack stack)
     {
         int result = insuranceCost(ownerID, stack);
         for (IPartSlot partSlot : AssemblyTags.getPartSlots(stack))
@@ -182,21 +195,21 @@ public class InteractionInsure extends AInteraction
         return result;
     }
 
-    protected int insuranceCost(UUID ownerID, ItemStack stack)
+    protected static int insuranceCost(UUID ownerID, ItemStack stack)
     {
         if (!stack.hasTagCompound()) return 0;
         NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
         return compound != null && ownerID.equals(compound.getUniqueId("insured")) ? 0 : getPartValue(stack);
     }
 
-    protected int getPartValue(ItemStack stack)
+    protected static int getPartValue(ItemStack stack)
     {
         if (AssemblyTags.hasInternalCore(stack)) stack = AssemblyTags.getInternalCore(stack);
         return MiscTags.getItemValue(stack);
     }
 
 
-    protected void insureRecursive(UUID ownerID, ItemStack stack)
+    protected static void insureRecursive(UUID ownerID, ItemStack stack)
     {
         ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
         for (IPartSlot partSlot : partSlots)
@@ -208,7 +221,7 @@ public class InteractionInsure extends AInteraction
         insure(ownerID, stack);
     }
 
-    protected void insure(UUID ownerID, ItemStack stack)
+    protected static void insure(UUID ownerID, ItemStack stack)
     {
         NBTTagCompound compound = stack.getTagCompound();
         MCTools.getOrGenerateSubCompound(compound, MODID).setUniqueId("insuredFor", ownerID);
@@ -218,7 +231,43 @@ public class InteractionInsure extends AInteraction
     }
 
 
-    public HashMap<UUID, ArrayList<ItemStack>> splitItemIntoInsuredParts(ItemStack stack)
+    public static void uninsureRecursive(ItemStack stack)
+    {
+        ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
+        for (IPartSlot partSlot : partSlots)
+        {
+            ItemStack part = partSlot.getPart();
+            if (!part.isEmpty()) uninsure(part);
+        }
+        AssemblyTags.setPartSlots(stack, partSlots);
+        uninsure(stack);
+    }
+
+    public static void uninsure(ItemStack stack)
+    {
+        if (!stack.hasTagCompound()) return;
+
+        NBTTagCompound compound = stack.getTagCompound(), compound2 = MCTools.getSubCompoundIfExists(compound, MODID);
+        if (compound2 != null)
+        {
+            compound2.removeTag("insuredFor");
+            if (compound2.hasNoTags()) compound.removeTag(MODID);
+        }
+
+
+        compound = MCTools.getSubCompoundIfExists(compound, "tiamatrpg", "core", "tag");
+        if (compound == null) return;
+
+        compound2 = MCTools.getSubCompoundIfExists(compound, MODID);
+        if (compound2 != null)
+        {
+            compound2.removeTag("insuredFor");
+            if (compound2.hasNoTags()) compound.removeTag(MODID);
+        }
+    }
+
+
+    public static HashMap<UUID, ArrayList<ItemStack>> splitItemIntoInsuredParts(ItemStack stack)
     {
         HashMap<UUID, ArrayList<ItemStack>> result = new HashMap<>();
         UUID owner = getInsuranceOwnerForPart(stack);
@@ -241,10 +290,81 @@ public class InteractionInsure extends AInteraction
         return result;
     }
 
-    protected UUID getInsuranceOwnerForPart(ItemStack stack)
+    protected static UUID getInsuranceOwnerForPart(ItemStack stack)
     {
         if (!stack.hasTagCompound()) return null;
         NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
         return compound == null || !compound.hasKey("insuredFor") ? null : compound.getUniqueId("insuredFor");
+    }
+
+
+    @SubscribeEvent
+    public static void itemJoinTempInstance(EntityJoinWorldEvent event)
+    {
+        Entity entity = event.getEntity();
+        World world = event.getWorld();
+        if (world.isRemote || !(entity instanceof EntityItem) || !(world instanceof WorldInstance) || InstanceData.get(world).saves()) return;
+
+        TRACKED_ITEMS.computeIfAbsent(world, o -> new HashMap<>()).put(entity.getUniqueID(), ((EntityItem) entity).getItem());
+    }
+
+    @SubscribeEvent
+    public static void itemExpire(ItemExpireEvent event)
+    {
+        EntityItem entityItem = event.getEntityItem();
+        if (entityItem.world.isRemote) return;
+
+        HashMap<UUID, ItemStack> map = TRACKED_ITEMS.get(entityItem.world);
+        if (map != null) map.remove(entityItem.getUniqueID());
+
+        mailAllInsured(event.getEntityItem().getItem());
+    }
+
+    @SubscribeEvent
+    public static void worldUnload(ChunkEvent.Unload event)
+    {
+        World world = event.getWorld();
+        if (world.isRemote) return;
+
+        HashMap<UUID, ItemStack> map = TRACKED_ITEMS.remove(world);
+        if (map != null) mailAllInsured(map.values());
+    }
+
+    
+    protected static void mailAllInsured(ItemStack... stacks)
+    {
+        mailAllInsured(Arrays.asList(stacks));
+    }
+
+    protected static void mailAllInsured(Collection<ItemStack> stacks)
+    {
+        HashMap<UUID, ArrayList<ItemStack>> allStacks = new HashMap<>();
+        for (ItemStack itemStack : stacks)
+        {
+            for (Map.Entry<UUID, ArrayList<ItemStack>> entry : splitItemIntoInsuredParts(itemStack).entrySet())
+            {
+                allStacks.computeIfAbsent(entry.getKey(), o -> new ArrayList<>()).addAll(entry.getValue());
+            }
+        }
+        if (allStacks.size() == 0) return;
+
+
+        MailSystem mailSystem = (MailSystem) RpgEconomyAPI.getMailSystemManager().getMailSystems()[0];
+        Date sendDateTime = Calendar.getInstance().getTime();
+        String subject = "Insurance Returns";
+        String message = "";
+
+
+        for (Map.Entry<UUID, ArrayList<ItemStack>> entry : allStacks.entrySet())
+        {
+            PlayerData data = PlayerData.get(entry.getKey());
+
+            GameProfile sender = new GameProfile(UUID.fromString("41C82C87-7AfB-4024-BA57-13D2C7777777"), ProfessionsAndInteractions.INSURANCE_AGENT);
+
+            NonNullList<ItemStack> attachments = NonNullList.create();
+            attachments.addAll(entry.getValue());
+
+            mailSystem.sendMailMessage(new MailMessage(-1, mailSystem, sender, new GameProfile(data.id, data.name), sendDateTime, subject, message, attachments, false));
+        }
     }
 }
