@@ -330,7 +330,7 @@ public class InteractionInsure extends AInteraction
         if (map != null) mailAllInsured(map.values());
     }
 
-    
+
     protected static void mailAllInsured(ItemStack... stacks)
     {
         mailAllInsured(Arrays.asList(stacks));
