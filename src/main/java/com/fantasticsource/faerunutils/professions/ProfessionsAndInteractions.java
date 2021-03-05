@@ -19,7 +19,10 @@ import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public class ProfessionsAndInteractions
 {
-    public static final String MASTER_SMITH = "Watts";
+    public static final String
+            MASTER_SMITH = "Watts",
+            MASTER_DESIGNER = null,
+            INSURANCE_AGENT = "Pavel Roman Neko";
 
     public static final String[] CRAFTING_PROFESSIONS = new String[]
             {
@@ -54,6 +57,16 @@ public class ProfessionsAndInteractions
         new InteractionTemper(true);
         new InteractionTemper(false);
 
+        new InteractionInsure("Entire Inventory");
+        new InteractionInsure("All Equipped Items");
+        new InteractionInsure("Mainhand");
+        new InteractionInsure("Offhand");
+        new InteractionInsure("Helm");
+        new InteractionInsure("Shoulder Armor");
+        new InteractionInsure("Cape");
+        new InteractionInsure("Chestpiece");
+        new InteractionInsure("Leg Armor");
+        new InteractionInsure("Boots");
 
         for (String profession : CRAFTING_PROFESSIONS)
         {
