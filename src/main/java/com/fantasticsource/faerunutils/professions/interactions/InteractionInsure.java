@@ -35,8 +35,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.*;
 
+import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 import static com.fantasticsource.tiamatinventory.TiamatInventory.CURRENCY_CAPABILITY;
-import static com.fantasticsource.tiamatinventory.TiamatInventory.MODID;
 
 public class InteractionInsure extends AInteraction
 {
@@ -199,7 +199,7 @@ public class InteractionInsure extends AInteraction
     {
         if (!stack.hasTagCompound()) return 0;
         NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
-        return compound != null && ownerID.equals(compound.getUniqueId("insured")) ? 0 : getPartValue(stack);
+        return compound != null && ownerID.equals(compound.getUniqueId("insuredFor")) ? 0 : getPartValue(stack);
     }
 
     protected static int getPartValue(ItemStack stack)
