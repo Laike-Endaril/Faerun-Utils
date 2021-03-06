@@ -126,7 +126,7 @@ public class InteractionInsure extends AInteraction
                     stacks.add(inv.getSheathedOffhand2());
                     stacks.addAll(inv.getTiamatArmor());
                 }
-                return stacks;
+                break;
 
             case "All Equipped Items":
                 stacks.add(player.getHeldItemMainhand());
@@ -140,39 +140,39 @@ public class InteractionInsure extends AInteraction
                     stacks.add(inv.getSheathedOffhand2());
                     stacks.addAll(inv.getTiamatArmor());
                 }
-                return stacks;
+                break;
 
             case "Mainhand":
                 stacks.add(player.getHeldItemMainhand());
-                return stacks;
+                break;
 
             case "Offhand":
                 stacks.addAll(player.inventory.offHandInventory);
-                return stacks;
+                break;
 
             case "Helm":
                 stacks.add(player.inventory.armorInventory.get(3));
-                return stacks;
+                break;
 
             case "Shoulder Armor":
                 if (inv != null) stacks.add(inv.getShoulders());
-                return stacks;
+                break;
 
             case "Cape":
                 if (inv != null) stacks.add(inv.getCape());
-                return stacks;
+                break;
 
             case "Chestpiece":
                 stacks.add(player.inventory.armorInventory.get(2));
-                return stacks;
+                break;
 
             case "Leg Armor":
                 stacks.add(player.inventory.armorInventory.get(1));
-                return stacks;
+                break;
 
             case "Boots":
                 stacks.add(player.inventory.armorInventory.get(0));
-                return stacks;
+                break;
         }
         stacks.removeIf(ItemStack::isEmpty);
         return stacks;
