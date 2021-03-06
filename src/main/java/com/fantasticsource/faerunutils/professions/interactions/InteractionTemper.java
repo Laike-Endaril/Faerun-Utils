@@ -18,6 +18,7 @@ import com.fantasticsource.tiamatitems.trait.recalculable.element.CRTraitElement
 import com.fantasticsource.tools.Tools;
 import moe.plushie.rpg_framework.api.RpgEconomyAPI;
 import moe.plushie.rpg_framework.api.currency.ICurrency;
+import moe.plushie.rpg_framework.api.currency.ICurrencyCapability;
 import moe.plushie.rpg_framework.api.currency.IWallet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -218,7 +219,8 @@ public class InteractionTemper extends AInteraction
         {
             ICurrency[] currencies = RpgEconomyAPI.getCurrencyManager().getCurrencies();
             ICurrency currency = currencies[0];
-            IWallet wallet = player.getCapability(CURRENCY_CAPABILITY, null).getWallet(currency);
+            ICurrencyCapability capability = player.getCapability(CURRENCY_CAPABILITY, null);
+            IWallet wallet = capability.getWallet(currency);
             int money = wallet.getAmount();
             if (cost > money)
             {
@@ -226,6 +228,7 @@ public class InteractionTemper extends AInteraction
                 return false;
             }
             wallet.setAmount(money - cost);
+            capability.syncToOwner(player, true);
         }
 
 

@@ -14,6 +14,7 @@ import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.mojang.authlib.GameProfile;
 import moe.plushie.rpg_framework.api.RpgEconomyAPI;
 import moe.plushie.rpg_framework.api.currency.ICurrency;
+import moe.plushie.rpg_framework.api.currency.ICurrencyCapability;
 import moe.plushie.rpg_framework.api.currency.IWallet;
 import moe.plushie.rpg_framework.mail.common.MailMessage;
 import moe.plushie.rpg_framework.mail.common.MailSystem;
@@ -30,8 +31,9 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
-import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 import java.util.*;
 
@@ -83,7 +85,8 @@ public class InteractionInsure extends AInteraction
             totalCost = adjustedCost(totalCost);
             ICurrency[] currencies = RpgEconomyAPI.getCurrencyManager().getCurrencies();
             ICurrency currency = currencies[0];
-            IWallet wallet = player.getCapability(CURRENCY_CAPABILITY, null).getWallet(currency);
+            ICurrencyCapability capability = player.getCapability(CURRENCY_CAPABILITY, null);
+            IWallet wallet = capability.getWallet(currency);
             int money = wallet.getAmount();
             if (totalCost > money)
             {
@@ -91,6 +94,7 @@ public class InteractionInsure extends AInteraction
                 return false;
             }
             wallet.setAmount(money - totalCost);
+            capability.syncToOwner(player, true);
         }
 
 
@@ -300,9 +304,13 @@ public class InteractionInsure extends AInteraction
     {
         Entity entity = event.getEntity();
         World world = event.getWorld();
-        if (world.isRemote || !(entity instanceof EntityItem) || !(world instanceof WorldInstance) || InstanceData.get(world).saves()) return;
+        if (world.isRemote || !(entity instanceof EntityItem)) return;
+        if (!(world instanceof WorldInstance)) return;
+        if (InstanceData.get(world).saves()) return;
 
-        TRACKED_ITEMS.computeIfAbsent(world, o -> new HashMap<>()).put(entity.getUniqueID(), ((EntityItem) entity).getItem());
+        EntityItem entityItem = (EntityItem) entity;
+        System.out.println(TextFormatting.GREEN + "Tracking " + entityItem + " for world " + world);
+        TRACKED_ITEMS.computeIfAbsent(world, o -> new HashMap<>()).put(entity.getUniqueID(), entityItem.getItem());
     }
 
     @SubscribeEvent
@@ -314,15 +322,26 @@ public class InteractionInsure extends AInteraction
         HashMap<UUID, ItemStack> map = TRACKED_ITEMS.get(entityItem.world);
         if (map != null) map.remove(entityItem.getUniqueID());
 
-        mailAllInsured(event.getEntityItem().getItem());
+        mailAllInsured(event.getEntityItem().getItem()); //Happens even if not added to list, so items that expire in eg. the overworld may return
     }
 
     @SubscribeEvent
-    public static void worldUnload(ChunkEvent.Unload event)
+    public static void itemPickup(PlayerEvent.ItemPickupEvent event)
+    {
+        EntityItem entityItem = event.getOriginalEntity();
+        if (entityItem.world.isRemote) return;
+
+        HashMap<UUID, ItemStack> map = TRACKED_ITEMS.get(entityItem.world);
+        if (map != null) map.remove(entityItem.getUniqueID());
+    }
+
+    @SubscribeEvent
+    public static void worldUnload(WorldEvent.Unload event)
     {
         World world = event.getWorld();
         if (world.isRemote) return;
 
+        System.out.println(TextFormatting.GREEN + "World unload: " + world);
         HashMap<UUID, ItemStack> map = TRACKED_ITEMS.remove(world);
         if (map != null) mailAllInsured(map.values());
     }
@@ -343,6 +362,16 @@ public class InteractionInsure extends AInteraction
                 allStacks.computeIfAbsent(entry.getKey(), o -> new ArrayList<>()).addAll(entry.getValue());
             }
         }
+        System.out.println();
+        System.out.println(TextFormatting.GREEN + "Final list: " + allStacks.size());
+        for (Map.Entry<UUID, ArrayList<ItemStack>> entry : allStacks.entrySet())
+        {
+            System.out.println(entry.getKey());
+            System.out.println(entry.getValue().size());
+            for (ItemStack stack : entry.getValue()) System.out.println(stack);
+            System.out.println();
+        }
+        System.out.println();
         if (allStacks.size() == 0) return;
 
 
@@ -361,6 +390,10 @@ public class InteractionInsure extends AInteraction
             NonNullList<ItemStack> attachments = NonNullList.create();
             attachments.addAll(entry.getValue());
 
+            System.out.println();
+            System.out.println("Sent to " + data.name + " (" + data.id + "):");
+            for (ItemStack stack : attachments) System.out.println(stack);
+            System.out.println();
             mailSystem.sendMailMessage(new MailMessage(-1, mailSystem, sender, new GameProfile(data.id, data.name), sendDateTime, subject, message, attachments, false));
         }
     }
