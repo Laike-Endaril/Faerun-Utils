@@ -7,6 +7,7 @@ import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
 import com.fantasticsource.tiamatitems.TiamatItems;
 import com.fantasticsource.tiamatitems.api.IPartSlot;
+import com.fantasticsource.tiamatitems.assembly.ItemAssembly;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tiamatitems.settings.CSettings;
@@ -264,7 +265,12 @@ public class InteractionTemper extends AInteraction
         }
 
 
+        //Part slots if assembly
         if (foundPart != null) AssemblyTags.setPartSlots(stack, partSlots);
+
+
+        //Recalc to apply trait
+        ItemAssembly.recalc(player, stack, true);
 
 
         return true;
