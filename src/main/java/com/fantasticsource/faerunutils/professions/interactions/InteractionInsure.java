@@ -62,7 +62,7 @@ public class InteractionInsure extends AInteraction
         cost = adjustedCost(cost);
 
 
-        return stacks.size() > 0 ? name + TextFormatting.RED + " (costs " + cost + ")" : null;
+        return stacks.size() > 0 ? name + TextFormatting.RED + " (costs " + ProfessionsAndInteractions.getCostString(cost) + ")" : null;
     }
 
     @Override
@@ -178,11 +178,6 @@ public class InteractionInsure extends AInteraction
         return stacks;
     }
 
-
-    protected static int adjustedCost(int rawCost)
-    {
-        return rawCost >> 3;
-    }
 
     public static int insuranceCostRecursive(UUID ownerID, ItemStack stack)
     {
@@ -368,5 +363,10 @@ public class InteractionInsure extends AInteraction
 
             mailSystem.sendMailMessage(new MailMessage(-1, mailSystem, sender, new GameProfile(data.id, data.name), sendDateTime, subject, message, attachments, false));
         }
+    }
+
+    protected static int adjustedCost(int rawCost)
+    {
+        return rawCost;
     }
 }

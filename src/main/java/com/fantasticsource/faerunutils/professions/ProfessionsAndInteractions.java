@@ -150,4 +150,18 @@ public class ProfessionsAndInteractions
             }
         }
     }
+
+
+    public static String getCostString(int cost)
+    {
+        int g = cost / 10000;
+        int s = (cost / 100) % 100;
+        int c = cost % 100;
+
+        String result = "";
+        if (g > 0) result += g + "g";
+        if (s > 0) result += (g > 0 ? " " : "") + s + "s";
+        result += (g > 0 || s > 0 ? " " : "") + c + "c";
+        return result;
+    }
 }

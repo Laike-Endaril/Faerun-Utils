@@ -101,7 +101,7 @@ public class InteractionTemper extends AInteraction
             if (!found) return null;
 
 
-            return MiscTags.getItemValue(stack) > 0 ? name + TextFormatting.RED + " (costs " + getCost(stack) + ")" : null;
+            return MiscTags.getItemValue(stack) > 0 ? name + TextFormatting.RED + " (costs " + ProfessionsAndInteractions.getCostString(getCost(stack)) + ")" : null;
         }
 
 
@@ -131,7 +131,7 @@ public class InteractionTemper extends AInteraction
             if (!found) continue;
 
 
-            return MiscTags.getItemValue(part) > 0 ? name + TextFormatting.RED + " (costs " + getCost(part) + ")" : null;
+            return MiscTags.getItemValue(part) > 0 ? name + TextFormatting.RED + " (costs " + ProfessionsAndInteractions.getCostString(getCost(part)) + ")" : null;
         }
 
 
