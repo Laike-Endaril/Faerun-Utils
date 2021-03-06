@@ -4,7 +4,8 @@ import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatinteractions.api.AInteraction;
 import com.fantasticsource.tiamatitems.TiamatItems;
-import com.fantasticsource.tiamatitems.assembly.ItemAssembly;
+import com.fantasticsource.tiamatitems.api.IPartSlot;
+import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tiamatitems.settings.CSettings;
 import com.fantasticsource.tiamatitems.trait.CItemType;
@@ -26,6 +27,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
+import java.util.ArrayList;
+
 import static com.fantasticsource.tiamatinventory.TiamatInventory.CURRENCY_CAPABILITY;
 
 public class InteractionTemper extends AInteraction
@@ -46,27 +49,63 @@ public class InteractionTemper extends AInteraction
         ItemStack stack = mainhand ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
         if (stack.getItem() != TiamatItems.tiamatItem) return null;
 
-        CItemType itemType = CSettings.LOCAL_SETTINGS.itemTypes.get(MiscTags.getItemTypeName(stack));
-        if (itemType == null) return null;
-
-        boolean found = false;
-        for (CRecalculableTrait recalculableTrait : itemType.staticRecalculableTraits.values())
+        ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
+        if (partSlots.size() == 0)
         {
-            for (CRecalculableTraitElement element : recalculableTrait.elements)
+            CItemType itemType = CSettings.LOCAL_SETTINGS.itemTypes.get(MiscTags.getItemTypeName(stack));
+            if (itemType == null) return null;
+
+            boolean found = false;
+            for (CRecalculableTrait recalculableTrait : itemType.staticRecalculableTraits.values())
             {
-                if (element instanceof CRTraitElement_GenericDouble && ((CRTraitElement_GenericDouble) element).name.equals("WeaponPower"))
+                for (CRecalculableTraitElement element : recalculableTrait.elements)
                 {
-                    found = true;
-                    break;
+                    if (element instanceof CRTraitElement_GenericDouble && ((CRTraitElement_GenericDouble) element).name.equals("WeaponPower"))
+                    {
+                        found = true;
+                        break;
+                    }
                 }
+                if (found) break;
             }
-            if (found) break;
+            if (!found) return null;
+
+
+            return MiscTags.getItemValue(stack) > 0 ? name + TextFormatting.RED + " (costs " + getCost(stack) + ")" : null;
         }
-        if (!found) return null;
 
 
-        int cost = getCost(stack);
-        return cost > 0 ? name + TextFormatting.RED + " (costs " + cost + ")" : null;
+        //Assembly
+        for (IPartSlot partSlot : partSlots)
+        {
+            ItemStack part = partSlot.getPart();
+            if (part.isEmpty()) continue;
+
+
+            CItemType itemType = CSettings.LOCAL_SETTINGS.itemTypes.get(MiscTags.getItemTypeName(part));
+            if (itemType == null) continue;
+
+            boolean found = false;
+            for (CRecalculableTrait recalculableTrait : itemType.staticRecalculableTraits.values())
+            {
+                for (CRecalculableTraitElement element : recalculableTrait.elements)
+                {
+                    if (element instanceof CRTraitElement_GenericDouble && ((CRTraitElement_GenericDouble) element).name.equals("WeaponPower"))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            if (!found) continue;
+
+
+            return MiscTags.getItemValue(part) > 0 ? name + TextFormatting.RED + " (costs " + getCost(part) + ")" : null;
+        }
+
+
+        return null;
     }
 
     @Override
@@ -78,14 +117,49 @@ public class InteractionTemper extends AInteraction
     @Override
     public boolean execute(EntityPlayerMP player, Vec3d hitVec, Entity target)
     {
-        //Reduce funds or reject attempt if too poor
+        //Find out if we're dealing with a sub-part or not and calculate cost
         ItemStack stack = mainhand ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
+        int cost = getCost(stack);
+        ItemStack foundPart = null;
+        ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
+        for (IPartSlot partSlot : partSlots)
+        {
+            ItemStack part = partSlot.getPart();
+            if (part.isEmpty()) continue;
+
+
+            CItemType itemType = CSettings.LOCAL_SETTINGS.itemTypes.get(MiscTags.getItemTypeName(part));
+            if (itemType == null) continue;
+
+            boolean found = false;
+            for (CRecalculableTrait recalculableTrait : itemType.staticRecalculableTraits.values())
+            {
+                for (CRecalculableTraitElement element : recalculableTrait.elements)
+                {
+                    if (element instanceof CRTraitElement_GenericDouble && ((CRTraitElement_GenericDouble) element).name.equals("WeaponPower"))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            if (!found) continue;
+
+
+            foundPart = part;
+            cost = getCost(part);
+            break;
+        }
+
+
+        //Reduce funds or reject attempt if too poor
         if (!player.isCreative())
         {
             ICurrency[] currencies = RpgEconomyAPI.getCurrencyManager().getCurrencies();
             ICurrency currency = currencies[0];
             IWallet wallet = player.getCapability(CURRENCY_CAPABILITY, null).getWallet(currency);
-            int money = wallet.getAmount(), cost = getCost(stack);
+            int money = wallet.getAmount();
             if (cost > money)
             {
                 player.sendMessage(new TextComponentString(TextFormatting.RED + "You don't have enough money!"));
@@ -100,7 +174,8 @@ public class InteractionTemper extends AInteraction
 
 
         //NBT alterations
-        NBTTagCompound compound = stack.getTagCompound(), compound2 = MCTools.getSubCompoundIfExists(compound, "tiamatrpg");
+        NBTTagCompound compound = foundPart == null ? stack.getTagCompound() : foundPart.getTagCompound();
+        NBTTagCompound compound2 = MCTools.getSubCompoundIfExists(compound, "tiamatrpg");
         NBTTagList list = (NBTTagList) compound2.getTag("traits");
         for (int i = 0; i < list.tagCount(); i++)
         {
@@ -130,8 +205,7 @@ public class InteractionTemper extends AInteraction
         }
 
 
-        //Recalc
-        ItemAssembly.recalc(player, stack, true);
+        if (foundPart != null) AssemblyTags.setPartSlots(stack, partSlots);
 
 
         return true;
