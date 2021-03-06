@@ -223,6 +223,8 @@ public class InteractionInsure extends AInteraction
 
     protected static void insure(UUID ownerID, ItemStack stack)
     {
+        if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
+
         NBTTagCompound compound = stack.getTagCompound();
         MCTools.getOrGenerateSubCompound(compound, MODID).setUniqueId("insuredFor", ownerID);
 
