@@ -3,6 +3,8 @@ package com.fantasticsource.faerunutils.professions.interactions;
 import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatinteractions.api.AInteraction;
+import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
+import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
 import com.fantasticsource.tiamatitems.TiamatItems;
 import com.fantasticsource.tiamatitems.api.IPartSlot;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
@@ -33,12 +35,12 @@ import static com.fantasticsource.tiamatinventory.TiamatInventory.CURRENCY_CAPAB
 
 public class InteractionTemper extends AInteraction
 {
-    protected boolean mainhand;
+    protected String type;
 
-    public InteractionTemper(boolean mainhand)
+    public InteractionTemper(String type)
     {
-        super("Temper " + (mainhand ? "Mainhand" : "Offhand") + " Item");
-        this.mainhand = mainhand;
+        super("Temper " + type);
+        this.type = type;
     }
 
     @Override
@@ -46,8 +48,35 @@ public class InteractionTemper extends AInteraction
     {
         if (!target.getName().equals(ProfessionsAndInteractions.MASTER_SMITH)) return null;
 
-        ItemStack stack = mainhand ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
-        if (stack.getItem() != TiamatItems.tiamatItem) return null;
+        ItemStack stack = null;
+        ITiamatPlayerInventory inv = TiamatInventoryAPI.getTiamatPlayerInventory(player);
+        switch (type)
+        {
+            case "Mainhand":
+                stack = player.getHeldItemMainhand();
+                break;
+
+            case "Offhand":
+                stack = player.inventory.offHandInventory.get(0);
+                break;
+
+            case "Sheathed Mainhand 1":
+                if (inv != null) stack = inv.getSheathedMainhand1();
+                break;
+
+            case "Sheathed Offhand 1":
+                if (inv != null) stack = inv.getSheathedOffhand1();
+                break;
+
+            case "Sheathed Mainhand 2":
+                if (inv != null) stack = inv.getSheathedMainhand2();
+                break;
+
+            case "Sheathed Offhand 2":
+                if (inv != null) stack = inv.getSheathedOffhand2();
+                break;
+        }
+        if (stack == null || stack.getItem() != TiamatItems.tiamatItem) return null;
 
         ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
         if (partSlots.size() == 0)
@@ -117,8 +146,38 @@ public class InteractionTemper extends AInteraction
     @Override
     public boolean execute(EntityPlayerMP player, Vec3d hitVec, Entity target)
     {
+        //Get item
+        ItemStack stack = null;
+        ITiamatPlayerInventory inv = TiamatInventoryAPI.getTiamatPlayerInventory(player);
+        switch (type)
+        {
+            case "Mainhand":
+                stack = player.getHeldItemMainhand();
+                break;
+
+            case "Offhand":
+                stack = player.inventory.offHandInventory.get(0);
+                break;
+
+            case "Sheathed Mainhand 1":
+                if (inv != null) stack = inv.getSheathedMainhand1();
+                break;
+
+            case "Sheathed Offhand 1":
+                if (inv != null) stack = inv.getSheathedOffhand1();
+                break;
+
+            case "Sheathed Mainhand 2":
+                if (inv != null) stack = inv.getSheathedMainhand2();
+                break;
+
+            case "Sheathed Offhand 2":
+                if (inv != null) stack = inv.getSheathedOffhand2();
+                break;
+        }
+
+
         //Find out if we're dealing with a sub-part or not and calculate cost
-        ItemStack stack = mainhand ? player.getHeldItemMainhand() : player.getHeldItemOffhand();
         int cost = getCost(stack);
         ItemStack foundPart = null;
         ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);

@@ -54,8 +54,12 @@ public class ProfessionsAndInteractions
 
     public static void init()
     {
-        new InteractionTemper(true);
-        new InteractionTemper(false);
+        new InteractionTemper("Mainhand");
+        new InteractionTemper("Offhand");
+        new InteractionTemper("Sheathed Mainhand 1");
+        new InteractionTemper("Sheathed Offhand 1");
+        new InteractionTemper("Sheathed Mainhand 2");
+        new InteractionTemper("Sheathed Offhand 2");
 
         new InteractionInsure("Entire Inventory");
         new InteractionInsure("All Equipped Items");
