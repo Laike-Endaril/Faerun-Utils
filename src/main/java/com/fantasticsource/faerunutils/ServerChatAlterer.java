@@ -2,8 +2,8 @@ package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faeruncharacters.PatreonHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -18,11 +18,12 @@ public class ServerChatAlterer
     @SubscribeEvent
     public static void serverChat(ServerChatEvent event)
     {
+        //Patreon name formatting
         EntityPlayerMP player = event.getPlayer();
         int cents = PatreonHandler.getPlayerPatreonCents(player);
 
         int max = -1;
-        String newName = "@p";
+        String name = "@p";
 
         for (Map.Entry<Integer, String> entry : PATREON_NAMES.entrySet())
         {
@@ -30,11 +31,23 @@ public class ServerChatAlterer
             if (cents >= req && req > max)
             {
                 max = req;
-                newName = entry.getValue();
+                name = entry.getValue();
             }
         }
 
-        ITextComponent comp = new TextComponentTranslation("chat.type.text", newName.replaceAll("@p", player.getDisplayName().getFormattedText()), ForgeHooks.newChatWithLinks(event.getMessage()));
-        event.setComponent(comp);
+        name = name.replaceAll("@p", player.getDisplayName().getFormattedText());
+
+
+        //Gold player messages to differentiate from NPC chatter, etc
+        String message = ForgeHooks.newChatWithLinks(event.getMessage()).getFormattedText();
+        message = TextFormatting.GOLD + message.replaceAll(TextFormatting.RESET.toString(), "" + TextFormatting.RESET + TextFormatting.GOLD);
+
+
+        //Itemstack chat links
+        //TODO
+
+
+        //Save changes
+        event.setComponent(new TextComponentTranslation("chat.type.text", name, message));
     }
 }
