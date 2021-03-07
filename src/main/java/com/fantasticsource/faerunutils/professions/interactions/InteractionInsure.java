@@ -281,7 +281,7 @@ public class InteractionInsure extends AInteraction
             if (!part.isEmpty())
             {
                 HashMap<UUID, ArrayList<ItemStack>> subResult = splitItemIntoInsuredParts(part);
-                for (UUID key : subResult.keySet()) result.computeIfAbsent(key, o -> new ArrayList<>()).addAll(subResult.get(key));
+                for (UUID partOwner : subResult.keySet()) result.computeIfAbsent(partOwner, o -> new ArrayList<>()).addAll(subResult.get(partOwner));
             }
             partSlot.setPart(ItemStack.EMPTY);
         }
@@ -295,7 +295,7 @@ public class InteractionInsure extends AInteraction
     {
         if (!stack.hasTagCompound()) return null;
         NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
-        return compound == null || !compound.hasKey("insuredFor") ? null : compound.getUniqueId("insuredFor");
+        return compound == null || !compound.hasKey("insuredForMost") ? null : compound.getUniqueId("insuredFor");
     }
 
 
@@ -309,7 +309,6 @@ public class InteractionInsure extends AInteraction
         if (InstanceData.get(world).saves()) return;
 
         EntityItem entityItem = (EntityItem) entity;
-        System.out.println(TextFormatting.GREEN + "Tracking " + entityItem + " for world " + world);
         TRACKED_ITEMS.computeIfAbsent(world, o -> new HashMap<>()).put(entity.getUniqueID(), entityItem.getItem());
     }
 
@@ -341,7 +340,6 @@ public class InteractionInsure extends AInteraction
         World world = event.getWorld();
         if (world.isRemote) return;
 
-        System.out.println(TextFormatting.GREEN + "World unload: " + world);
         HashMap<UUID, ItemStack> map = TRACKED_ITEMS.remove(world);
         if (map != null) mailAllInsured(map.values());
     }
@@ -362,16 +360,6 @@ public class InteractionInsure extends AInteraction
                 allStacks.computeIfAbsent(entry.getKey(), o -> new ArrayList<>()).addAll(entry.getValue());
             }
         }
-        System.out.println();
-        System.out.println(TextFormatting.GREEN + "Final list: " + allStacks.size());
-        for (Map.Entry<UUID, ArrayList<ItemStack>> entry : allStacks.entrySet())
-        {
-            System.out.println(entry.getKey());
-            System.out.println(entry.getValue().size());
-            for (ItemStack stack : entry.getValue()) System.out.println(stack);
-            System.out.println();
-        }
-        System.out.println();
         if (allStacks.size() == 0) return;
 
 
@@ -389,12 +377,38 @@ public class InteractionInsure extends AInteraction
 
             NonNullList<ItemStack> attachments = NonNullList.create();
             attachments.addAll(entry.getValue());
+            for (ItemStack stack : attachments) removeInsuranceRecursive(stack);
 
-            System.out.println();
-            System.out.println("Sent to " + data.name + " (" + data.id + "):");
-            for (ItemStack stack : attachments) System.out.println(stack);
-            System.out.println();
             mailSystem.sendMailMessage(new MailMessage(-1, mailSystem, sender, new GameProfile(data.id, data.name), sendDateTime, subject, message, attachments, false));
+        }
+    }
+
+    public static void removeInsuranceRecursive(ItemStack stack)
+    {
+        if (stack.isEmpty() || !stack.hasTagCompound()) return;
+
+        NBTTagCompound compound = stack.getTagCompound(), compound2 = MCTools.getSubCompoundIfExists(compound, MODID);
+        if (compound2 != null)
+        {
+            compound2.removeTag("insuredForMost");
+            compound2.removeTag("insuredForLeast");
+            if (compound2.hasNoTags())
+            {
+                compound.removeTag(MODID);
+                if (compound.hasNoTags()) stack.setTagCompound(null);
+            }
+        }
+
+        compound = MCTools.getSubCompoundIfExists(compound, "tiamatrpg", "core", "tag");
+        if (compound != null)
+        {
+            compound2 = MCTools.getSubCompoundIfExists(compound, MODID);
+            if (compound2 != null)
+            {
+                compound2.removeTag("insuredForMost");
+                compound2.removeTag("insuredForLeast");
+                if (compound2.hasNoTags()) compound.removeTag(MODID);
+            }
         }
     }
 
