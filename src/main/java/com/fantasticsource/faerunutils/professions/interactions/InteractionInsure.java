@@ -11,6 +11,7 @@ import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
 import com.fantasticsource.tiamatitems.api.IPartSlot;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
+import com.fantasticsource.tools.datastructures.Pair;
 import com.mojang.authlib.GameProfile;
 import moe.plushie.rpg_framework.api.RpgEconomyAPI;
 import moe.plushie.rpg_framework.api.currency.ICurrency;
@@ -232,61 +233,44 @@ public class InteractionInsure extends AInteraction
     }
 
 
-    public static void uninsureRecursive(ItemStack stack)
-    {
-        ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
-        for (IPartSlot partSlot : partSlots)
-        {
-            ItemStack part = partSlot.getPart();
-            if (!part.isEmpty()) uninsure(part);
-        }
-        AssemblyTags.setPartSlots(stack, partSlots);
-        uninsure(stack);
-    }
-
-    public static void uninsure(ItemStack stack)
-    {
-        if (!stack.hasTagCompound()) return;
-
-        NBTTagCompound compound = stack.getTagCompound(), compound2 = MCTools.getSubCompoundIfExists(compound, MODID);
-        if (compound2 != null)
-        {
-            compound2.removeTag("insuredFor");
-            if (compound2.hasNoTags()) compound.removeTag(MODID);
-        }
-
-
-        compound = MCTools.getSubCompoundIfExists(compound, "tiamatrpg", "core", "tag");
-        if (compound == null) return;
-
-        compound2 = MCTools.getSubCompoundIfExists(compound, MODID);
-        if (compound2 != null)
-        {
-            compound2.removeTag("insuredFor");
-            if (compound2.hasNoTags()) compound.removeTag(MODID);
-        }
-    }
-
-
     public static HashMap<UUID, ArrayList<ItemStack>> splitItemIntoInsuredParts(ItemStack stack)
+    {
+        return splitItemIntoInsuredParts(stack, null);
+    }
+
+    public static HashMap<UUID, ArrayList<ItemStack>> splitItemIntoInsuredParts(ItemStack stack, Pair<UUID, Boolean> allInsuredBy)
     {
         HashMap<UUID, ArrayList<ItemStack>> result = new HashMap<>();
         UUID owner = getInsuranceOwnerForPart(stack);
-        if (owner != null) result.computeIfAbsent(owner, o -> new ArrayList<>()).add(stack);
+        if (owner == null)
+        {
+            if (allInsuredBy == null) allInsuredBy = new Pair<>(null, false);
+            else allInsuredBy.setValue(false);
+        }
+        else
+        {
+            if (allInsuredBy == null) allInsuredBy = new Pair<>(owner, true);
+            else if (!owner.equals(allInsuredBy.getKey())) allInsuredBy.setValue(false);
+            result.computeIfAbsent(owner, o -> new ArrayList<>()).add(stack);
+        }
 
         ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
         for (IPartSlot partSlot : partSlots)
         {
             ItemStack part = partSlot.getPart();
-            if (!part.isEmpty())
-            {
-                HashMap<UUID, ArrayList<ItemStack>> subResult = splitItemIntoInsuredParts(part);
-                for (UUID partOwner : subResult.keySet()) result.computeIfAbsent(partOwner, o -> new ArrayList<>()).addAll(subResult.get(partOwner));
-            }
+            if (part.isEmpty()) continue;
+
+            HashMap<UUID, ArrayList<ItemStack>> subResult = splitItemIntoInsuredParts(part, allInsuredBy);
+            for (UUID partOwner : subResult.keySet()) result.computeIfAbsent(partOwner, o -> new ArrayList<>()).addAll(subResult.get(partOwner));
             partSlot.setPart(ItemStack.EMPTY);
         }
 
-        AssemblyTags.setPartSlots(stack, partSlots);
+        if (allInsuredBy.getValue())
+        {
+            result.get(owner).clear();
+            result.get(owner).add(stack);
+        }
+        else AssemblyTags.setPartSlots(stack, partSlots);
 
         return result;
     }
@@ -367,25 +351,35 @@ public class InteractionInsure extends AInteraction
         Date sendDateTime = Calendar.getInstance().getTime();
         String subject = "Insurance Returns";
         String message = "";
+        GameProfile sender = new GameProfile(UUID.fromString("32a69517-f9c0-4042-9d24-ec6e600ac3db"), "Laike_Endaril");
 
 
         for (Map.Entry<UUID, ArrayList<ItemStack>> entry : allStacks.entrySet())
         {
             PlayerData data = PlayerData.get(entry.getKey());
-
-            GameProfile sender = new GameProfile(UUID.fromString("32a69517-f9c0-4042-9d24-ec6e600ac3db"), "Laike_Endaril");
+            ArrayList<ItemStack> returns = entry.getValue();
 
             NonNullList<ItemStack> attachments = NonNullList.create();
-            attachments.addAll(entry.getValue());
-            for (ItemStack stack : attachments) removeInsuranceRecursive(stack);
+            for (int i = 0; i < returns.size(); i++)
+            {
+                ItemStack stack = returns.get(i);
+                removeInsuranceRecursive(stack);
+                attachments.add(stack);
 
-            mailSystem.sendMailMessage(new MailMessage(-1, mailSystem, sender, new GameProfile(data.id, data.name), sendDateTime, subject, message, attachments, false));
+                if (attachments.size() == 5 || i == returns.size() - 1)
+                {
+                    mailSystem.sendMailMessage(new MailMessage(-1, mailSystem, sender, new GameProfile(data.id, data.name), sendDateTime, subject, message, attachments, false));
+                    if (data.player != null) mailSystem.notifyClient((EntityPlayerMP) data.player);
+                    attachments = NonNullList.create();
+                }
+            }
         }
     }
 
-    public static void removeInsuranceRecursive(ItemStack stack)
+
+    public static ItemStack removeInsuranceRecursive(ItemStack stack)
     {
-        if (stack.isEmpty() || !stack.hasTagCompound()) return;
+        if (stack.isEmpty() || !stack.hasTagCompound()) return stack;
 
         NBTTagCompound compound = stack.getTagCompound(), compound2 = MCTools.getSubCompoundIfExists(compound, MODID);
         if (compound2 != null)
@@ -410,7 +404,23 @@ public class InteractionInsure extends AInteraction
                 if (compound2.hasNoTags()) compound.removeTag(MODID);
             }
         }
+
+        boolean changed = false;
+        ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(stack);
+        for (IPartSlot partSlot : partSlots)
+        {
+            ItemStack part = partSlot.getPart();
+            if (part.isEmpty()) continue;
+
+            changed = true;
+            removeInsuranceRecursive(part);
+        }
+
+        if (changed) AssemblyTags.setPartSlots(stack, partSlots);
+
+        return stack;
     }
+
 
     protected static int adjustedCost(int rawCost)
     {
