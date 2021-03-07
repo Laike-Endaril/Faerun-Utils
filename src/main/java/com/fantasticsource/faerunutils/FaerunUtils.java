@@ -7,6 +7,7 @@ import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
 import com.fantasticsource.mctools.ServerTickTimer;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -43,13 +44,31 @@ public class FaerunUtils
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
         MinecraftForge.EVENT_BUS.register(ProfessionsAndInteractions.class);
         MinecraftForge.EVENT_BUS.register(InteractionInsure.class);
+        MinecraftForge.EVENT_BUS.register(ServerChatAlterer.class);
         Network.init();
+        initConfig();
     }
 
     @SubscribeEvent
     public static void saveConfig(ConfigChangedEvent.OnConfigChangedEvent event)
     {
         if (event.getModID().equals(MODID)) ConfigManager.sync(MODID, Config.Type.INSTANCE);
+    }
+
+    @SubscribeEvent
+    public static void syncConfig(ConfigChangedEvent.PostConfigChangedEvent event)
+    {
+        if (event.getModID().equals(MODID)) initConfig();
+    }
+
+    public static void initConfig()
+    {
+        ServerChatAlterer.PATREON_NAMES.clear();
+        for (String s : FaerunConfig.patreonNames)
+        {
+            String tokens[] = Tools.fixedSplit(s, ",");
+            ServerChatAlterer.PATREON_NAMES.put(Integer.parseInt(tokens[0].trim()), tokens[1].trim());
+        }
     }
 
     @Mod.EventHandler
