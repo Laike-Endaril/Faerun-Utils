@@ -373,7 +373,7 @@ public class InteractionInsure extends AInteraction
         {
             PlayerData data = PlayerData.get(entry.getKey());
 
-            GameProfile sender = new GameProfile(UUID.fromString("41C82C87-7AfB-4024-BA57-13D2C7777777"), ProfessionsAndInteractions.INSURANCE_AGENT);
+            GameProfile sender = new GameProfile(UUID.fromString("32a69517-f9c0-4042-9d24-ec6e600ac3db"), "Laike_Endaril");
 
             NonNullList<ItemStack> attachments = NonNullList.create();
             attachments.addAll(entry.getValue());
