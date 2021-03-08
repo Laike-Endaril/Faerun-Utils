@@ -40,7 +40,7 @@ public class ContainerBag extends Container
     public final ItemStack bag;
 
     protected boolean updating = false;
-    protected ItemStack[] previous = new ItemStack[5];
+    protected ItemStack[] previous;
 
 
     public ContainerBag(EntityPlayer player, World world, String itemType, int size, ItemStack bag)
@@ -50,6 +50,7 @@ public class ContainerBag extends Container
         this.itemType = itemType;
         bagInventorySize = size;
         this.bag = bag;
+        previous = new ItemStack[size];
 
 
         ArrayList<IPartSlot> partSlots = AssemblyTags.getPartSlots(bag);
