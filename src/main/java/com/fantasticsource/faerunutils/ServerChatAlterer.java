@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faeruncharacters.PatreonHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.ForgeHooks;
@@ -39,12 +40,14 @@ public class ServerChatAlterer
 
 
         //Gold player messages to differentiate from NPC chatter, etc
-        String message = ForgeHooks.newChatWithLinks(event.getMessage()).getFormattedText();
-        message = TextFormatting.GOLD + message.replaceAll(TextFormatting.RESET.toString(), "" + TextFormatting.RESET + TextFormatting.GOLD);
+        ITextComponent message = ForgeHooks.newChatWithLinks(event.getMessage());
+        message.getStyle().setColor(TextFormatting.GOLD);
 
 
         //Itemstack chat links
-        //TODO
+//        for (int i = 0; i < message.)
+//            for (ITextComponent c : message.getSiblings()) System.out.println(c.getFormattedText());
+//        player.getHeldItemMainhand().getTextComponent();
 
 
         //Save changes
