@@ -7,6 +7,7 @@ import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
 import com.fantasticsource.mctools.ServerTickTimer;
+import com.fantasticsource.tiamatitems.TransientAttributeModEvent;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,6 +16,7 @@ import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -131,5 +133,24 @@ public class FaerunUtils
             AttributeMap attributeMap = (AttributeMap) livingBase.getAttributeMap();
             attributeMap.getAttributeInstance(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         }
+    }
+
+
+    @SubscribeEvent
+    public static void transientAttributeMods(TransientAttributeModEvent event)
+    {
+        EntityLivingBase livingBase = event.getEntityLiving();
+        if (!(livingBase instanceof EntityPlayerMP)) return;
+
+
+        EntityPlayerMP player = (EntityPlayerMP) livingBase;
+        InventoryPlayer inv = player.inventory;
+        int filled = 0;
+        for (int i = 0; i < 27; i++)
+        {
+            if (!inv.getStackInSlot(9 + i).isEmpty()) filled++;
+        }
+
+        event.applyTransientModifier(MODID + ":ItemWeight", "generic.movementSpeed", 1, -0.5 * filled / 27);
     }
 }
