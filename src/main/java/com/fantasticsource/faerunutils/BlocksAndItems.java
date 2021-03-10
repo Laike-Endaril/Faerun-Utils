@@ -26,7 +26,6 @@ public class BlocksAndItems
     public static BlockAssembler blockAssembler;
     public static ItemAssembler itemAssembler;
 
-
     public static CreativeTabs creativeTab = new CreativeTabs(FaerunUtils.MODID)
     {
         @Override

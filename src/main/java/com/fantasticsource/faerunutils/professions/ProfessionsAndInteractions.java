@@ -21,7 +21,7 @@ public class ProfessionsAndInteractions
 {
     public static final String
             MASTER_SMITH = "Watts",
-            MASTER_DESIGNER = null,
+            MASTER_DESIGNER = "Mabel Sable",
             INSURANCE_AGENT = "Pavel Roman Neko";
 
     public static final String[] CRAFTING_PROFESSIONS = new String[]
@@ -54,6 +54,19 @@ public class ProfessionsAndInteractions
 
     public static void init()
     {
+        new InteractionCreatePalette("Mainhand");
+        new InteractionCreatePalette("Offhand");
+        new InteractionCreatePalette("Sheathed Mainhand 1");
+        new InteractionCreatePalette("Sheathed Offhand 1");
+        new InteractionCreatePalette("Sheathed Mainhand 2");
+        new InteractionCreatePalette("Sheathed Offhand 2");
+        new InteractionCreatePalette("Helm");
+        new InteractionCreatePalette("Shoulder Armor");
+        new InteractionCreatePalette("Cape");
+        new InteractionCreatePalette("Chestpiece");
+        new InteractionCreatePalette("Leg Armor");
+        new InteractionCreatePalette("Boots");
+
         new InteractionTemper("Mainhand");
         new InteractionTemper("Offhand");
         new InteractionTemper("Sheathed Mainhand 1");

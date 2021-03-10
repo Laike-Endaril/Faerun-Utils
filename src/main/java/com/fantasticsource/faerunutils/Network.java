@@ -7,6 +7,8 @@ import com.fantasticsource.faerunutils.professions.interactions.InteractionQuitP
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.component.CItemStack;
+import com.fantasticsource.mctools.gui.element.textured.GUIItemStack;
+import com.fantasticsource.mctools.gui.screen.ItemstackSelectionGUI;
 import com.fantasticsource.mctools.gui.screen.YesNoGUI;
 import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
@@ -23,6 +25,7 @@ import com.fantasticsource.tiamatitems.trait.recalculable.element.CRTraitElement
 import com.fantasticsource.tiamatitems.trait.recalculable.element.CRTraitElement_GenericString;
 import com.fantasticsource.tiamatitems.trait.recalculable.element.CRTraitElement_PassiveAttributeMod;
 import com.fantasticsource.tools.Tools;
+import com.fantasticsource.tools.datastructures.Color;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -32,6 +35,7 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -43,9 +47,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
@@ -58,15 +60,22 @@ public class Network
     public static void init()
     {
         WRAPPER.registerMessage(OpenBagPacketHandler.class, OpenBagPacket.class, discriminator++, Side.CLIENT);
+
         WRAPPER.registerMessage(OpenCraftingPacketHandler.class, OpenCraftingPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(RequestCraftOptionsPacketHandler.class, RequestCraftOptionsPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(CraftOptionsPacketHandler.class, CraftOptionsPacket.class, discriminator++, Side.CLIENT);
+
         WRAPPER.registerMessage(RequestConfirmQuitPacketHandler.class, RequestConfirmQuitPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(ConfirmQuitPacketHandler.class, ConfirmQuitPacket.class, discriminator++, Side.SERVER);
+
         WRAPPER.registerMessage(CraftPacketHandler.class, CraftPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(CraftResultPacketHandler.class, CraftResultPacket.class, discriminator++, Side.CLIENT);
+
         WRAPPER.registerMessage(RequestConfirmForgetPacketHandler.class, RequestConfirmForgetPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(ConfirmForgetPacketHandler.class, ConfirmForgetPacket.class, discriminator++, Side.SERVER);
+
+        WRAPPER.registerMessage(RequestPaletteTargetPacketHandler.class, RequestPaletteTargetPacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(ApplyPalettePacketHandler.class, ApplyPalettePacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -869,6 +878,144 @@ public class Network
         public IMessage onMessage(ConfirmForgetPacket packet, MessageContext ctx)
         {
             FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> InteractionForgetRecipe.forget(ctx.getServerHandler().player, packet.recipe));
+            return null;
+        }
+    }
+
+
+    public static class RequestPaletteTargetPacket implements IMessage
+    {
+        boolean mainhand;
+
+        public RequestPaletteTargetPacket() //Required; probably for when the packet is received
+        {
+        }
+
+        public RequestPaletteTargetPacket(boolean mainhand)
+        {
+            this.mainhand = mainhand;
+        }
+
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeBoolean(mainhand);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            mainhand = buf.readBoolean();
+        }
+    }
+
+    public static class RequestPaletteTargetPacketHandler implements IMessageHandler<RequestPaletteTargetPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(RequestPaletteTargetPacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.addScheduledTask(() ->
+                {
+                    ArrayList<ItemStack> options = GlobalInventory.getAllNonSkinItems(mc.player);
+                    options.removeIf(stack -> !MiscTags.getItemTypeName(stack).contains("Blueprint"));
+                    if (options.size() == 0) mc.player.sendMessage(new TextComponentString("No items to apply the palette to!"));
+                    else
+                    {
+                        GUIItemStack element = new GUIItemStack(null, 16, 16, ItemStack.EMPTY);
+                        new ItemstackSelectionGUI(element, "Select item to apply palette to...", options.toArray(new ItemStack[0]));
+                        ItemStack stack = element.getItemStack();
+                        if (!stack.isEmpty()) WRAPPER.sendToServer(new ApplyPalettePacket(packet.mainhand, stack));
+                    }
+                });
+            }
+
+            return null;
+        }
+    }
+
+
+    public static class ApplyPalettePacket implements IMessage
+    {
+        boolean mainhand;
+        ItemStack stack;
+
+        public ApplyPalettePacket()
+        {
+            //Required
+        }
+
+        public ApplyPalettePacket(boolean mainhand, ItemStack stack)
+        {
+            this.mainhand = mainhand;
+            this.stack = stack;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeBoolean(mainhand);
+            new CItemStack().set(stack).write(buf);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            mainhand = buf.readBoolean();
+            stack = new CItemStack().read(buf).value;
+        }
+    }
+
+    public static class ApplyPalettePacketHandler implements IMessageHandler<ApplyPalettePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(ApplyPalettePacket packet, MessageContext ctx)
+        {
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() ->
+            {
+                EntityPlayerMP player = ctx.getServerHandler().player;
+                ItemStack query = packet.stack, palette = packet.mainhand ? player.getHeldItemMainhand() : player.inventory.offHandInventory.get(0);
+                if (!MiscTags.getItemTypeName(palette).equals("Palette") || !MiscTags.getItemTypeName(query).contains("Blueprint")) return;
+
+                ItemStack target = null;
+                for (ItemStack stack : GlobalInventory.getAllNonSkinItems(player))
+                {
+                    if (ItemMatcher.stacksMatch(stack, query))
+                    {
+                        target = stack;
+                        break;
+                    }
+                }
+                if (target == null) return;
+
+
+                LinkedHashMap<Integer, Color> dyeOverrides = MiscTags.getDyeOverrides(palette);
+                MiscTags.setDyeOverrides(target, dyeOverrides);
+
+                String nbtString = target.getTagCompound().toString();
+                for (Map.Entry<Integer, Color> entry : dyeOverrides.entrySet())
+                {
+                    int index = entry.getKey();
+                    nbtString = nbtString.replaceAll("dye" + index + "r:[^b]*", "dye" + index + "r:" + ((byte) entry.getValue().r()));
+                    nbtString = nbtString.replaceAll("dye" + index + "g:[^b]*", "dye" + index + "g:" + ((byte) entry.getValue().g()));
+                    nbtString = nbtString.replaceAll("dye" + index + "b:[^b]*", "dye" + index + "b:" + ((byte) entry.getValue().b()));
+                    nbtString = nbtString.replaceAll("dye" + index + "t:[^b]*", "dye" + index + "t:" + ((byte) entry.getValue().a()));
+                }
+                try
+                {
+                    target.setTagCompound(JsonToNBT.getTagFromJson(nbtString));
+                }
+                catch (NBTException e)
+                {
+                    e.printStackTrace();
+                    return;
+                }
+
+                MCTools.destroyItemStack(palette);
+            });
             return null;
         }
     }
