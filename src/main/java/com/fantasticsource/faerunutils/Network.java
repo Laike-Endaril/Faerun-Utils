@@ -46,6 +46,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
 
@@ -117,6 +118,7 @@ public class Network
 
     public static class OpenBagPacketHandler implements IMessageHandler<OpenBagPacket, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(OpenBagPacket packet, MessageContext ctx)
         {
@@ -160,6 +162,7 @@ public class Network
 
     public static class OpenCraftingPacketHandler implements IMessageHandler<OpenCraftingPacket, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(OpenCraftingPacket packet, MessageContext ctx)
         {
@@ -315,6 +318,7 @@ public class Network
 
     public static class CraftOptionsPacketHandler implements IMessageHandler<CraftOptionsPacket, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(CraftOptionsPacket packet, MessageContext ctx)
         {
@@ -364,6 +368,7 @@ public class Network
 
     public static class RequestConfirmQuitPacketHandler implements IMessageHandler<RequestConfirmQuitPacket, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(RequestConfirmQuitPacket packet, MessageContext ctx)
         {
@@ -778,6 +783,7 @@ public class Network
 
     public static class CraftResultPacketHandler implements IMessageHandler<CraftResultPacket, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(CraftResultPacket packet, MessageContext ctx)
         {
@@ -824,6 +830,7 @@ public class Network
 
     public static class RequestConfirmForgetPacketHandler implements IMessageHandler<RequestConfirmForgetPacket, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(RequestConfirmForgetPacket packet, MessageContext ctx)
         {
@@ -912,6 +919,7 @@ public class Network
 
     public static class RequestPaletteTargetPacketHandler implements IMessageHandler<RequestPaletteTargetPacket, IMessage>
     {
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(RequestPaletteTargetPacket packet, MessageContext ctx)
         {
