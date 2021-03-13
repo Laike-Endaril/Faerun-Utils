@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
+import com.fantasticsource.faerunutils.potions.PotionDefinitions;
 import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionInsure;
 import com.fantasticsource.instances.Destination;
@@ -26,7 +27,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -47,8 +47,10 @@ public class FaerunUtils
         MinecraftForge.EVENT_BUS.register(ProfessionsAndInteractions.class);
         MinecraftForge.EVENT_BUS.register(InteractionInsure.class);
         MinecraftForge.EVENT_BUS.register(ServerChatAlterer.class);
+        MinecraftForge.EVENT_BUS.register(PotionDefinitions.class);
         Network.init();
         initConfig();
+        ProfessionsAndInteractions.init();
     }
 
     @SubscribeEvent
@@ -79,12 +81,6 @@ public class FaerunUtils
         event.registerServerCommand(new CmdDie());
         event.registerServerCommand(new CmdJoinInstanceType());
         event.registerServerCommand(new CmdOpenBag());
-    }
-
-    @Mod.EventHandler
-    public static void serverStarted(FMLServerStartedEvent event)
-    {
-        ProfessionsAndInteractions.init();
     }
 
     @SubscribeEvent

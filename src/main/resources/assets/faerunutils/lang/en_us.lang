@@ -4,6 +4,12 @@ tile.faerunutils:assembler.name=Assembler
 
 faerunutils.bag=Bag
 
+faerunutils.deepwounds=Deep Wounds
+potion.effect.faerunutils.deepwounds=Potion of Deep Wounds
+splash_potion.effect.faerunutils.deepwounds=Splash Potion of Deep Wounds
+lingering_potion.effect.faerunutils.deepwounds=Lingering Potion of Deep Wounds
+tipped_arrow.effect.faerunutils.deepwounds=Arrow of Deep Wounds
+
 
 
 faerunutils.cmd.die.usage=I kill you!
