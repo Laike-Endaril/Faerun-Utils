@@ -155,7 +155,7 @@ public class InteractionInsure extends AInteraction
                 stacks.addAll(player.inventory.offHandInventory);
                 break;
 
-            case "Helm":
+            case "Headpiece":
                 stacks.add(player.inventory.armorInventory.get(3));
                 break;
 

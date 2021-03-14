@@ -129,7 +129,7 @@ public class InteractionCreatePalette extends AInteraction
             case "Sheathed Offhand 2":
                 if (inv != null) return inv.getSheathedOffhand2();
 
-            case "Helm":
+            case "Headpiece":
                 return player.inventory.armorInventory.get(3);
 
             case "Shoulder Armor":

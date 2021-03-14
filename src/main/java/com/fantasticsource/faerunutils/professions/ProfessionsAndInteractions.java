@@ -60,7 +60,7 @@ public class ProfessionsAndInteractions
         new InteractionCreatePalette("Sheathed Offhand 1");
         new InteractionCreatePalette("Sheathed Mainhand 2");
         new InteractionCreatePalette("Sheathed Offhand 2");
-        new InteractionCreatePalette("Helm");
+        new InteractionCreatePalette("Headpiece");
         new InteractionCreatePalette("Shoulder Armor");
         new InteractionCreatePalette("Cape");
         new InteractionCreatePalette("Chestpiece");
@@ -78,7 +78,7 @@ public class ProfessionsAndInteractions
         new InteractionInsure("All Equipped Items");
         new InteractionInsure("Mainhand");
         new InteractionInsure("Offhand");
-        new InteractionInsure("Helm");
+        new InteractionInsure("Headpiece");
         new InteractionInsure("Shoulder Armor");
         new InteractionInsure("Cape");
         new InteractionInsure("Chestpiece");
