@@ -90,7 +90,7 @@ public class InteractionCreatePalette extends AInteraction
         {
             String[] tokens = Tools.fixedSplit(textureLayers.get(i), ":");
             int colorIndex = Integer.parseInt(tokens[1]);
-            if (dyeOverrides.containsKey(colorIndex)) textureLayers.set(i, tokens[0] + colorIndex + dyeOverrides.get(colorIndex).hex8());
+            if (dyeOverrides.containsKey(colorIndex)) textureLayers.set(i, tokens[0] + ":" + colorIndex + ":" + dyeOverrides.get(colorIndex).hex8());
         }
         TextureTags.setItemLayers(palette, AssemblyTags.STATE_FULL, textureLayers);
 
