@@ -5,7 +5,11 @@ import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
@@ -22,5 +26,19 @@ public class PotionDeepWounds extends BetterPotion
     {
         super.applyAttributesModifiersToEntity(entityLivingBaseIn, attributeMapIn, amplifier);
         entityLivingBaseIn.setHealth(Tools.min(entityLivingBaseIn.getHealth(), entityLivingBaseIn.getMaxHealth()));
+    }
+
+
+    @SubscribeEvent
+    public static void livingHurt(LivingHurtEvent event)
+    {
+        EntityLivingBase entity = event.getEntityLiving();
+        if (entity instanceof EntityPlayerMP)
+        {
+            PotionEffect effect = entity.getActivePotionEffect(PotionDefinitions.POTION_EFFECT_DEEP_WOUNDS);
+            int level = effect == null ? 0 : effect.getAmplifier() + 1;
+            level += event.getAmount() * 0.5;
+            if (level > 0) entity.addPotionEffect(new PotionEffect(PotionDefinitions.POTION_EFFECT_DEEP_WOUNDS, Integer.MAX_VALUE, level - 1));
+        }
     }
 }

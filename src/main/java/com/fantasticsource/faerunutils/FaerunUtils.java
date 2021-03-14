@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
+import com.fantasticsource.faerunutils.potions.PotionDeepWounds;
 import com.fantasticsource.faerunutils.potions.PotionDefinitions;
 import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionInsure;
@@ -48,6 +49,7 @@ public class FaerunUtils
         MinecraftForge.EVENT_BUS.register(InteractionInsure.class);
         MinecraftForge.EVENT_BUS.register(ServerChatAlterer.class);
         MinecraftForge.EVENT_BUS.register(PotionDefinitions.class);
+        MinecraftForge.EVENT_BUS.register(PotionDeepWounds.class);
         Network.init();
         initConfig();
         ProfessionsAndInteractions.init();
