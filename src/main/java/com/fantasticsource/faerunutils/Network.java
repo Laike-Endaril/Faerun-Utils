@@ -930,7 +930,7 @@ public class Network
                 mc.addScheduledTask(() ->
                 {
                     ArrayList<ItemStack> options = GlobalInventory.getAllNonSkinItems(mc.player);
-                    options.removeIf(stack -> !MiscTags.getItemTypeName(stack).contains("Blueprint"));
+                    options.removeIf(stack -> !MiscTags.getItemTypeName(stack).contains("Blueprint") || MiscTags.getItemTypeName(stack).contains("Recipe"));
                     if (options.size() == 0) mc.player.sendMessage(new TextComponentString("No items to apply the palette to!"));
                     else
                     {
@@ -943,9 +943,11 @@ public class Network
                             }
                         };
                         GUIItemStack element = new GUIItemStack(fakeScreen, 16, 16, ItemStack.EMPTY);
-                        new ItemstackSelectionGUI(element, "Select item to apply palette to...", options.toArray(new ItemStack[0]));
-                        ItemStack stack = element.getItemStack();
-                        if (!stack.isEmpty()) WRAPPER.sendToServer(new ApplyPalettePacket(packet.mainhand, stack));
+                        new ItemstackSelectionGUI(element, "Select item to apply palette to...", options.toArray(new ItemStack[0])).addOnClosedActions(() ->
+                        {
+                            ItemStack stack = element.getItemStack();
+                            if (!stack.isEmpty()) WRAPPER.sendToServer(new ApplyPalettePacket(packet.mainhand, stack));
+                        });
                     }
                 });
             }
