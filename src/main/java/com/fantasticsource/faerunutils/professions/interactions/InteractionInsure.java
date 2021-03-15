@@ -129,6 +129,7 @@ public class InteractionInsure extends AInteraction
                     stacks.add(inv.getSheathedOffhand1());
                     stacks.add(inv.getSheathedMainhand2());
                     stacks.add(inv.getSheathedOffhand2());
+                    stacks.add(inv.getBackpack());
                     stacks.addAll(inv.getTiamatArmor());
                 }
                 break;
@@ -143,6 +144,7 @@ public class InteractionInsure extends AInteraction
                     stacks.add(inv.getSheathedOffhand1());
                     stacks.add(inv.getSheathedMainhand2());
                     stacks.add(inv.getSheathedOffhand2());
+                    stacks.add(inv.getBackpack());
                     stacks.addAll(inv.getTiamatArmor());
                 }
                 break;

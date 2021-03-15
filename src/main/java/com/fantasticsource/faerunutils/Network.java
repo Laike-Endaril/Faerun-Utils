@@ -252,12 +252,12 @@ public class Network
             if (recipe.isEmpty()) return;
 
 
-            String s = !recipe.hasTagCompound() ? "" : recipe.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString("product");
-            if (s.equals("")) return;
+            String productTypeName = !recipe.hasTagCompound() ? "" : recipe.getTagCompound().getCompoundTag("tiamatitems").getCompoundTag("generic").getString("product");
+            if (productTypeName.equals("")) return;
 
 
             CRarity rarity = CSettings.LOCAL_SETTINGS.rarities.get("Crude");
-            CItemType productType = CSettings.LOCAL_SETTINGS.itemTypes.get(s);
+            CItemType productType = CSettings.LOCAL_SETTINGS.itemTypes.get(productTypeName);
             if (productType == null) return;
 
 
