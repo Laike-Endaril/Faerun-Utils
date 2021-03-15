@@ -7,6 +7,7 @@ import com.fantasticsource.faerunutils.professions.interactions.InteractionQuitP
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.component.CItemStack;
+import com.fantasticsource.mctools.gui.GUIScreen;
 import com.fantasticsource.mctools.gui.element.textured.GUIItemStack;
 import com.fantasticsource.mctools.gui.screen.ItemstackSelectionGUI;
 import com.fantasticsource.mctools.gui.screen.YesNoGUI;
@@ -933,7 +934,15 @@ public class Network
                     if (options.size() == 0) mc.player.sendMessage(new TextComponentString("No items to apply the palette to!"));
                     else
                     {
-                        GUIItemStack element = new GUIItemStack(null, 16, 16, ItemStack.EMPTY);
+                        GUIScreen fakeScreen = new GUIScreen()
+                        {
+                            @Override
+                            public String title()
+                            {
+                                return null;
+                            }
+                        };
+                        GUIItemStack element = new GUIItemStack(fakeScreen, 16, 16, ItemStack.EMPTY);
                         new ItemstackSelectionGUI(element, "Select item to apply palette to...", options.toArray(new ItemStack[0]));
                         ItemStack stack = element.getItemStack();
                         if (!stack.isEmpty()) WRAPPER.sendToServer(new ApplyPalettePacket(packet.mainhand, stack));
