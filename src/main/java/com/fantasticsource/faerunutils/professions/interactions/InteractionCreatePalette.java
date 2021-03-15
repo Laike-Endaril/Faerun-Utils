@@ -81,6 +81,7 @@ public class InteractionCreatePalette extends AInteraction
         }
 
 
+        //Set dye override colors and layer colors
         LinkedHashMap<Integer, Color> dyeOverrides = MiscTags.getDyeOverrides(getItem(player));
 
         ItemStack palette = CSettings.LOCAL_SETTINGS.itemTypes.get("Palette").generateItem(0, CSettings.LOCAL_SETTINGS.rarities.get("Fine"));
@@ -93,6 +94,12 @@ public class InteractionCreatePalette extends AInteraction
             if (dyeOverrides.containsKey(colorIndex)) textureLayers.set(i, tokens[0] + ":" + colorIndex + ":" + dyeOverrides.get(colorIndex).hex8());
         }
         TextureTags.setItemLayers(palette, AssemblyTags.STATE_FULL, textureLayers);
+
+
+        //Remove item core and type so it doesn't recalc and lose colors
+        AssemblyTags.removeInternalCore(palette);
+        palette.getTagCompound().getCompoundTag("tiamatrpg").removeTag("type");
+
 
         MCTools.give(player, palette);
 
