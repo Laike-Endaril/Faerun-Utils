@@ -8,7 +8,8 @@ import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
@@ -29,8 +30,8 @@ public class PotionDeepWounds extends BetterPotion
     }
 
 
-    @SubscribeEvent
-    public static void livingHurt(LivingHurtEvent event)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void livingHurt(LivingDamageEvent event)
     {
         EntityLivingBase entity = event.getEntityLiving();
         if (entity instanceof EntityPlayerMP)
