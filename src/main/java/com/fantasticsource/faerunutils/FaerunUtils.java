@@ -4,14 +4,12 @@ import com.fantasticsource.faerunutils.bag.CmdOpenBag;
 import com.fantasticsource.faerunutils.potions.PotionDeepWounds;
 import com.fantasticsource.faerunutils.potions.PotionDefinitions;
 import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
-import com.fantasticsource.faerunutils.professions.interactions.InteractionCreatePalette;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionInsure;
 import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
 import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.tiamatitems.TransientAttributeModEvent;
-import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,15 +19,12 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -155,16 +150,5 @@ public class FaerunUtils
         }
 
         event.applyTransientModifier(MODID + ":ItemWeight", "generic.movementSpeed", 1, -0.5 * filled / 27);
-    }
-
-
-    @SubscribeEvent
-    public static void test(PlayerInteractEvent.RightClickItem event)
-    {
-        ItemStack stack = event.getItemStack();
-        if (TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette") && event.getEntityPlayer() instanceof EntityPlayerMP)
-        {
-            InteractionCreatePalette.usePalette((EntityPlayerMP) event.getEntityPlayer(), true);
-        }
     }
 }
