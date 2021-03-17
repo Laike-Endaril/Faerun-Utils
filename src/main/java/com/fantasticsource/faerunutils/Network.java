@@ -930,7 +930,7 @@ public class Network
                 mc.addScheduledTask(() ->
                 {
                     ArrayList<ItemStack> options = GlobalInventory.getAllNonSkinItems(mc.player);
-                    options.removeIf(stack -> MiscTags.getDyeOverrides(stack) == null);
+                    options.removeIf(stack -> MiscTags.getDyeOverrides(stack) == null || TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette"));
                     if (options.size() == 0) mc.player.sendMessage(new TextComponentString("No items to apply the palette to!"));
                     else
                     {

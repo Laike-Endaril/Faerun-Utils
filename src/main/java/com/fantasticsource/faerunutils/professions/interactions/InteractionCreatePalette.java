@@ -49,7 +49,7 @@ public class InteractionCreatePalette extends AInteraction
 
 
         ItemStack stack = getItem(player);
-        if (MiscTags.getDyeOverrides(stack) == null) return null;
+        if (MiscTags.getDyeOverrides(stack) == null || TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette")) return null;
 
         return name;
     }
