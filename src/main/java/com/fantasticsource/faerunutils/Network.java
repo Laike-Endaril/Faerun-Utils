@@ -1032,8 +1032,6 @@ public class Network
                     e.printStackTrace();
                     return;
                 }
-
-                MCTools.destroyItemStack(palette);
             });
             return null;
         }
