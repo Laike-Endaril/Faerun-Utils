@@ -930,7 +930,7 @@ public class Network
                 mc.addScheduledTask(() ->
                 {
                     ArrayList<ItemStack> options = GlobalInventory.getAllNonSkinItems(mc.player);
-                    options.removeIf(stack -> !MiscTags.getItemTypeName(stack).contains("Blueprint") || MiscTags.getItemTypeName(stack).contains("Recipe"));
+                    options.removeIf(stack -> MiscTags.getDyeOverrides(stack) == null);
                     if (options.size() == 0) mc.player.sendMessage(new TextComponentString("No items to apply the palette to!"));
                     else
                     {
@@ -997,7 +997,7 @@ public class Network
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 ItemStack query = packet.stack, palette = packet.mainhand ? player.getHeldItemMainhand() : player.inventory.offHandInventory.get(0);
-                if (!MiscTags.getItemTypeName(palette).equals("Palette") || !MiscTags.getItemTypeName(query).contains("Blueprint")) return;
+                if (!TextFormatting.getTextWithoutFormattingCodes(palette.getDisplayName()).equals("Palette") || MiscTags.getDyeOverrides(query) == null) return;
 
                 ItemStack target = null;
                 for (ItemStack stack : GlobalInventory.getAllNonSkinItems(player))

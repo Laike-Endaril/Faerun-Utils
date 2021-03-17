@@ -49,7 +49,7 @@ public class InteractionCreatePalette extends AInteraction
 
 
         ItemStack stack = getItem(player);
-        if (!MiscTags.getItemTypeName(stack).contains("Blueprint")) return null;
+        if (MiscTags.getDyeOverrides(stack) == null) return null;
 
         return name;
     }
