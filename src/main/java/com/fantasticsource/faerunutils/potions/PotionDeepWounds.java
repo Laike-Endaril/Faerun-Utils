@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils.potions;
 
+import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.mctools.potions.BetterPotion;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.EntityLivingBase;
@@ -37,9 +38,11 @@ public class PotionDeepWounds extends BetterPotion
         if (entity instanceof EntityPlayerMP)
         {
             PotionEffect effect = entity.getActivePotionEffect(PotionDefinitions.POTION_EFFECT_DEEP_WOUNDS);
-            int level = effect == null ? 0 : effect.getAmplifier() + 1;
-            level += event.getAmount() * 0.5;
-            if (level > 0) entity.addPotionEffect(new PotionEffect(PotionDefinitions.POTION_EFFECT_DEEP_WOUNDS, Integer.MAX_VALUE, level - 1));
+            int level = (int) ((effect == null ? 0 : effect.getAmplifier() + 1) + event.getAmount() * 0.5);
+            if (level > 0)
+            {
+                ServerTickTimer.schedule(1, () -> entity.addPotionEffect(new PotionEffect(PotionDefinitions.POTION_EFFECT_DEEP_WOUNDS, Integer.MAX_VALUE, level - 1)));
+            }
         }
     }
 }
