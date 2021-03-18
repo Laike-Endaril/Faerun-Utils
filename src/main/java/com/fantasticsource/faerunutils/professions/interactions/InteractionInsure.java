@@ -428,4 +428,19 @@ public class InteractionInsure extends AInteraction
     {
         return rawCost;
     }
+
+
+    public static boolean isFullyInsured(UUID owner, ItemStack stack)
+    {
+        if (!isInsured(owner, stack)) return false;
+        for (ItemStack part : AssemblyTags.getNonEmptyParts(stack)) if (!isFullyInsured(owner, part)) return false;
+        return true;
+    }
+
+    public static boolean isInsured(UUID owner, ItemStack stack)
+    {
+        if (!stack.hasTagCompound()) return false;
+        NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
+        return compound != null && owner.equals(compound.getUniqueId("insuredFor"));
+    }
 }

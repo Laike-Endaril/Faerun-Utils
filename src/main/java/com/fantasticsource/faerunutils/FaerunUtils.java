@@ -26,12 +26,14 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zr,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzh,);required-after:tiamatinventory@[1.12.2.000zu,);required-after:tiamatinteractions@[1.12.2.000d,)")
 public class FaerunUtils
@@ -53,6 +55,11 @@ public class FaerunUtils
         Network.init();
         initConfig();
         ProfessionsAndInteractions.init();
+
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        {
+            MinecraftForge.EVENT_BUS.register(TooltipAlterer.class);
+        }
     }
 
     @SubscribeEvent
