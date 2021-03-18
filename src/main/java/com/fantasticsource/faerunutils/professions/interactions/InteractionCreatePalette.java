@@ -31,7 +31,7 @@ import static com.fantasticsource.tiamatinventory.TiamatInventory.CURRENCY_CAPAB
 
 public class InteractionCreatePalette extends AInteraction
 {
-    protected static final int COST = 500;
+    protected static final int COST = 2500;
     protected static final String COST_STRING = "5s";
 
     protected String type;
