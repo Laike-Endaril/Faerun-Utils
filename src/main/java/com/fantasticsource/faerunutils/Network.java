@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.professions.ProfessionsAndInteractions;
 import com.fantasticsource.faerunutils.professions.crafting.CraftingGUI;
+import com.fantasticsource.faerunutils.professions.interactions.InteractionCreatePalette;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionForgetRecipe;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionQuitProfession;
 import com.fantasticsource.mctools.GlobalInventory;
@@ -930,7 +931,7 @@ public class Network
                 mc.addScheduledTask(() ->
                 {
                     ArrayList<ItemStack> options = GlobalInventory.getAllNonSkinItems(mc.player);
-                    options.removeIf(stack -> MiscTags.getDyeOverrides(stack) == null || TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette"));
+                    options.removeIf(stack -> !InteractionCreatePalette.canMakePaletteFrom(stack) || TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette"));
                     if (options.size() == 0) mc.player.sendMessage(new TextComponentString("No items to apply the palette to!"));
                     else
                     {
@@ -997,7 +998,7 @@ public class Network
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 ItemStack query = packet.stack, palette = packet.mainhand ? player.getHeldItemMainhand() : player.inventory.offHandInventory.get(0);
-                if (!TextFormatting.getTextWithoutFormattingCodes(palette.getDisplayName()).equals("Palette") || MiscTags.getDyeOverrides(query) == null) return;
+                if (!TextFormatting.getTextWithoutFormattingCodes(palette.getDisplayName()).equals("Palette") || !InteractionCreatePalette.canMakePaletteFrom(query)) return;
 
                 ItemStack target = null;
                 for (ItemStack stack : GlobalInventory.getAllNonSkinItems(player))
@@ -1011,9 +1012,8 @@ public class Network
                 if (target == null) return;
 
 
+                //Apply dyes and dye overrides to target item
                 LinkedHashMap<Integer, Color> dyeOverrides = MiscTags.getDyeOverrides(palette);
-                MiscTags.setDyeOverrides(target, dyeOverrides);
-
                 String nbtString = target.getTagCompound().toString();
                 for (Map.Entry<Integer, Color> entry : dyeOverrides.entrySet())
                 {
@@ -1032,6 +1032,11 @@ public class Network
                     e.printStackTrace();
                     return;
                 }
+                MiscTags.setDyeOverrides(target, dyeOverrides);
+
+
+                //Mark target item so it can't have palettes extracted from it
+                InteractionCreatePalette.blockPaletteCreation(target);
             });
             return null;
         }

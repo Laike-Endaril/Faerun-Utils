@@ -19,6 +19,7 @@ import moe.plushie.rpg_framework.api.currency.IWallet;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
@@ -27,6 +28,7 @@ import net.minecraft.util.text.TextFormatting;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 import static com.fantasticsource.tiamatinventory.TiamatInventory.CURRENCY_CAPABILITY;
 
 public class InteractionCreatePalette extends AInteraction
@@ -49,7 +51,7 @@ public class InteractionCreatePalette extends AInteraction
 
 
         ItemStack stack = getItem(player);
-        if (MiscTags.getDyeOverrides(stack) == null || TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette")) return null;
+        if (!canMakePaletteFrom(stack)) return null;
 
         return name;
     }
@@ -82,8 +84,8 @@ public class InteractionCreatePalette extends AInteraction
 
 
         //Set dye override colors and layer colors
-        LinkedHashMap<Integer, Color> dyeOverrides = MiscTags.getDyeOverrides(getItem(player));
-
+        ItemStack source = getItem(player);
+        LinkedHashMap<Integer, Color> dyeOverrides = MiscTags.getDyeOverrides(source);
         ItemStack palette = CSettings.LOCAL_SETTINGS.itemTypes.get("Palette").generateItem(0, CSettings.LOCAL_SETTINGS.rarities.get("Fine"));
         MiscTags.setDyeOverrides(palette, dyeOverrides);
         ArrayList<String> textureLayers = TextureTags.getItemLayers(palette, AssemblyTags.STATE_FULL);
@@ -101,7 +103,13 @@ public class InteractionCreatePalette extends AInteraction
         palette.getTagCompound().getCompoundTag("tiamatrpg").removeTag("type");
 
 
+        //Give palette
         MCTools.give(player, palette);
+
+
+        //Mark item it came from so it can't have another palette made from it
+        blockPaletteCreation(source);
+
 
         return true;
     }
@@ -163,5 +171,21 @@ public class InteractionCreatePalette extends AInteraction
     {
         //To be called from the LC / RC action on the Tiamat Item
         Network.WRAPPER.sendTo(new Network.RequestPaletteTargetPacket(mainhand), player);
+    }
+
+    public static boolean canMakePaletteFrom(ItemStack stack)
+    {
+        if (MiscTags.getDyeOverrides(stack) == null) return false;
+        if (TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette")) return false;
+        NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
+        return compound == null || !compound.getBoolean("blockPaletteCreation");
+    }
+
+    public static void blockPaletteCreation(ItemStack stack)
+    {
+        if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
+        NBTTagCompound compound = stack.getTagCompound();
+        MCTools.getOrGenerateSubCompound(compound, MODID).setBoolean("blockPaletteCreation", true);
+        if (AssemblyTags.hasInternalCore(stack)) MCTools.getOrGenerateSubCompound(compound, "tiamatrpg", "core", "tag", MODID).setBoolean("blockPaletteCreation", true);
     }
 }
