@@ -19,7 +19,7 @@ public class TooltipAlterer
         ItemStack stack = event.getItemStack();
         List<String> tooltip = event.getToolTip();
         int i = 0;
-        while (!"".equals(tooltip.get(i)) && i < tooltip.size()) i++;
+        while (i < tooltip.size() && !"".equals(tooltip.get(i))) i++;
 
         //Add palette block tag if applicable
         if (!InteractionCreatePalette.canMakePaletteFrom(stack))
