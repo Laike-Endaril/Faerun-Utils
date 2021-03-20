@@ -3,6 +3,7 @@ package com.fantasticsource.faerunutils;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionCreatePalette;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionInsure;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -28,7 +29,8 @@ public class TooltipAlterer
         }
 
         //Add insurance tag if applicable
-        if (InteractionInsure.isFullyInsured(Minecraft.getMinecraft().player.getUniqueID(), stack))
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player != null && InteractionInsure.isFullyInsured(Minecraft.getMinecraft().player.getUniqueID(), stack))
         {
             tooltip.add(i++, TextFormatting.GREEN + "Fully Insured");
         }
