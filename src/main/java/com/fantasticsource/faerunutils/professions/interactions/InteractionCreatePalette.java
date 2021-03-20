@@ -175,10 +175,15 @@ public class InteractionCreatePalette extends AInteraction
 
     public static boolean canMakePaletteFrom(ItemStack stack)
     {
-        if (MiscTags.getDyeOverrides(stack) == null) return false;
-        if (TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette")) return false;
+        if (!canApplyPaletteTo(stack)) return false;
+
         NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
         return compound == null || !compound.getBoolean("blockPaletteCreation");
+    }
+
+    public static boolean canApplyPaletteTo(ItemStack stack)
+    {
+        return (MiscTags.getDyeOverrides(stack) != null && !TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette"));
     }
 
     public static void blockPaletteCreation(ItemStack stack)

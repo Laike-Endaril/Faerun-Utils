@@ -931,7 +931,7 @@ public class Network
                 mc.addScheduledTask(() ->
                 {
                     ArrayList<ItemStack> options = GlobalInventory.getAllNonSkinItems(mc.player);
-                    options.removeIf(stack -> !InteractionCreatePalette.canMakePaletteFrom(stack) || TextFormatting.getTextWithoutFormattingCodes(stack.getDisplayName()).equals("Palette"));
+                    options.removeIf(stack -> !InteractionCreatePalette.canApplyPaletteTo(stack));
                     if (options.size() == 0) mc.player.sendMessage(new TextComponentString("No items to apply the palette to!"));
                     else
                     {
@@ -998,7 +998,7 @@ public class Network
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 ItemStack query = packet.stack, palette = packet.mainhand ? player.getHeldItemMainhand() : player.inventory.offHandInventory.get(0);
-                if (!TextFormatting.getTextWithoutFormattingCodes(palette.getDisplayName()).equals("Palette") || !InteractionCreatePalette.canMakePaletteFrom(query)) return;
+                if (!TextFormatting.getTextWithoutFormattingCodes(palette.getDisplayName()).equals("Palette") || !InteractionCreatePalette.canApplyPaletteTo(query)) return;
 
                 ItemStack target = null;
                 for (ItemStack stack : GlobalInventory.getAllNonSkinItems(player))
@@ -1031,6 +1031,12 @@ public class Network
                 {
                     e.printStackTrace();
                     return;
+                }
+                if (AssemblyTags.hasInternalCore(target))
+                {
+                    ItemStack core = AssemblyTags.getInternalCore(target);
+                    MiscTags.setDyeOverrides(core, dyeOverrides);
+                    AssemblyTags.setInternalCore(target, core);
                 }
                 MiscTags.setDyeOverrides(target, dyeOverrides);
 
