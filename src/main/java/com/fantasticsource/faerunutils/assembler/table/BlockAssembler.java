@@ -3,6 +3,7 @@ package com.fantasticsource.faerunutils.assembler.table;
 import com.fantasticsource.faerunutils.BlocksAndItems;
 import com.fantasticsource.faerunutils.ClientProxy;
 import com.fantasticsource.faerunutils.FaerunUtils;
+import com.fantasticsource.tiamatitems.Network;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -30,6 +31,7 @@ public class BlockAssembler extends Block
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
         if (worldIn.isRemote) ClientProxy.showAssemblerGUI();
+        else Network.LAST_ASSEMBLER_INTERACTION_POSITIONS.put(playerIn.getUniqueID(), pos);
 
         return true;
     }

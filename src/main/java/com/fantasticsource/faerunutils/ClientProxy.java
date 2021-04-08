@@ -1,6 +1,8 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.bag.BagGUI;
+import com.fantasticsource.mctools.gui.GUIScreen;
+import com.fantasticsource.tiamatitems.assembly.AssemblerGUI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 
@@ -8,7 +10,7 @@ public class ClientProxy
 {
     public static void showAssemblerGUI()
     {
-        Minecraft.getMinecraft().displayGuiScreen(); //TODO open new assembler GUI in tiamat items
+        GUIScreen.showUnstacked(new AssemblerGUI());
     }
 
     public static void showBagGUI(String itemType, int size, ItemStack bag)
