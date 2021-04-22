@@ -135,7 +135,7 @@ public class FaerunUtils
         {
             EntityLivingBase livingBase = (EntityLivingBase) entity;
 
-            //Remove knockback
+            //Remove vanilla knockback
             AttributeMap attributeMap = (AttributeMap) livingBase.getAttributeMap();
             attributeMap.getAttributeInstance(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
         }

@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -145,15 +146,22 @@ public class Attributes
         if (!(entity instanceof EntityLivingBase)) return;
 
 
-        //(Re)set the base values for attributes with MC children, recalc their totals, and re-apply them
-        MOVE_SPEED.setBaseAmount(entity, MOVE_SPEED.defaultBaseAmount);
-        HEALTH.setBaseAmount(entity, HEALTH.defaultBaseAmount);
+        HEALTH.getTotalAmount(entity);
+        MOVE_SPEED.getTotalAmount(entity);
+
+
+        if (entity instanceof EntityPlayerMP)
+        {
+            STAMINA.sync(entity);
+            MANA.sync(entity);
+        }
     }
 
     @SubscribeEvent
     public static void entityUpdate(LivingEvent.LivingUpdateEvent event)
     {
         EntityLivingBase livingBase = event.getEntityLiving();
+        if (livingBase.world.isRemote || !livingBase.isEntityAlive()) return;
 
 
         double current = livingBase.getHealth(), dif = HEALTH_REGEN.getTotalAmount(livingBase) / 20;
