@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -191,6 +192,7 @@ public class Attributes
             current = Tools.max(0, current + dif);
         }
         STAMINA.setCurrentAmount(livingBase, current);
+        if (current <= 0 && livingBase instanceof EntityPlayerMP) livingBase.setSprinting(false);
 
 
         current = MANA.getCurrentAmount(livingBase);
