@@ -10,7 +10,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -150,10 +149,13 @@ public class Attributes
         MOVE_SPEED.getTotalAmount(entity);
 
 
-        if (entity instanceof EntityPlayerMP)
+        if (entity instanceof EntityPlayer && entity.world.isRemote)
         {
-            STAMINA.sync(entity);
-            MANA.sync(entity);
+            for (BetterAttribute attribute : new BetterAttribute[]{STAMINA, MANA})
+            {
+                CustomHUDData.DATA.put(attribute.name.replace(MODID + ".", ""), "" + attribute.getCurrentAmount(entity));
+                CustomHUDData.DATA.put("max" + attribute.name.replace(MODID + ".", ""), "" + attribute.getTotalAmount(entity));
+            }
         }
     }
 

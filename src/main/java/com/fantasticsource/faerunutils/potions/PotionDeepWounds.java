@@ -1,14 +1,18 @@
 package com.fantasticsource.faerunutils.potions;
 
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.mctools.potions.BetterPotion;
 import com.fantasticsource.tools.Tools;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -24,12 +28,28 @@ public class PotionDeepWounds extends BetterPotion
     }
 
     @Override
-    public void applyAttributesModifiersToEntity(EntityLivingBase entityLivingBaseIn, AbstractAttributeMap attributeMapIn, int amplifier)
+    public void applyAttributesModifiersToEntity(EntityLivingBase livingBase, AbstractAttributeMap attributeMapIn, int amplifier)
     {
-        super.applyAttributesModifiersToEntity(entityLivingBaseIn, attributeMapIn, amplifier);
-        entityLivingBaseIn.setHealth(Tools.min(entityLivingBaseIn.getHealth(), entityLivingBaseIn.getMaxHealth()));
+        super.applyAttributesModifiersToEntity(livingBase, attributeMapIn, amplifier);
+        livingBase.setHealth(Tools.min(livingBase.getHealth(), livingBase.getMaxHealth()));
+        MCTools.getOrGenerateSubCompound(livingBase.getEntityData(), MODID).setInteger("deepWoundsAmp", amplifier);
     }
 
+
+    @SubscribeEvent
+    public static void entityJoinWorld(EntityJoinWorldEvent event)
+    {
+        Entity entity = event.getEntity();
+        if (entity instanceof EntityLivingBase)
+        {
+            PotionEffect effect = ((EntityLivingBase) entity).getActivePotionEffect(PotionDefinitions.POTION_EFFECT_DEEP_WOUNDS);
+            NBTTagCompound compound = MCTools.getSubCompoundIfExists(entity.getEntityData(), MODID);
+            if (effect != null && compound != null && compound.hasKey("deepWoundsAmp"))
+            {
+                ((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionDefinitions.POTION_EFFECT_DEEP_WOUNDS, Integer.MAX_VALUE, compound.getInteger("deepWoundsAmp")));
+            }
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void livingHurt(LivingDamageEvent event)
