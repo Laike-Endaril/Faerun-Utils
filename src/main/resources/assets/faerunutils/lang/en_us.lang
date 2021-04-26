@@ -1,8 +1,20 @@
+faerunutils.keyCategory=Faerun Utils
+
+faerunutils.key.mainhand=Mainhand Action 1
+faerunutils.key.mainhand2=Mainhand Action 2
+faerunutils.key.offhand=Offhand Action 1
+faerunutils.key.offhand2=Offhand Action 2
+faerunutils.key.kick=Kick
+
+
+
 itemGroup.faerunutils=Faerun Utils
 
 tile.faerunutils:assembler.name=Assembler
 
 faerunutils.bag=Bag
+
+
 
 faerunutils.deepwounds=Deep Wounds
 potion.effect.faerunutils.deepwounds=Potion of Deep Wounds
@@ -196,8 +208,9 @@ attribute.description.faerunutils.maxProjectileTargets=Increases the number of t
 
 attribute.name.faerunutils.maxAngle=Maximum Attack Angle
 attribute.description.faerunutils.maxAngle=Increases the angle of attacks and skills that use a cone shape.
-attribute.name.faerunutils.maxCombo=Maximum Combo Hits
-attribute.description.faerunutils.maxCombo=Increases the number of attacks you can use in a row while performing a combo.
+attribute.name.faerunutils.comboUsage=Combo Usage
+attribute.description.faerunutils.comboUsage=How much of your combo an attack takes up, as a percentage.  Once the attacks in your combo add up to 100% or more, the combo ends.
+attribute.value.faerunutils.comboUsage=%3$s%%
 attribute.name.faerunutils.projectileSpeed=Projectile Speed
 attribute.description.faerunutils.projectileSpeed=Increases the speed of your projectiles.
 attribute.name.faerunutils.aoeTime=AOE Time

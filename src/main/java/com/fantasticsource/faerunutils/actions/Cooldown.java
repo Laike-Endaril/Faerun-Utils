@@ -1,7 +1,9 @@
 package com.fantasticsource.faerunutils.actions;
 
+import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.tools.component.CDouble;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.Entity;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,6 +17,13 @@ public class Cooldown extends CFaerunAction
     public Cooldown(double time)
     {
         useTime = time;
+    }
+
+    @Override
+    protected void execute(Entity source, String event)
+    {
+        super.execute(source, event);
+        if (event.equals("end")) Attributes.COMBO_USAGE.setCurrentAmount(source, 0);
     }
 
     @Override

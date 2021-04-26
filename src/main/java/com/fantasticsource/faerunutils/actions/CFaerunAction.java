@@ -20,6 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,9 +55,19 @@ public abstract class CFaerunAction extends CAction
         if (mpCost > 0) builder.append("\n" + TextFormatting.BLUE + "MP Cost: " + Tools.formatNicely(mpCost));
         if (staminaCost > 0) builder.append("\n" + TextFormatting.GOLD + "Stamina Cost: " + Tools.formatNicely(staminaCost));
 
+        if (attributes.size() > 0)
+        {
+            builder.append("\n\nDuring this action...");
+            for (Map.Entry<BetterAttribute, Double> entry : attributes.entrySet())
+            {
+                double amount = entry.getValue();
+                builder.append((amount >= 0 ? "+" : "") + Tools.formatNicely(amount) + " " + I18n.translateToLocal(entry.getKey().name));
+            }
+        }
+
         if (categoryTags.size() > 0)
         {
-            builder.append("\nCategories:");
+            builder.append("\n\nCategories:");
             for (String category : categoryTags) builder.append("\n" + TextFormatting.LIGHT_PURPLE + category);
         }
 
@@ -96,12 +107,12 @@ public abstract class CFaerunAction extends CAction
 
             case "end":
                 onCompletion();
+                for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 for (Map.Entry<BetterAttribute, Double> entry : attributes.entrySet())
                 {
                     BetterAttribute attribute = entry.getKey();
                     attribute.setBaseAmount(source, attribute.getBaseAmount(source) - entry.getValue());
                 }
-                for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 break;
         }
 

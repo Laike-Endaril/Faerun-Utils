@@ -10,9 +10,13 @@ public class SkillJab extends CFaerunAction
         super("faerunutils.skill.unarmed.jab");
         useTime = 0.25;
         staminaCost = 2.5;
+        attributes.put(Attributes.COMBO_USAGE, 20d);
+        attributes.put(Attributes.MAX_MELEE_RANGE, 1d);
+        attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
         attributes.put(Attributes.BLUNT_DAMAGE, 5d);
         attributes.put(Attributes.INTERRUPT_FORCE, 5d);
         attributes.put(Attributes.KNOCKBACK_FORCE, 5d);
+        attributes.put(Attributes.FINESSE, 5d);
         categoryTags.add("Unarmed");
         canComboTo.add("faerunutils.skill.unarmed.jab");
         canComboTo.add("faerunutils.skill.unarmed.straight");

@@ -295,29 +295,26 @@ public class Network
             FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() ->
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
-                if (!FaerunUtils.canUseActions(player)) return;
-
-
                 switch (packet.control)
                 {
                     case "mainhand":
-                        FaerunUtils.useItemAction(player, true, 0);
+                        FaerunUtils.tryUseItemAction(player, true, 0);
                         break;
 
                     case "mainhand2":
-                        FaerunUtils.useItemAction(player, true, 1);
+                        FaerunUtils.tryUseItemAction(player, true, 1);
                         break;
 
                     case "offhand":
-                        FaerunUtils.useItemAction(player, false, 0);
+                        FaerunUtils.tryUseItemAction(player, false, 0);
                         break;
 
                     case "offhand2":
-                        FaerunUtils.useItemAction(player, false, 1);
+                        FaerunUtils.tryUseItemAction(player, false, 1);
                         break;
 
                     case "kick":
-                        CAction.ALL_ACTIONS.get("faerunutils.skill.unarmed.kick").queue(player, "Main");
+                        FaerunUtils.tryUseAction(player, CAction.ALL_ACTIONS.get("faerunutils.skill.unarmed.kick"));
                         break;
 
                     default:

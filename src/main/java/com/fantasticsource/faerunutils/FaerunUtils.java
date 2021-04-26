@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.faerunutils.actions.CFaerunAction;
 import com.fantasticsource.faerunutils.actions.Cooldown;
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
 import com.fantasticsource.faerunutils.potions.PotionDeepWounds;
@@ -16,6 +17,7 @@ import com.fantasticsource.tiamatactions.action.ActionQueue;
 import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamatitems.TransientAttributeModEvent;
 import com.fantasticsource.tools.Tools;
+import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -174,16 +176,10 @@ public class FaerunUtils
     public static boolean canBlock(Entity entity)
     {
         ArrayList<CAction> actions = ActionQueue.get(entity, "Main").queue;
-        return actions.size() == 0 || actions.get(0) instanceof Cooldown;
+        return actions.size() == 0 || actions.get(0).getClass() == Cooldown.class;
     }
 
-    public static boolean canUseActions(Entity entity)
-    {
-        //TODO
-        return true;
-    }
-
-    public static void useItemAction(EntityLivingBase livingBase, boolean mainhand, int index)
+    public static void tryUseItemAction(EntityLivingBase livingBase, boolean mainhand, int index)
     {
         ItemStack stack, other;
         if (mainhand)
@@ -206,6 +202,24 @@ public class FaerunUtils
         }
         if (actionName == null || actionName.equals("")) actionName = mainhand ? "faerunutils.skill.unarmed.straight" : "faerunutils.skill.unarmed.jab";
 
-        CAction.ALL_ACTIONS.get(actionName).queue(livingBase, "Main");
+        tryUseAction(livingBase, CAction.ALL_ACTIONS.get(actionName));
+    }
+
+    public static void tryUseAction(EntityLivingBase livingBase, CAction action)
+    {
+        if (!(action instanceof CFaerunAction) || canUseAction(livingBase, (CFaerunAction) action)) action.queue(livingBase, "Main");
+    }
+
+    public static boolean canUseAction(Entity entity, CFaerunAction action)
+    {
+        if (Attributes.COMBO_USAGE.getCurrentAmount(entity) + action.attributes.getOrDefault(Attributes.COMBO_USAGE, 0d) >= 100) return false;
+
+        ArrayList<CAction> queue = ActionQueue.get(entity, "Main").queue;
+        if (queue.size() == 0) return true;
+
+        CAction currentAction = queue.get(0);
+        if (currentAction instanceof Cooldown) return false;
+        if (!(currentAction instanceof CFaerunAction)) return true;
+        return ((CFaerunAction) currentAction).canComboTo.contains(action.name);
     }
 }

@@ -118,9 +118,9 @@ public class Attributes
             MAX_MELEE_TARGETS = new BetterAttribute(MODID + ".maxMeleeTargets", 0, MAX_TARGETS), //Determined by the attack/skill being used, and possibly strength/dexterity/magical force/magical skill
             MAX_PROJECTILE_TARGETS = new BetterAttribute(MODID + ".maxProjectileTargets", 0, MAX_TARGETS), //Determined by the attack/skill being used
 
-    //All of these are determined by the attack/skill being used, and may or may not use other attributes depending
+    //All of these are determined by the weapons/attack/skill being used, and may or may not use other attributes depending
     MAX_MELEE_ANGLE = new BetterAttribute(MODID + ".maxAngle", 0),
-            MAX_COMBO_LENGTH = new BetterAttribute(MODID + ".maxCombo", 0),
+            COMBO_USAGE = new BetterAttribute(MODID + ".comboUsage", 0),
             PROJECTILE_SPEED = new BetterAttribute(MODID + ".projectileSpeed", 0),
             AOE_TIME = new BetterAttribute(MODID + ".aoeTime", 0),
 
@@ -170,6 +170,8 @@ public class Attributes
 
         HEALTH.getTotalAmount(entity);
         MOVE_SPEED.getTotalAmount(entity);
+
+        COMBO_USAGE.setCurrentAmount(entity, 0);
 
 
         if (entity instanceof EntityPlayer && entity.world.isRemote)
