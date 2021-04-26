@@ -9,9 +9,9 @@ public class SkillKick extends CFaerunAction
     {
         super("faerunutils.skill.unarmed.kick");
         useTime = 1.5;
+        comboUsage = 60;
         staminaCost = 15;
-        attributes.put(Attributes.COMBO_USAGE, 60d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 1.5d);
+        attributes.put(Attributes.MAX_MELEE_RANGE, 3d);
         attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
         attributes.put(Attributes.BLUNT_DAMAGE, 30d);
         attributes.put(Attributes.INTERRUPT_FORCE, 30d);

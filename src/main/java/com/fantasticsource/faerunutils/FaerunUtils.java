@@ -213,12 +213,15 @@ public class FaerunUtils
 
     public static void tryUseAction(EntityLivingBase livingBase, CAction action)
     {
-        if (!(action instanceof CFaerunAction) || canUseAction(livingBase, (CFaerunAction) action)) action.queue(livingBase, "Main");
+        if (!(action instanceof CFaerunAction) || canUseAction(livingBase, (CFaerunAction) action))
+        {
+            action.queue(livingBase, "Main");
+        }
     }
 
     public static boolean canUseAction(Entity entity, CFaerunAction action)
     {
-        if (Attributes.COMBO_USAGE.getCurrentAmount(entity) + action.attributes.getOrDefault(Attributes.COMBO_USAGE, 0d) >= 100) return false;
+        if (Attributes.COMBO.getCurrentAmount(entity) - action.comboUsage < 0) return false;
 
         ArrayList<CAction> queue = ActionQueue.get(entity, "Main").queue;
         if (queue.size() == 0) return true;

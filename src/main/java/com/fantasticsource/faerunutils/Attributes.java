@@ -120,7 +120,7 @@ public class Attributes
 
     //All of these are determined by the weapons/attack/skill being used, and may or may not use other attributes depending
     MAX_MELEE_ANGLE = new BetterAttribute(MODID + ".maxAngle", 0),
-            COMBO_USAGE = new BetterAttribute(MODID + ".comboUsage", 0),
+            COMBO = new BetterAttribute(MODID + ".combo", 100),
             PROJECTILE_SPEED = new BetterAttribute(MODID + ".projectileSpeed", 0),
             AOE_TIME = new BetterAttribute(MODID + ".aoeTime", 0),
 
@@ -171,7 +171,7 @@ public class Attributes
         HEALTH.getTotalAmount(entity);
         MOVE_SPEED.getTotalAmount(entity);
 
-        COMBO_USAGE.setCurrentAmount(entity, 0);
+        COMBO.setCurrentAmount(entity, COMBO.getTotalAmount(entity));
 
 
         if (entity instanceof EntityPlayer && entity.world.isRemote)

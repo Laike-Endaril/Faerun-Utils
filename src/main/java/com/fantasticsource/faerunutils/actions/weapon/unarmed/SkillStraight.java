@@ -9,9 +9,9 @@ public class SkillStraight extends CFaerunAction
     {
         super("faerunutils.skill.unarmed.straight");
         useTime = 0.5;
+        comboUsage = 40;
         staminaCost = 5;
-        attributes.put(Attributes.COMBO_USAGE, 40d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 1d);
+        attributes.put(Attributes.MAX_MELEE_RANGE, 2d);
         attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
         attributes.put(Attributes.BLUNT_DAMAGE, 10d);
         attributes.put(Attributes.INTERRUPT_FORCE, 10d);

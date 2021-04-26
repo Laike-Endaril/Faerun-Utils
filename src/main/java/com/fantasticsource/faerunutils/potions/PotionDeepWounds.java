@@ -52,7 +52,7 @@ public class PotionDeepWounds extends BetterPotion
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void livingHurt(LivingDamageEvent event)
+    public static void livingDamage(LivingDamageEvent event)
     {
         EntityLivingBase entity = event.getEntityLiving();
         if (entity instanceof EntityPlayerMP)

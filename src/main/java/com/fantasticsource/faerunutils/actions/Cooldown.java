@@ -12,10 +12,12 @@ public class Cooldown extends CFaerunAction
 {
     public Cooldown()
     {
+        this(0);
     }
 
     public Cooldown(double time)
     {
+        super("faerunutils.cooldown");
         useTime = time;
     }
 
@@ -23,7 +25,7 @@ public class Cooldown extends CFaerunAction
     protected void execute(Entity source, String event)
     {
         super.execute(source, event);
-        if (event.equals("end")) Attributes.COMBO_USAGE.setCurrentAmount(source, 0);
+        if (event.equals("end")) Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getTotalAmount(source));
     }
 
     @Override

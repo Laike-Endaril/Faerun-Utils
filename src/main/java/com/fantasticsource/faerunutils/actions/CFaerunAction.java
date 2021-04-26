@@ -13,6 +13,7 @@ import com.fantasticsource.mctools.betterattributes.BetterAttribute;
 import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamatactions.config.TiamatActionsConfig;
 import com.fantasticsource.tiamatactions.node.CNode;
+import com.fantasticsource.tiamatactions.node.CNodeComment;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.DecimalWeightedPool;
 import net.minecraft.entity.Entity;
@@ -32,24 +33,37 @@ import java.util.Map;
 
 public abstract class CFaerunAction extends CAction
 {
-    public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, timer = 0;
+    public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0;
     public LinkedHashMap<BetterAttribute, Double> attributes = new LinkedHashMap<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
 
     public CFaerunAction()
     {
         super();
+        if (tickEndpointNodes.size() == 0)
+        {
+            CNodeComment node = new CNodeComment(name, "tick", 0, 0);
+            tickNodes.put(0L, node);
+            tickEndpointNodes.add(node, 0);
+        }
     }
 
     public CFaerunAction(String name)
     {
         super(name);
+        if (tickEndpointNodes.size() == 0)
+        {
+            CNodeComment node = new CNodeComment(name, "tick", 0, 0);
+            tickNodes.put(0L, node);
+            tickEndpointNodes.add(node, 0);
+        }
     }
 
     public String getTooltip()
     {
         StringBuilder builder = new StringBuilder(name);
 
+        if (comboUsage > 0) builder.append("\n" + TextFormatting.YELLOW + "Combo Usage: " + Tools.formatNicely(comboUsage));
         if (useTime > 0) builder.append("\n" + TextFormatting.YELLOW + "Use Time: " + Tools.formatNicely(useTime) + "s");
         if (hpCost > 0) builder.append("\n" + TextFormatting.RED + "HP Cost: " + Tools.formatNicely(hpCost));
         if (mpCost > 0) builder.append("\n" + TextFormatting.BLUE + "MP Cost: " + Tools.formatNicely(mpCost));
@@ -91,6 +105,7 @@ public abstract class CFaerunAction extends CAction
                 break;
 
             case "start":
+                if (comboUsage > 0) Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getCurrentAmount(source) - comboUsage);
                 if (hpCost > 0) Attributes.HEALTH.setCurrentAmount(source, Attributes.HEALTH.getCurrentAmount(source) - hpCost);
                 if (mpCost > 0) Attributes.MANA.setCurrentAmount(source, Attributes.MANA.getCurrentAmount(source) - mpCost);
                 if (staminaCost > 0) Attributes.STAMINA.setCurrentAmount(source, Attributes.STAMINA.getCurrentAmount(source) - staminaCost);
@@ -104,7 +119,7 @@ public abstract class CFaerunAction extends CAction
 
             case "tick":
                 for (CNode endNode : tickEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
-                timer += Attributes.ATTACK_SPEED.getTotalAmount(source) * 0.05;
+                timer += Attributes.ATTACK_SPEED.getTotalAmount(source) * 0.0005;
                 if (timer >= useTime) active = false;
                 break;
 
@@ -116,6 +131,7 @@ public abstract class CFaerunAction extends CAction
                     BetterAttribute attribute = entry.getKey();
                     attribute.setBaseAmount(source, attribute.getBaseAmount(source) - entry.getValue());
                 }
+                if (!(this instanceof Cooldown) && queue.queue.size() == 1) new Cooldown(2).queue(source, queue.name);
                 break;
         }
 
@@ -125,25 +141,26 @@ public abstract class CFaerunAction extends CAction
 
     protected void onCompletion()
     {
-        int targets = (int) Attributes.MAX_TARGETS.getTotalAmount(source);
+        int targets = (int) Attributes.MAX_MELEE_TARGETS.getTotalAmount(source);
         if (targets == 0) return;
 
 
         ArrayList<Entity> entities = new ArrayList<>(source.world.loadedEntityList);
         double minRange = Attributes.MIN_MELEE_RANGE.getTotalAmount(source);
-        Vec3d sourceCenter = source.getPositionVector().addVector(0, source.height * 0.5, 0);
+        entities.remove(source);
+        Vec3d sourceEyes = source.getPositionVector().addVector(0, source.getEyeHeight(), 0);
         if (minRange > 0)
         {
             double minSqr = minRange * minRange;
             entities.removeIf(entity ->
             {
                 if (!entity.isEntityAlive() || !(entity instanceof EntityLivingBase)) return true;
-                return entity.getPositionVector().addVector(0, entity.height * 0.5, 0).squareDistanceTo(sourceCenter) > minSqr;
+                return entity.getPositionVector().addVector(0, entity.height * 0.5, 0).squareDistanceTo(sourceEyes) > minSqr;
             });
         }
 
         double finesse = Attributes.FINESSE.getTotalAmount(source);
-        for (Entity entity : EntityFilters.inCone(sourceCenter, source.getRotationYawHead(), source.rotationPitch, Attributes.MAX_MELEE_RANGE.getTotalAmount(source), Attributes.MAX_MELEE_ANGLE.getTotalAmount(source), true, entities))
+        for (Entity entity : EntityFilters.inCone(sourceEyes, source.getRotationYawHead(), source.rotationPitch, Attributes.MAX_MELEE_RANGE.getTotalAmount(source), Attributes.MAX_MELEE_ANGLE.getTotalAmount(source), true, entities))
         {
             if (Sight.canSee((EntityLivingBase) entity, source, true))
             {
