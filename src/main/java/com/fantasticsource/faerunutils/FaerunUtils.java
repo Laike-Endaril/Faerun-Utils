@@ -17,7 +17,6 @@ import com.fantasticsource.tiamatactions.action.ActionQueue;
 import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamatitems.TransientAttributeModEvent;
 import com.fantasticsource.tools.Tools;
-import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -37,6 +36,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -73,6 +73,12 @@ public class FaerunUtils
             MinecraftForge.EVENT_BUS.register(TooltipAlterer.class);
             Keys.init(event);
         }
+    }
+
+    @Mod.EventHandler
+    public static void postInit(FMLPostInitializationEvent event)
+    {
+        CFaerunAction.init(event);
     }
 
     @SubscribeEvent

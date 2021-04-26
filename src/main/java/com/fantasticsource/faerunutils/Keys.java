@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Keyboard;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
@@ -22,7 +21,7 @@ public class Keys
             MAINHAND_2 = new KeyBinding(MODID + ".key.mainhand2", KeyConflictContext.IN_GAME, KeyModifier.ALT, -100, MODID + ".keyCategory"),
             OFFHAND = new KeyBinding(MODID + ".key.offhand", KeyConflictContext.IN_GAME, -99, MODID + ".keyCategory"),
             OFFHAND_2 = new KeyBinding(MODID + ".key.offhand2", KeyConflictContext.IN_GAME, KeyModifier.ALT, -99, MODID + ".keyCategory"),
-            KICK = new KeyBinding(MODID + ".key.kick", KeyConflictContext.IN_GAME, Keyboard.KEY_E, MODID + ".keyCategory");
+            KICK = new KeyBinding(MODID + ".key.kick", KeyConflictContext.IN_GAME, -98, MODID + ".keyCategory");
 
 
     public static void init(FMLPreInitializationEvent event)

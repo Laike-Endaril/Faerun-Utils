@@ -3,6 +3,9 @@ package com.fantasticsource.faerunutils.actions;
 import com.fantasticsource.dynamicstealth.server.senses.sight.Sight;
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.FaerunUtils;
+import com.fantasticsource.faerunutils.actions.weapon.unarmed.SkillJab;
+import com.fantasticsource.faerunutils.actions.weapon.unarmed.SkillKick;
+import com.fantasticsource.faerunutils.actions.weapon.unarmed.SkillStraight;
 import com.fantasticsource.mctools.EntityFilters;
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
@@ -21,6 +24,8 @@ import net.minecraft.profiler.Profiler;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -259,5 +264,12 @@ public abstract class CFaerunAction extends CAction
                 }
             }
         }
+    }
+
+    public static void init(FMLPostInitializationEvent event)
+    {
+        new SkillJab();
+        new SkillStraight();
+        new SkillKick();
     }
 }
