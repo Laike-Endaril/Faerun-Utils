@@ -17,7 +17,6 @@ import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.DecimalWeightedPool;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
@@ -25,7 +24,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,9 +35,6 @@ public abstract class CFaerunAction extends CAction
     public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, timer = 0;
     public LinkedHashMap<BetterAttribute, Double> attributes = new LinkedHashMap<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
-
-    //See Attributes class, there are many, including damage types dealt
-    public ArrayList<AttributeModifier> activeAttributeModifiers = new ArrayList<>();
 
     public CFaerunAction()
     {
@@ -268,8 +263,8 @@ public abstract class CFaerunAction extends CAction
 
     public static void init(FMLPostInitializationEvent event)
     {
-        new SkillJab();
-        new SkillStraight();
-        new SkillKick();
+        new SkillJab().save();
+        new SkillStraight().save();
+        new SkillKick().save();
     }
 }
