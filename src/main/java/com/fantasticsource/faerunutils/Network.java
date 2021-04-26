@@ -7,6 +7,7 @@ import com.fantasticsource.mctools.gui.GUIScreen;
 import com.fantasticsource.mctools.gui.element.textured.GUIItemStack;
 import com.fantasticsource.mctools.gui.screen.ItemstackSelectionGUI;
 import com.fantasticsource.mctools.items.ItemMatcher;
+import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamatitems.nbt.AssemblyTags;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.datastructures.Color;
@@ -43,9 +44,9 @@ public class Network
     public static void init()
     {
         WRAPPER.registerMessage(OpenBagPacketHandler.class, OpenBagPacket.class, discriminator++, Side.CLIENT);
-
         WRAPPER.registerMessage(RequestPaletteTargetPacketHandler.class, RequestPaletteTargetPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(ApplyPalettePacketHandler.class, ApplyPalettePacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(ControlPacketHandler.class, ControlPacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -253,6 +254,76 @@ public class Network
 
                 //Mark target item so it can't have palettes extracted from it
                 InteractionCreatePalette.blockPaletteCreation(target);
+            });
+            return null;
+        }
+    }
+
+
+    public static class ControlPacket implements IMessage
+    {
+        String control;
+
+        public ControlPacket()
+        {
+            //Required
+        }
+
+        public ControlPacket(String control)
+        {
+            this.control = control;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            ByteBufUtils.writeUTF8String(buf, control);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            control = ByteBufUtils.readUTF8String(buf);
+        }
+    }
+
+    public static class ControlPacketHandler implements IMessageHandler<ControlPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(ControlPacket packet, MessageContext ctx)
+        {
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() ->
+            {
+                EntityPlayerMP player = ctx.getServerHandler().player;
+                if (!FaerunUtils.canUseActions(player)) return;
+
+
+                switch (packet.control)
+                {
+                    case "mainhand":
+                        FaerunUtils.useItemAction(player, true, 0);
+                        break;
+
+                    case "mainhand2":
+                        FaerunUtils.useItemAction(player, true, 1);
+                        break;
+
+                    case "offhand":
+                        FaerunUtils.useItemAction(player, false, 0);
+                        break;
+
+                    case "offhand2":
+                        FaerunUtils.useItemAction(player, false, 1);
+                        break;
+
+                    case "kick":
+                        CAction.ALL_ACTIONS.get("faerunutils.skill.unarmed.kick").queue(player, "Main");
+                        break;
+
+                    default:
+                        System.err.println(TextFormatting.RED + "Unknown control received: " + packet.control);
+                        System.err.println(TextFormatting.RED + "From player: " + player.getName() + " (" + player.getUniqueID() + ")");
+                }
             });
             return null;
         }

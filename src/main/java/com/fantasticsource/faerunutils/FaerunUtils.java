@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.faerunutils.actions.Cooldown;
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
 import com.fantasticsource.faerunutils.potions.PotionDeepWounds;
 import com.fantasticsource.faerunutils.potions.PotionDefinitions;
@@ -8,7 +9,11 @@ import com.fantasticsource.faerunutils.professions.interactions.InteractionInsur
 import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.ServerTickTimer;
+import com.fantasticsource.mctools.Slottings;
+import com.fantasticsource.tiamatactions.action.ActionQueue;
+import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamatitems.TransientAttributeModEvent;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
@@ -19,6 +24,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -35,7 +42,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zzze,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzq,);required-after:tiamatinventory@[1.12.2.000zzc,);required-after:tiamatinteractions@[1.12.2.000d,);required-after:tiamatactions@[1.12.2.000zzzd,)")
+import java.util.ArrayList;
+
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zzzh,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzq,);required-after:tiamatinventory@[1.12.2.000zzc,);required-after:tiamatinteractions@[1.12.2.000d,);required-after:tiamatactions@[1.12.2.000zzzf,);required-after:dynamicstealth@[1.12.2.113e,)")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
@@ -60,6 +69,7 @@ public class FaerunUtils
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
             MinecraftForge.EVENT_BUS.register(TooltipAlterer.class);
+            Keys.init(event);
         }
     }
 
@@ -158,5 +168,44 @@ public class FaerunUtils
         }
 
         event.applyTransientModifier(MODID + ":ItemWeight", "generic.movementSpeed", 1, -0.5 * filled / 27);
+    }
+
+
+    public static boolean canBlock(Entity entity)
+    {
+        ArrayList<CAction> actions = ActionQueue.get(entity, "Main").queue;
+        return actions.size() == 0 || actions.get(0) instanceof Cooldown;
+    }
+
+    public static boolean canUseActions(Entity entity)
+    {
+        //TODO
+        return true;
+    }
+
+    public static void useItemAction(EntityLivingBase livingBase, boolean mainhand, int index)
+    {
+        ItemStack stack, other;
+        if (mainhand)
+        {
+            stack = livingBase.getHeldItemMainhand();
+            other = livingBase.getHeldItemOffhand();
+        }
+        else
+        {
+            stack = livingBase.getHeldItemOffhand();
+            other = livingBase.getHeldItemMainhand();
+        }
+        if (stack.isEmpty() && Slottings.isTwoHanded(other)) stack = other;
+
+        String actionName = null;
+        if (stack.hasTagCompound())
+        {
+            NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), "tiamatitems", "generic");
+            if (compound != null) actionName = compound.getString((mainhand ? "mainhand" : "offhand") + index);
+        }
+        if (actionName == null || actionName.equals("")) actionName = mainhand ? "faerunutils.skill.unarmed.straight" : "faerunutils.skill.unarmed.jab";
+
+        CAction.ALL_ACTIONS.get(actionName).queue(livingBase, "Main");
     }
 }
