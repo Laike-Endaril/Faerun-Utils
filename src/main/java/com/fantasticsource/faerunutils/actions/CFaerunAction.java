@@ -91,6 +91,9 @@ public abstract class CFaerunAction extends CAction
                 break;
 
             case "start":
+                if (hpCost > 0) Attributes.HEALTH.setCurrentAmount(source, Attributes.HEALTH.getCurrentAmount(source) - hpCost);
+                if (mpCost > 0) Attributes.MANA.setCurrentAmount(source, Attributes.MANA.getCurrentAmount(source) - mpCost);
+                if (staminaCost > 0) Attributes.STAMINA.setCurrentAmount(source, Attributes.STAMINA.getCurrentAmount(source) - staminaCost);
                 for (Map.Entry<BetterAttribute, Double> entry : attributes.entrySet())
                 {
                     BetterAttribute attribute = entry.getKey();
