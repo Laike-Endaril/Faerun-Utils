@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
@@ -21,14 +22,24 @@ public class Keys
             MAINHAND_2 = new KeyBinding(MODID + ".key.mainhand2", KeyConflictContext.IN_GAME, KeyModifier.ALT, -100, MODID + ".keyCategory"),
             OFFHAND = new KeyBinding(MODID + ".key.offhand", KeyConflictContext.IN_GAME, -99, MODID + ".keyCategory"),
             OFFHAND_2 = new KeyBinding(MODID + ".key.offhand2", KeyConflictContext.IN_GAME, KeyModifier.ALT, -99, MODID + ".keyCategory"),
-            KICK = new KeyBinding(MODID + ".key.kick", KeyConflictContext.IN_GAME, -98, MODID + ".keyCategory");
+            KICK = new KeyBinding(MODID + ".key.kick", KeyConflictContext.IN_GAME, -98, MODID + ".keyCategory"),
+            COMBO_CANCEL = new KeyBinding(MODID + ".key.comboCancel", KeyConflictContext.IN_GAME, Keyboard.KEY_C, MODID + ".keyCategory");
 
 
     public static void init(FMLPreInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(Keys.class);
 
-        for (KeyBinding keyBinding : new KeyBinding[]{MAINHAND, MAINHAND_2, OFFHAND, OFFHAND_2, KICK}) ClientRegistry.registerKeyBinding(keyBinding);
+        for (KeyBinding keyBinding : new KeyBinding[]
+                {
+                        MAINHAND,
+                        MAINHAND_2,
+                        OFFHAND,
+                        OFFHAND_2,
+                        KICK,
+                        COMBO_CANCEL
+                })
+            ClientRegistry.registerKeyBinding(keyBinding);
     }
 
     @SubscribeEvent
@@ -53,6 +64,10 @@ public class Keys
         else if (KICK.isKeyDown() && KICK.isPressed())
         {
             Network.WRAPPER.sendToServer(new Network.ControlPacket("kick"));
+        }
+        else if (COMBO_CANCEL.isKeyDown() && COMBO_CANCEL.isPressed())
+        {
+            Network.WRAPPER.sendToServer(new Network.ControlPacket("comboCancel"));
         }
     }
 }

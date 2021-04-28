@@ -233,4 +233,20 @@ public class FaerunUtils
         CAction finalAction = queue.get(queue.size() - 1);
         return ((CFaerunAction) finalAction).canComboTo.contains(action.name);
     }
+
+    public static void cancelCombo(Entity entity)
+    {
+        ArrayList<CAction> queue = ActionQueue.get(entity, "Main").queue;
+
+        for (int i = 1; i < queue.size(); i++)
+        {
+            CAction action = queue.get(i);
+            if (action instanceof Cooldown) return;
+            if (!(action instanceof CFaerunAction)) continue;
+
+            Attributes.COMBO.setCurrentAmount(entity, Attributes.COMBO.getCurrentAmount(entity) + ((CFaerunAction) action).comboUsage);
+            queue.remove(action);
+            i--;
+        }
+    }
 }

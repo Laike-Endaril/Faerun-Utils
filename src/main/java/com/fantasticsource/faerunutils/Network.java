@@ -317,6 +317,10 @@ public class Network
                         FaerunUtils.tryUseAction(player, CAction.ALL_ACTIONS.get("faerunutils.skill.unarmed.kick"));
                         break;
 
+                    case "comboCancel":
+                        FaerunUtils.cancelCombo(player);
+                        break;
+
                     default:
                         System.err.println(TextFormatting.RED + "Unknown control received: " + packet.control);
                         System.err.println(TextFormatting.RED + "From player: " + player.getName() + " (" + player.getUniqueID() + ")");
