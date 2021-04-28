@@ -14,6 +14,7 @@ import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamatactions.config.TiamatActionsConfig;
 import com.fantasticsource.tiamatactions.node.CNode;
 import com.fantasticsource.tiamatactions.node.CNodeComment;
+import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.DecimalWeightedPool;
 import net.minecraft.entity.Entity;
@@ -21,18 +22,24 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
+
 public abstract class CFaerunAction extends CAction
 {
+    public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
+
     public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0;
     public LinkedHashMap<BetterAttribute, Double> attributes = new LinkedHashMap<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
@@ -101,11 +108,11 @@ public abstract class CFaerunAction extends CAction
         switch (event)
         {
             case "init":
+                if (comboUsage > 0) Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getCurrentAmount(source) - comboUsage);
                 for (CNode endNode : initEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
                 break;
 
             case "start":
-                if (comboUsage > 0) Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getCurrentAmount(source) - comboUsage);
                 if (hpCost > 0) Attributes.HEALTH.setCurrentAmount(source, Attributes.HEALTH.getCurrentAmount(source) - hpCost);
                 if (mpCost > 0) Attributes.MANA.setCurrentAmount(source, Attributes.MANA.getCurrentAmount(source) - mpCost);
                 if (staminaCost > 0) Attributes.STAMINA.setCurrentAmount(source, Attributes.STAMINA.getCurrentAmount(source) - staminaCost);
@@ -229,10 +236,11 @@ public abstract class CFaerunAction extends CAction
             if (defenseAttribute == null) continue;
 
             double amount = entry.getValue();
-            if (amount == 0) continue;
+            if (amount <= 0) continue;
 
             double prevented = defenseAttribute.getTotalAmount(entity);
 
+            //Armor damage
             if (useArmor && armorToDamage != null && prevented > 0)
             {
                 double armorDamage = prevented;
@@ -241,6 +249,7 @@ public abstract class CFaerunAction extends CAction
                 if (armorDamage > 0) armorToDamage.damageItem((int) armorDamage, (EntityLivingBase) entity);
             }
 
+            //Vital strike
             amount -= prevented;
             if (vitalStrike)
             {
@@ -248,6 +257,7 @@ public abstract class CFaerunAction extends CAction
                 prevented *= 3;
             }
 
+            //Body damage
             if (damageAttribute == Attributes.HEAT_DAMAGE)
             {
                 Attributes.BODY_TEMPERATURE.setCurrentAmount(entity, Attributes.BODY_TEMPERATURE.getCurrentAmount(entity) + amount);
@@ -256,9 +266,21 @@ public abstract class CFaerunAction extends CAction
             {
                 Attributes.BODY_TEMPERATURE.setCurrentAmount(entity, Attributes.BODY_TEMPERATURE.getCurrentAmount(entity) - amount);
             }
+            else if (damageAttribute == Attributes.HEALING_DAMAGE)
+            {
+                if (entity instanceof EntityLivingBase && ((EntityLivingBase) entity).isEntityUndead())
+                {
+                    entity.attackEntityFrom(new EntityDamageSource(MODID, source), (float) amount);
+                }
+                else
+                {
+                    Attributes.HEALTH.setCurrentAmount(entity, Tools.min(Attributes.HEALTH.getTotalAmount(entity), Attributes.HEALTH.getCurrentAmount(entity) + amount));
+                }
+            }
             else
             {
-                Attributes.HEALTH.setCurrentAmount(entity, Attributes.HEALTH.getCurrentAmount(entity) - amount);
+                entity.attackEntityFrom(new EntityDamageSource(MODID, source).setDamageBypassesArmor().setDamageIsAbsolute(), (float) amount);
+                ReflectionTool.set(ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD, entity, 0);
             }
         }
 

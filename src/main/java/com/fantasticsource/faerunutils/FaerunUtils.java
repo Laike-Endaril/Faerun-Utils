@@ -229,6 +229,8 @@ public class FaerunUtils
         CAction currentAction = queue.get(0);
         if (currentAction instanceof Cooldown) return false;
         if (!(currentAction instanceof CFaerunAction)) return true;
-        return ((CFaerunAction) currentAction).canComboTo.contains(action.name);
+
+        CAction finalAction = queue.get(queue.size() - 1);
+        return ((CFaerunAction) finalAction).canComboTo.contains(action.name);
     }
 }
