@@ -23,6 +23,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
@@ -43,6 +45,8 @@ public abstract class CFaerunAction extends CAction
     public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0;
     public LinkedHashMap<BetterAttribute, Double> attributes = new LinkedHashMap<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
+    public ItemStack itemstackUsed = null;
+    public boolean playedSwishSound = false;
 
     public CFaerunAction()
     {
@@ -126,12 +130,20 @@ public abstract class CFaerunAction extends CAction
 
             case "tick":
                 for (CNode endNode : tickEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
-                timer += Attributes.ATTACK_SPEED.getTotalAmount(source) * 0.0005;
-                if (timer >= useTime) active = false;
+                double tempo = Attributes.ATTACK_SPEED.getTotalAmount(source) * 0.01;
+                double tickProgress = tempo * 0.05;
+                timer += tickProgress;
+
+                if (!playedSwishSound && (useTime - timer) / tempo <= 0.15) playSwishSound();
+
+                if (timer >= useTime)
+                {
+                    onCompletion();
+                    active = false;
+                }
                 break;
 
             case "end":
-                onCompletion();
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 for (Map.Entry<BetterAttribute, Double> entry : attributes.entrySet())
                 {
@@ -153,8 +165,8 @@ public abstract class CFaerunAction extends CAction
 
 
         ArrayList<Entity> entities = new ArrayList<>(source.world.loadedEntityList);
-        double minRange = Attributes.MIN_MELEE_RANGE.getTotalAmount(source);
         entities.remove(source);
+        double minRange = Attributes.MIN_MELEE_RANGE.getTotalAmount(source);
         Vec3d sourceEyes = source.getPositionVector().addVector(0, source.getEyeHeight(), 0);
         if (minRange > 0)
         {
@@ -167,25 +179,34 @@ public abstract class CFaerunAction extends CAction
         }
 
         double finesse = Attributes.FINESSE.getTotalAmount(source);
-        for (Entity entity : EntityFilters.inCone(sourceEyes, source.getRotationYawHead(), source.rotationPitch, Attributes.MAX_MELEE_RANGE.getTotalAmount(source), Attributes.MAX_MELEE_ANGLE.getTotalAmount(source), true, entities))
+        boolean thrust = Attributes.MAX_MELEE_ANGLE.getTotalAmount(source) == 0;
+        for (Entity entity : EntityFilters.inCone(sourceEyes, source.getRotationYawHead(), source.rotationPitch, source.width * 0.5 + Attributes.MAX_MELEE_RANGE.getTotalAmount(source), Attributes.MAX_MELEE_ANGLE.getTotalAmount(source), true, entities))
         {
             if (Sight.canSee((EntityLivingBase) entity, source, true))
             {
-                if (FaerunUtils.canBlock(entity) && Math.random() < Attributes.BLOCK_CHANCE.getTotalAmount(entity) / 100d)
+                double chance = Attributes.BLOCK_CHANCE.getTotalAmount(entity) / 100d;
+                if (thrust) chance *= 0.75;
+                if (FaerunUtils.canBlock(entity) && Math.random() < chance)
                 {
+//                    playBlockSound();
                     //TODO block indicators
                     return;
                 }
 
-                if (Math.random() < (Attributes.PARRY_CHANCE.getTotalAmount(entity) - finesse) / 100d)
+                chance = (Attributes.PARRY_CHANCE.getTotalAmount(entity) - finesse) / 100d;
+                if (thrust) chance *= 0.75;
+                if (Math.random() < chance)
                 {
+//                    playParrySound();
                     //TODO parry indicators
                     finesse *= 0.5;
                     targets--;
                     continue;
                 }
 
-                if (Math.random() < (Attributes.DODGE_CHANCE.getTotalAmount(entity) - finesse) / 100d)
+                chance = (Attributes.DODGE_CHANCE.getTotalAmount(entity) - finesse) / 100d;
+                if (thrust) chance *= 1.25;
+                if (Math.random() < chance)
                 {
                     //TODO dodge indicators
                     continue;
@@ -247,7 +268,9 @@ public abstract class CFaerunAction extends CAction
                 NBTTagCompound compound = MCTools.getSubCompoundIfExists(armorToDamage.getTagCompound(), "tiamatitems", "generic");
                 if (compound != null && compound.hasKey("armor." + damageAttribute.name + ".reduction")) armorDamage -= compound.getDouble("armor." + damageAttribute.name + ".reduction");
                 if (armorDamage > 0) armorToDamage.damageItem((int) armorDamage, (EntityLivingBase) entity);
+                playHitSound(true);
             }
+            else playHitSound(false);
 
             //Vital strike
             amount -= prevented;
@@ -308,5 +331,50 @@ public abstract class CFaerunAction extends CAction
         new SkillJab().save();
         new SkillStraight().save();
         new SkillKick().save();
+    }
+
+
+    public void playSwishSound()
+    {
+        if (this instanceof Cooldown) return;
+
+        playedSwishSound = true;
+        String soundName = Attributes.MAX_MELEE_ANGLE.getTotalAmount(source) == 0 ? "thrust" : "swing";
+
+        float pitch = 1;
+        if (categoryTags.contains("Heavy")) pitch -= .4f;
+
+        MCTools.playSimpleSoundForAll(new ResourceLocation(soundName), source, 16, 2, 1, pitch - 0.2f + Tools.random(0.4f), SoundCategory.HOSTILE);
+    }
+
+    public void playBlockSound(ItemStack blockingItemstack)
+    {
+        if (this instanceof Cooldown) return;
+
+        //TODO
+    }
+
+    public void playParrySound(ItemStack parryingItemstack)
+    {
+        if (this instanceof Cooldown) return;
+
+        //TODO
+    }
+
+    public void playHitSound(boolean hitArmor)
+    {
+        if (this instanceof Cooldown) return;
+
+        double slash = Attributes.SLASH_DAMAGE.getTotalAmount(source);
+        double pierce = Attributes.PIERCE_DAMAGE.getTotalAmount(source);
+        double blunt = Attributes.BLUNT_DAMAGE.getTotalAmount(source);
+        String soundName = slash >= pierce && slash >= blunt ? "slash" : pierce >= blunt ? "pierce" : "bash";
+
+        soundName += hitArmor ? "armor" : "body";
+
+        float pitch = 1;
+        if (categoryTags.contains("Heavy")) pitch -= .4f;
+
+        MCTools.playSimpleSoundForAll(new ResourceLocation(soundName), source, 16, 2, 1, pitch - 0.2f + Tools.random(0.4f), SoundCategory.HOSTILE);
     }
 }

@@ -208,14 +208,17 @@ public class FaerunUtils
         }
         if (actionName == null || actionName.equals("")) actionName = mainhand ? "faerunutils.skill.unarmed.straight" : "faerunutils.skill.unarmed.jab";
 
-        tryUseAction(livingBase, CAction.ALL_ACTIONS.get(actionName));
+        tryUseAction(livingBase, CAction.ALL_ACTIONS.get(actionName), stack);
     }
 
-    public static void tryUseAction(EntityLivingBase livingBase, CAction action)
+    public static void tryUseAction(EntityLivingBase livingBase, CAction action, ItemStack itemstackUsed)
     {
-        if (!(action instanceof CFaerunAction) || canUseAction(livingBase, (CFaerunAction) action))
+        if (!(action instanceof CFaerunAction)) action.queue(livingBase, "Main");
+        else if (canUseAction(livingBase, (CFaerunAction) action))
         {
+            ((CFaerunAction) action).itemstackUsed = itemstackUsed;
             action.queue(livingBase, "Main");
+            ((CFaerunAction) action).itemstackUsed = null;
         }
     }
 
