@@ -47,6 +47,7 @@ public abstract class CFaerunAction extends CAction
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
     public ItemStack itemstackUsed = null;
     public boolean playedSwishSound = false;
+    public String material;
 
     public CFaerunAction()
     {
@@ -188,8 +189,14 @@ public abstract class CFaerunAction extends CAction
                 if (thrust) chance *= 0.75;
                 if (FaerunUtils.canBlock(entity) && Math.random() < chance)
                 {
-//                    playBlockSound();
-                    //TODO block indicators
+                    ItemStack blockingStack = bestBlockStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand());
+                    String blockMat = getBlockMaterial(blockingStack);
+                    if (material.equals("flesh") && !blockMat.equals("flesh")) onHit(source);
+                    else if (blockMat.equals("flesh") && !material.equals("flesh")) onHit(entity);
+                    else playBlockSound(blockingStack);
+
+                    //TODO visual block indicators
+
                     return;
                 }
 
@@ -197,8 +204,12 @@ public abstract class CFaerunAction extends CAction
                 if (thrust) chance *= 0.75;
                 if (Math.random() < chance)
                 {
-//                    playParrySound();
-                    //TODO parry indicators
+                    ItemStack parryingStack = bestParryStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand());
+                    if (material.equals("flesh") && !getParryMaterial(parryingStack).equals("flesh")) onHit(source);
+                    else playParrySounds(entity, parryingStack);
+
+                    //TODO visual parry indicators
+
                     finesse *= 0.5;
                     targets--;
                     continue;
@@ -208,7 +219,7 @@ public abstract class CFaerunAction extends CAction
                 if (thrust) chance *= 1.25;
                 if (Math.random() < chance)
                 {
-                    //TODO dodge indicators
+                    //TODO visual dodge indicators
                     continue;
                 }
             }
@@ -334,6 +345,73 @@ public abstract class CFaerunAction extends CAction
     }
 
 
+    public static String getBlockMaterial(ItemStack stack)
+    {
+        if (!stack.hasTagCompound()) return "flesh";
+        NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
+        if (compound == null || !compound.hasKey("blockMaterial")) return "flesh";
+        return compound.getString("blockMaterial");
+    }
+
+    public static String getParryMaterial(ItemStack stack)
+    {
+        if (stack == null || stack.isEmpty() || !stack.hasTagCompound()) return "flesh";
+        NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
+        if (compound == null || !compound.hasKey("parryMaterial")) return "flesh";
+        return compound.getString("parryMaterial");
+    }
+
+    public static boolean isHeavy(ItemStack stack)
+    {
+        if (stack == null || stack.isEmpty() || !stack.hasTagCompound()) return false;
+        NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
+        return compound != null && compound.getBoolean("heavy");
+    }
+
+
+    public static ItemStack bestBlockStack(ItemStack stack1, ItemStack stack2)
+    {
+        //Prefer heavier
+        boolean heavy1 = isHeavy(stack1), heavy2 = isHeavy(stack2);
+        if (heavy1 != heavy2) return heavy1 ? stack1 : stack2;
+        //Both heavy or both light
+
+        //Prefer harder
+        String mat1 = getBlockMaterial(stack1), mat2 = getBlockMaterial(stack2);
+        if (!mat1.equals(mat2))
+        {
+            if (mat1.equals("metal")) return stack1;
+            if (mat2.equals("metal")) return stack2;
+            if (mat1.equals("wood")) return stack1;
+            return stack2;
+        }
+        //Both same material
+
+        return stack1;
+    }
+
+    public static ItemStack bestParryStack(ItemStack stack1, ItemStack stack2)
+    {
+        //Prefer harder
+        String mat1 = getBlockMaterial(stack1), mat2 = getBlockMaterial(stack2);
+        if (!mat1.equals(mat2))
+        {
+            if (mat1.equals("metal")) return stack1;
+            if (mat2.equals("metal")) return stack2;
+            if (mat1.equals("wood")) return stack1;
+            return stack2;
+        }
+        //Both same material
+
+        //Prefer lighter
+        boolean heavy1 = isHeavy(stack1), heavy2 = isHeavy(stack2);
+        if (heavy1 != heavy2) return heavy1 ? stack2 : stack1;
+        //Both heavy or both light
+
+        return stack1;
+    }
+
+
     public void playSwishSound()
     {
         if (this instanceof Cooldown) return;
@@ -351,14 +429,29 @@ public abstract class CFaerunAction extends CAction
     {
         if (this instanceof Cooldown) return;
 
-        //TODO
+        String blockMat = getBlockMaterial(blockingItemstack);
+        if (material.equals("flesh") && !blockMat.equals("flesh"))
+        {
+            playHitSound(true);
+            //TODO damage self instead of enemy
+        }
+        else MCTools.playSimpleSoundForAll(new ResourceLocation((isHeavy(blockingItemstack) ? "heavy" : "light") + blockMat + "block" + (categoryTags.contains("Heavy") ? "heavy" : "light") + material), source, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
     }
 
-    public void playParrySound(ItemStack parryingItemstack)
+    public void playParrySounds(Entity parryingEntity, ItemStack parryingItemstack)
     {
         if (this instanceof Cooldown) return;
 
-        //TODO
+        String parryMat = getParryMaterial(parryingItemstack);
+        if (parryMat.equals("flesh"))
+        {
+            MCTools.playSimpleSoundForAll(new ResourceLocation("fleshparry"), source, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
+        }
+        else
+        {
+            MCTools.playSimpleSoundForAll(new ResourceLocation((categoryTags.contains("Heavy") ? "heavy" : "light") + material + "parry"), source, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
+            MCTools.playSimpleSoundForAll(new ResourceLocation((isHeavy(parryingItemstack) ? "heavy" : "light") + parryMat + "parry"), parryingEntity, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
+        }
     }
 
     public void playHitSound(boolean hitArmor)

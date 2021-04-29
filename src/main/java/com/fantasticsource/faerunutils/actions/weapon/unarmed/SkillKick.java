@@ -12,6 +12,7 @@ public class SkillKick extends CFaerunAction
         useTime = 1;
         comboUsage = 60;
         staminaCost = 15;
+        material = "flesh";
 
         attributes.put(Attributes.MAX_MELEE_RANGE, 2.5d);
         attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);

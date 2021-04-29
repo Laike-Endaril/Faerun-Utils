@@ -12,6 +12,7 @@ public class SkillStraight extends CFaerunAction
         useTime = 0.5;
         comboUsage = 30;
         staminaCost = 5;
+        material = "flesh";
 
         attributes.put(Attributes.MAX_MELEE_RANGE, 2d);
         attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);

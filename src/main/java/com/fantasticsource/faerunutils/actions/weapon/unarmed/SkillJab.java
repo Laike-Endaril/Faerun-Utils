@@ -12,6 +12,7 @@ public class SkillJab extends CFaerunAction
         useTime = 0.25;
         comboUsage = 20;
         staminaCost = 2.5;
+        material = "flesh";
 
         attributes.put(Attributes.MAX_MELEE_RANGE, 2d);
         attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
