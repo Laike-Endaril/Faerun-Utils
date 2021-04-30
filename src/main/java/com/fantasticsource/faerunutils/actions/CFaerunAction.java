@@ -3,9 +3,9 @@ package com.fantasticsource.faerunutils.actions;
 import com.fantasticsource.dynamicstealth.server.senses.sight.Sight;
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.FaerunUtils;
-import com.fantasticsource.faerunutils.actions.weapon.unarmed.SkillJab;
-import com.fantasticsource.faerunutils.actions.weapon.unarmed.SkillKick;
-import com.fantasticsource.faerunutils.actions.weapon.unarmed.SkillStraight;
+import com.fantasticsource.faerunutils.actions.weapon.unarmed.Jab;
+import com.fantasticsource.faerunutils.actions.weapon.unarmed.Kick;
+import com.fantasticsource.faerunutils.actions.weapon.unarmed.Straight;
 import com.fantasticsource.mctools.EntityFilters;
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
@@ -181,38 +181,45 @@ public abstract class CFaerunAction extends CAction
 
         double finesse = Attributes.FINESSE.getTotalAmount(source);
         boolean thrust = Attributes.MAX_MELEE_ANGLE.getTotalAmount(source) == 0;
+        double chance;
         for (Entity entity : EntityFilters.inCone(sourceEyes, source.getRotationYawHead(), source.rotationPitch, source.width * 0.5 + Attributes.MAX_MELEE_RANGE.getTotalAmount(source), Attributes.MAX_MELEE_ANGLE.getTotalAmount(source), true, entities))
         {
             if (Sight.canSee((EntityLivingBase) entity, source, true))
             {
-                double chance = Attributes.BLOCK_CHANCE.getTotalAmount(entity) / 100d;
+                chance = Attributes.BLOCK_CHANCE.getTotalAmount(entity) / 100d;
                 if (thrust) chance *= 0.75;
                 if (FaerunUtils.canBlock(entity) && Math.random() < chance)
                 {
-                    ItemStack blockingStack = bestBlockStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand());
-                    String blockMat = getBlockMaterial(blockingStack);
-                    if (material.equals("flesh") && !blockMat.equals("flesh")) onHit(source);
-                    else if (blockMat.equals("flesh") && !material.equals("flesh")) onHit(entity);
-                    else playBlockSound(blockingStack);
+                    ItemStack blockingStack = bestBlockStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand(), isHeavy(itemstackUsed));
+                    if (!isHeavy(itemstackUsed) || canBlockHeavy(blockingStack))
+                    {
+                        String blockMat = getBlockMaterial(blockingStack);
+                        if (material.equals("flesh") && !blockMat.equals("flesh")) onHit(source);
+                        else if (blockMat.equals("flesh") && !material.equals("flesh")) onHit(entity);
+                        else playBlockSound(blockingStack);
 
-                    //TODO visual block indicators
+                        //TODO visual block indicators
 
-                    return;
+                        return;
+                    }
                 }
 
                 chance = (Attributes.PARRY_CHANCE.getTotalAmount(entity) - finesse) / 100d;
                 if (thrust) chance *= 0.75;
                 if (Math.random() < chance)
                 {
-                    ItemStack parryingStack = bestParryStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand());
-                    if (material.equals("flesh") && !getParryMaterial(parryingStack).equals("flesh")) onHit(source);
-                    else playParrySounds(entity, parryingStack);
+                    ItemStack parryingStack = bestParryStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand(), isHeavy(itemstackUsed));
+                    if (!isHeavy(itemstackUsed) || canBlockHeavy(parryingStack))
+                    {
+                        if (material.equals("flesh") && !getParryMaterial(parryingStack).equals("flesh")) onHit(source);
+                        else playParrySounds(entity, parryingStack);
 
-                    //TODO visual parry indicators
+                        //TODO visual parry indicators
 
-                    finesse *= 0.5;
-                    targets--;
-                    continue;
+                        finesse *= 0.5;
+                        targets--;
+                        continue;
+                    }
                 }
 
                 chance = (Attributes.DODGE_CHANCE.getTotalAmount(entity) - finesse) / 100d;
@@ -339,9 +346,9 @@ public abstract class CFaerunAction extends CAction
 
     public static void init(FMLPostInitializationEvent event)
     {
-        new SkillJab().save();
-        new SkillStraight().save();
-        new SkillKick().save();
+        new Jab().save();
+        new Straight().save();
+        new Kick().save();
     }
 
 
@@ -368,9 +375,27 @@ public abstract class CFaerunAction extends CAction
         return compound != null && compound.getBoolean("heavy");
     }
 
-
-    public static ItemStack bestBlockStack(ItemStack stack1, ItemStack stack2)
+    public static boolean canBlockHeavy(ItemStack stack)
     {
+        if (stack == null || stack.isEmpty() || !stack.hasTagCompound()) return false;
+        NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), MODID);
+        return compound != null && compound.getBoolean("canBlockHeavy");
+    }
+
+
+    public static ItemStack bestBlockStack(ItemStack stack1, ItemStack stack2, boolean requireHeavyBlocking)
+    {
+        //Extra checks if heavy blocking is required
+        if (requireHeavyBlocking)
+        {
+            if (!canBlockHeavy(stack2))
+            {
+                if (!canBlockHeavy(stack1)) return ItemStack.EMPTY;
+                return stack1;
+            }
+            else if (!canBlockHeavy(stack1)) return stack2;
+        }
+
         //Prefer heavier
         boolean heavy1 = isHeavy(stack1), heavy2 = isHeavy(stack2);
         if (heavy1 != heavy2) return heavy1 ? stack1 : stack2;
@@ -390,8 +415,19 @@ public abstract class CFaerunAction extends CAction
         return stack1;
     }
 
-    public static ItemStack bestParryStack(ItemStack stack1, ItemStack stack2)
+    public static ItemStack bestParryStack(ItemStack stack1, ItemStack stack2, boolean requireHeavyParrying)
     {
+        //Extra checks if heavy blocking is required
+        if (requireHeavyParrying)
+        {
+            if (!canBlockHeavy(stack2))
+            {
+                if (!canBlockHeavy(stack1)) return ItemStack.EMPTY;
+                return stack1;
+            }
+            else if (!canBlockHeavy(stack1)) return stack2;
+        }
+
         //Prefer harder
         String mat1 = getBlockMaterial(stack1), mat2 = getBlockMaterial(stack2);
         if (!mat1.equals(mat2))
