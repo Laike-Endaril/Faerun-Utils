@@ -1,10 +1,12 @@
 package com.fantasticsource.faerunutils.actions.weapon.bow;
 
 import com.fantasticsource.faerunutils.Attributes;
-import com.fantasticsource.faerunutils.actions.CFaerunAction;
-import net.minecraft.entity.projectile.EntityArrow;
+import com.fantasticsource.faerunutils.actions.CFaerunProjectileAction;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.projectile.EntityTippedArrow;
 
-public class Shot extends CFaerunAction
+public class Shot extends CFaerunProjectileAction
 {
     public Shot()
     {
@@ -16,11 +18,11 @@ public class Shot extends CFaerunAction
         material = "metal";
 
 
-        projectileType = EntityArrow.class;
         attributes.put(Attributes.PROJECTILE_RANGE, Double.MAX_VALUE);
         attributes.put(Attributes.PROJECTILE_DURATION, Double.MAX_VALUE);
-        attributes.put(Attributes.PROJECTILE_SPEED, 5d);
+        attributes.put(Attributes.PROJECTILE_COUNT, 1d);
         attributes.put(Attributes.MAX_PROJECTILE_TARGETS, 1d);
+        attributes.put(Attributes.PROJECTILE_SPEED, 5d);
 
         attributes.put(Attributes.PIERCE_DAMAGE, 10d);
 
@@ -34,5 +36,11 @@ public class Shot extends CFaerunAction
 
 
         canComboTo.add("faerunutils.unarmed.kick");
+    }
+
+    @Override
+    public Entity getProjectile()
+    {
+        return new EntityTippedArrow(source.world, (EntityLivingBase) source);
     }
 }

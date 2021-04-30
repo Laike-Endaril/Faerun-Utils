@@ -19,7 +19,6 @@ import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.DecimalWeightedPool;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IProjectile;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
@@ -49,7 +48,6 @@ public abstract class CFaerunAction extends CAction
     public ItemStack itemstackUsed = null;
     public boolean playedSwishSound = false;
     public String material;
-    public Class<? extends IProjectile> projectileType = null;
 
     public CFaerunAction()
     {

@@ -121,6 +121,7 @@ public class Attributes
     //All of these are determined by the weapons/attack/skill being used, and may or may not use other attributes depending
     MAX_MELEE_ANGLE = new BetterAttribute(MODID + ".maxAngle", 0),
             COMBO = new BetterAttribute(MODID + ".combo", 100),
+            PROJECTILE_COUNT = new BetterAttribute(MODID + ".projectileCount", 0),
             PROJECTILE_SPEED = new BetterAttribute(MODID + ".projectileSpeed", 0),
             PROJECTILE_DURATION = new BetterAttribute(MODID + ".projectileDuration", 0),
             AOE_DURATION = new BetterAttribute(MODID + ".aoeDuration", 0),
