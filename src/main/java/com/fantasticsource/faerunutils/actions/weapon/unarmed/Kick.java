@@ -48,5 +48,14 @@ public class Kick extends CFaerunAction
 
         canComboTo.add("faerunutils.quarterstaff.jab");
         canComboTo.add("faerunutils.quarterstaff.spinningstrikes");
+
+        canComboTo.add("faerunutils.greatsword.slash");
+        canComboTo.add("faerunutils.greatsword.thrust");
+
+        canComboTo.add("faerunutils.greataxe.slash");
+
+        canComboTo.add("faerunutils.hammer.bash");
+
+        canComboTo.add("faerunutils.bow.shot");
     }
 }

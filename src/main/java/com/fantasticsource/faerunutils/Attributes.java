@@ -122,7 +122,8 @@ public class Attributes
     MAX_MELEE_ANGLE = new BetterAttribute(MODID + ".maxAngle", 0),
             COMBO = new BetterAttribute(MODID + ".combo", 100),
             PROJECTILE_SPEED = new BetterAttribute(MODID + ".projectileSpeed", 0),
-            AOE_TIME = new BetterAttribute(MODID + ".aoeTime", 0),
+            PROJECTILE_DURATION = new BetterAttribute(MODID + ".projectileDuration", 0),
+            AOE_DURATION = new BetterAttribute(MODID + ".aoeDuration", 0),
 
     //Intelligence and Wisdom are terrible gameplay concepts *for players*...they work fine for NPCs, ONLY FOR DECIDING WHETHER AI MAKES GOOD DECISIONS, and you really only need one for that
     //On the other hand, memory is an often-overlooked concept for AI

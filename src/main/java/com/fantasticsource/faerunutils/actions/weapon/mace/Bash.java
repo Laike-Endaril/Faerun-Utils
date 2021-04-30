@@ -23,7 +23,7 @@ public class Bash extends CFaerunAction
         attributes.put(Attributes.BLUNT_DAMAGE, 15d);
 
         attributes.put(Attributes.INTERRUPT_FORCE, 10d);
-        attributes.put(Attributes.KNOCKBACK_FORCE, 100d);
+        attributes.put(Attributes.KNOCKBACK_FORCE, 110d);
 
         attributes.put(Attributes.FINESSE, 2.5d);
 
