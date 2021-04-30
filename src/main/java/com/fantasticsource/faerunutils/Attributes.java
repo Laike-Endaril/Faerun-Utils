@@ -54,8 +54,8 @@ public class Attributes
     //Many of these will be altered further (often reduced) by modifiers on specific weapons and attacks
     PROJECTILE_ACCURACY = new AdditiveParentsAttribute(MODID + ".projectileAccuracy", 50, new Pair<>(DEXTERITY, 0.5)),
             BLOCK_CHANCE = new AdditiveParentsAttribute(MODID + ".block", 50, new Pair<>(DEXTERITY, 0.4)),
-            DODGE_CHANCE = new AdditiveParentsAttribute(MODID + ".dodge", 50, new Pair<>(DEXTERITY, 0.4)),
             PARRY_CHANCE = new AdditiveParentsAttribute(MODID + ".parry", 0, new Pair<>(DEXTERITY, 0.1)),
+            DODGE_CHANCE = new AdditiveParentsAttribute(MODID + ".dodge", 50, new Pair<>(DEXTERITY, 0.4)),
             FINESSE = new AdditiveParentsAttribute(MODID + ".finesse", 0, new Pair<>(DEXTERITY, 0.2)),
             ARMOR_BYPASS_CHANCE = new BonusPercentParentsAttribute(MODID + ".armorBypass", 0, DEXTERITY),
             VITAL_STRIKE_CHANCE = new AdditiveParentsAttribute(MODID + ".vitalStrike", 5, new Pair<>(DEXTERITY, 0.5)),
