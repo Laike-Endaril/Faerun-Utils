@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.hammer;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class OverheadBash extends CFaerunAction
 {
@@ -15,14 +16,14 @@ public class OverheadBash extends CFaerunAction
         material = "metal";
 
 
-        attributes.put(Attributes.MAX_MELEE_ANGLE, 2.5d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 3.5d);
-        attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE.name, 2.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE.name, 3.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS.name, 1d));
 
-        attributes.put(Attributes.BLUNT_DAMAGE, 100d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.BLUNT_DAMAGE.name, 100d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 200d);
-        attributes.put(Attributes.KNOCKBACK_FORCE, 15d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 200d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.KNOCKBACK_FORCE.name, 15d));
 
 
         categoryTags.add("2H");

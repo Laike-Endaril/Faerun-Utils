@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.scythe;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class TrippingSlash extends CFaerunAction
 {
@@ -15,17 +16,17 @@ public class TrippingSlash extends CFaerunAction
         material = "metal";
 
 
-        attributes.put(Attributes.MAX_MELEE_ANGLE, 5d);
-        attributes.put(Attributes.MIN_MELEE_RANGE, 2.5d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 4d);
-        attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE.name, 5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MIN_MELEE_RANGE.name, 2.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE.name, 4d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS.name, 1d));
 
-        attributes.put(Attributes.SLASH_DAMAGE, 70d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.SLASH_DAMAGE.name, 70d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 100d);
-        attributes.put(Attributes.TRIP_FORCE, 150d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 100d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.TRIP_FORCE.name, 150d));
 
-        attributes.put(Attributes.ARMOR_BYPASS_CHANCE, 2d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.ARMOR_BYPASS_CHANCE.name, 2d));
 
 
         categoryTags.add("2H");

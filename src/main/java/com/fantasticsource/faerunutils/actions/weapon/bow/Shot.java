@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.bow;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunProjectileAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityTippedArrow;
@@ -18,17 +19,17 @@ public class Shot extends CFaerunProjectileAction
         material = "metal";
 
 
-        attributes.put(Attributes.PROJECTILE_RANGE, Double.MAX_VALUE);
-        attributes.put(Attributes.PROJECTILE_DURATION, Double.MAX_VALUE);
-        attributes.put(Attributes.PROJECTILE_COUNT, 1d);
-        attributes.put(Attributes.MAX_PROJECTILE_TARGETS, 1d);
-        attributes.put(Attributes.PROJECTILE_SPEED, 5d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_RANGE.name, Double.MAX_VALUE));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_DURATION.name, Double.MAX_VALUE));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_COUNT.name, 1d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_PROJECTILE_TARGETS.name, 1d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_SPEED.name, 5d));
 
-        attributes.put(Attributes.PIERCE_DAMAGE, 10d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PIERCE_DAMAGE.name, 10d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 10d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 10d));
 
-        attributes.put(Attributes.ARMOR_BYPASS_CHANCE, 5d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.ARMOR_BYPASS_CHANCE.name, 5d));
 
 
         categoryTags.add("2H");

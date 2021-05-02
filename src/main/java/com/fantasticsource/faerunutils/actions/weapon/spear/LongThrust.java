@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.spear;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class LongThrust extends CFaerunAction
 {
@@ -15,16 +16,16 @@ public class LongThrust extends CFaerunAction
         material = "metal";
 
 
-        attributes.put(Attributes.MIN_MELEE_RANGE, 4d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 5d);
-        attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MIN_MELEE_RANGE.name, 4d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE.name, 5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS.name, 1d));
 
-        attributes.put(Attributes.PIERCE_DAMAGE, 30d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PIERCE_DAMAGE.name, 30d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 30d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 30d));
 
-        attributes.put(Attributes.FINESSE, 2d);
-        attributes.put(Attributes.ARMOR_BYPASS_CHANCE, 10d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.FINESSE.name, 2d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.ARMOR_BYPASS_CHANCE.name, 10d));
 
 
         categoryTags.add("2H");

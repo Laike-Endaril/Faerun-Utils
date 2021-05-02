@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.mctools.betterattributes.AdditiveParentsAttribute;
 import com.fantasticsource.mctools.betterattributes.BetterAttribute;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 import com.fantasticsource.mctools.betterattributes.BonusPercentParentsAttribute;
 import com.fantasticsource.tiamathud.CustomHUDData;
 import com.fantasticsource.tools.Tools;
@@ -244,8 +245,7 @@ public class Attributes
             if (attribute == STAMINA)
             {
                 double speedMult = Tools.min(1, attribute.getCurrentAmount(entity) / attribute.getTotalAmount(entity) * 2);
-                MOVE_SPEED.setBaseAmount(entity, MOVE_SPEED.defaultBaseAmount * speedMult);
-                ATTACK_SPEED.setBaseAmount(entity, ATTACK_SPEED.defaultBaseAmount * speedMult);
+                BetterAttributeMod.addMods(entity, new BetterAttributeMod("staminaSpeed", MOVE_SPEED.name, 100, 2, speedMult), new BetterAttributeMod("staminaSpeed", ATTACK_SPEED.name, 100, 2, speedMult));
             }
         }
         else

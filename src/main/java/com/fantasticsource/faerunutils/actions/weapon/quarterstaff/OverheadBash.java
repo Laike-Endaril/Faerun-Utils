@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.quarterstaff;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class OverheadBash extends CFaerunAction
 {
@@ -15,14 +16,14 @@ public class OverheadBash extends CFaerunAction
         material = "wood";
 
 
-        attributes.put(Attributes.MAX_MELEE_ANGLE, 2.5d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 4d);
-        attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE.name, 2.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE.name, 4d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS.name, 1d));
 
-        attributes.put(Attributes.BLUNT_DAMAGE, 30d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.BLUNT_DAMAGE.name, 30d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 25d);
-        attributes.put(Attributes.KNOCKBACK_FORCE, 5d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 25d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.KNOCKBACK_FORCE.name, 5d));
 
 
         categoryTags.add("2H");

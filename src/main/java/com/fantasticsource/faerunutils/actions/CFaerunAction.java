@@ -10,6 +10,7 @@ import com.fantasticsource.mctools.EntityFilters;
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.betterattributes.BetterAttribute;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamatactions.config.TiamatActionsConfig;
 import com.fantasticsource.tiamatactions.node.CNode;
@@ -27,14 +28,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
@@ -43,7 +41,7 @@ public abstract class CFaerunAction extends CAction
     public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
 
     public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0;
-    public LinkedHashMap<BetterAttribute, Double> attributes = new LinkedHashMap<>();
+    public ArrayList<BetterAttributeMod> attributeMods = new ArrayList<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
     public ItemStack itemstackUsed = null;
     public boolean playedSwishSound = false;
@@ -81,13 +79,12 @@ public abstract class CFaerunAction extends CAction
         if (mpCost > 0) builder.append("\n" + TextFormatting.BLUE + "MP Cost: " + Tools.formatNicely(mpCost));
         if (staminaCost > 0) builder.append("\n" + TextFormatting.GOLD + "Stamina Cost: " + Tools.formatNicely(staminaCost));
 
-        if (attributes.size() > 0)
+        if (attributeMods.size() > 0)
         {
             builder.append("\n\nDuring this action...");
-            for (Map.Entry<BetterAttribute, Double> entry : attributes.entrySet())
+            for (BetterAttributeMod mod : attributeMods)
             {
-                double amount = entry.getValue();
-                builder.append((amount >= 0 ? "+" : "") + Tools.formatNicely(amount) + " " + I18n.translateToLocal(entry.getKey().name));
+                builder.append("\n" + mod);
             }
         }
 
@@ -121,11 +118,7 @@ public abstract class CFaerunAction extends CAction
                 if (hpCost > 0) Attributes.HEALTH.setCurrentAmount(source, Attributes.HEALTH.getCurrentAmount(source) - hpCost);
                 if (mpCost > 0) Attributes.MANA.setCurrentAmount(source, Attributes.MANA.getCurrentAmount(source) - mpCost);
                 if (staminaCost > 0) Attributes.STAMINA.setCurrentAmount(source, Attributes.STAMINA.getCurrentAmount(source) - staminaCost);
-                for (Map.Entry<BetterAttribute, Double> entry : attributes.entrySet())
-                {
-                    BetterAttribute attribute = entry.getKey();
-                    attribute.setBaseAmount(source, attribute.getBaseAmount(source) + entry.getValue());
-                }
+                BetterAttributeMod.addMods(source, attributeMods.toArray(new BetterAttributeMod[0]));
                 for (CNode endNode : startEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
                 break;
 
@@ -146,11 +139,7 @@ public abstract class CFaerunAction extends CAction
 
             case "end":
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
-                for (Map.Entry<BetterAttribute, Double> entry : attributes.entrySet())
-                {
-                    BetterAttribute attribute = entry.getKey();
-                    attribute.setBaseAmount(source, attribute.getBaseAmount(source) - entry.getValue());
-                }
+                BetterAttributeMod.removeModsWithNameContaining(source, name, true);
                 if (!(this instanceof Cooldown) && queue.queue.size() == 1) new Cooldown(2).queue(source, queue.name);
                 break;
         }
@@ -243,6 +232,7 @@ public abstract class CFaerunAction extends CAction
         boolean vitalStrike = Math.random() < Attributes.VITAL_STRIKE_CHANCE.getTotalAmount(source);
 
         //Apply active armor mods
+        ArrayList<BetterAttributeMod> activeArmorMods = new ArrayList<>();
         if (useArmor)
         {
             ArrayList<ItemStack> armors = GlobalInventory.getVanillaArmorItems(entity);
@@ -255,26 +245,29 @@ public abstract class CFaerunAction extends CAction
 
                 armorCoverage.setWeight(armor, coverage);
 
-                NBTTagCompound compound = MCTools.getSubCompoundIfExists(armor.getTagCompound(), "tiamatitems", "generic");
+                NBTTagCompound compound = MCTools.getSubCompoundIfExists(armor.getTagCompound(), MODID, "activeArmorMods");
                 if (compound != null)
                 {
                     for (String key : compound.getKeySet())
                     {
-                        BetterAttribute attribute = BetterAttribute.BETTER_ATTRIBUTES.get(key);
-                        if (attributes != null) attribute.setBaseAmount(entity, attribute.getBaseAmount(entity) + compound.getDouble(key));
+                        BetterAttributeMod mod = new BetterAttributeMod();
+                        mod.deserializeNBT(compound.getCompoundTag(key));
+                        activeArmorMods.add(mod);
                     }
                 }
             }
+
+            BetterAttributeMod.addMods(entity, activeArmorMods.toArray(new BetterAttributeMod[0]));
         }
 
         //Deal damage
         ItemStack armorToDamage = armorCoverage.getRandom();
-        for (Map.Entry<BetterAttribute, Double> entry : attributes.entrySet())
+        for (BetterAttribute damageAttribute : BetterAttribute.BETTER_ATTRIBUTES.values())
         {
-            BetterAttribute damageAttribute = entry.getKey(), defenseAttribute = Attributes.getDefenseAttribute(damageAttribute);
+            BetterAttribute defenseAttribute = Attributes.getDefenseAttribute(damageAttribute);
             if (defenseAttribute == null) continue;
 
-            double amount = entry.getValue();
+            double amount = damageAttribute.getTotalAmount(source);
             if (amount <= 0) continue;
 
             double prevented = defenseAttribute.getTotalAmount(entity);
@@ -283,8 +276,8 @@ public abstract class CFaerunAction extends CAction
             if (useArmor && armorToDamage != null && prevented > 0)
             {
                 double armorDamage = prevented;
-                NBTTagCompound compound = MCTools.getSubCompoundIfExists(armorToDamage.getTagCompound(), "tiamatitems", "generic");
-                if (compound != null && compound.hasKey("armor." + damageAttribute.name + ".reduction")) armorDamage -= compound.getDouble("armor." + damageAttribute.name + ".reduction");
+                NBTTagCompound compound = MCTools.getSubCompoundIfExists(armorToDamage.getTagCompound(), MODID);
+                if (compound != null) armorDamage -= compound.getDouble("armor." + damageAttribute.name + ".reduction");
                 if (armorDamage > 0) armorToDamage.damageItem((int) armorDamage, (EntityLivingBase) entity);
                 playHitSound(true);
             }
@@ -326,22 +319,7 @@ public abstract class CFaerunAction extends CAction
         }
 
         //Remove active armor mods
-        if (useArmor)
-        {
-            for (ItemStack armor : armorCoverage.pool.keySet())
-            {
-                if (!armor.hasTagCompound()) continue;
-                NBTTagCompound compound = MCTools.getSubCompoundIfExists(armor.getTagCompound(), "tiamatitems", "generic");
-                if (compound != null)
-                {
-                    for (String key : compound.getKeySet())
-                    {
-                        BetterAttribute attribute = BetterAttribute.BETTER_ATTRIBUTES.get(key);
-                        if (attribute != null) attribute.setBaseAmount(entity, attribute.getBaseAmount(entity) - compound.getDouble(key));
-                    }
-                }
-            }
-        }
+        BetterAttributeMod.removeMods(entity, activeArmorMods.toArray(new BetterAttributeMod[0]));
     }
 
     public static void init(FMLPostInitializationEvent event)

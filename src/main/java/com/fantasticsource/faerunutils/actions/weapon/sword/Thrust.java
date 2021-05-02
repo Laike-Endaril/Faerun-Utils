@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.sword;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class Thrust extends CFaerunAction
 {
@@ -15,15 +16,15 @@ public class Thrust extends CFaerunAction
         material = "metal";
 
 
-        attributes.put(Attributes.MAX_MELEE_RANGE, 3.5d);
-        attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE.name, 3.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS.name, 1d));
 
-        attributes.put(Attributes.PIERCE_DAMAGE, 25d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PIERCE_DAMAGE.name, 25d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 5d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 5d));
 
-        attributes.put(Attributes.FINESSE, 2.5d);
-        attributes.put(Attributes.ARMOR_BYPASS_CHANCE, 10d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.FINESSE.name, 2.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.ARMOR_BYPASS_CHANCE.name, 10d));
 
 
         categoryTags.add("1H");

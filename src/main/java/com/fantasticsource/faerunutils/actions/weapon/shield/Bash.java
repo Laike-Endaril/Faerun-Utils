@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.shield;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class Bash extends CFaerunAction
 {
@@ -15,14 +16,14 @@ public class Bash extends CFaerunAction
         material = "metal";
 
 
-        attributes.put(Attributes.MAX_MELEE_ANGLE, 2.5d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 2d);
-        attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE.name, 2.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE.name, 2d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS.name, 1d));
 
-        attributes.put(Attributes.BLUNT_DAMAGE, 10d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.BLUNT_DAMAGE.name, 10d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 50d);
-        attributes.put(Attributes.KNOCKBACK_FORCE, 150d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 50d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.KNOCKBACK_FORCE.name, 150d));
 
 
         categoryTags.add("1H");

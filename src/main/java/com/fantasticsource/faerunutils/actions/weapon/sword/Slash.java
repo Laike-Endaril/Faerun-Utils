@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.sword;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class Slash extends CFaerunAction
 {
@@ -15,17 +16,17 @@ public class Slash extends CFaerunAction
         material = "metal";
 
 
-        attributes.put(Attributes.MAX_MELEE_ANGLE, 35d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 3d);
-        attributes.put(Attributes.MAX_MELEE_TARGETS, 2d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE.name, 35d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE.name, 3d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS.name, 2d));
 
-        attributes.put(Attributes.SLASH_DAMAGE, 15d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.SLASH_DAMAGE.name, 15d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 5d);
-        attributes.put(Attributes.KNOCKBACK_FORCE, 5d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.KNOCKBACK_FORCE.name, 5d));
 
-        attributes.put(Attributes.FINESSE, 5d);
-        attributes.put(Attributes.ARMOR_BYPASS_CHANCE, 5d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.FINESSE.name, 5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.ARMOR_BYPASS_CHANCE.name, 5d));
 
 
         categoryTags.add("1H");

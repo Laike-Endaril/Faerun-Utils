@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.axe;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class OverheadChop extends CFaerunAction
 {
@@ -15,18 +16,18 @@ public class OverheadChop extends CFaerunAction
         material = "metal";
 
 
-        attributes.put(Attributes.MAX_MELEE_ANGLE, 2.5d);
-        attributes.put(Attributes.MIN_MELEE_RANGE, 1.5d);
-        attributes.put(Attributes.MAX_MELEE_RANGE, 3d);
-        attributes.put(Attributes.MAX_MELEE_TARGETS, 1d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE.name, 2.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MIN_MELEE_RANGE.name, 1.5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE.name, 3d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS.name, 1d));
 
-        attributes.put(Attributes.SLASH_DAMAGE, 20d);
-        attributes.put(Attributes.PIERCE_DAMAGE, 20d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.SLASH_DAMAGE.name, 20d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PIERCE_DAMAGE.name, 20d));
 
-        attributes.put(Attributes.INTERRUPT_FORCE, 25d);
-        attributes.put(Attributes.KNOCKBACK_FORCE, 10d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 25d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.KNOCKBACK_FORCE.name, 10d));
 
-        attributes.put(Attributes.ARMOR_BYPASS_CHANCE, 3d);
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.ARMOR_BYPASS_CHANCE.name, 3d));
 
 
         categoryTags.add("1H");
