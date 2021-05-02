@@ -10,12 +10,14 @@ import com.fantasticsource.faerunutils.professions.interactions.InteractionInsur
 import com.fantasticsource.instances.Destination;
 import com.fantasticsource.instances.server.Teleport;
 import com.fantasticsource.instances.tags.entity.EscapePoint;
+import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.mctools.Slottings;
+import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
+import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.tiamatactions.action.ActionQueue;
 import com.fantasticsource.tiamatactions.action.CAction;
-import com.fantasticsource.tiamatitems.TransientAttributeModEvent;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -161,21 +163,56 @@ public class FaerunUtils
 
 
     @SubscribeEvent
-    public static void transientAttributeMods(TransientAttributeModEvent event)
+    public static void inventoryChanged(InventoryChangedEvent event)
     {
-        EntityLivingBase livingBase = event.getEntityLiving();
-        if (!(livingBase instanceof EntityPlayerMP)) return;
+        Entity entity = event.getEntity();
+        if (!(entity instanceof EntityPlayerMP)) return;
 
 
-        EntityPlayerMP player = (EntityPlayerMP) livingBase;
+        EntityPlayerMP player = (EntityPlayerMP) entity;
         InventoryPlayer inv = player.inventory;
         int filled = 0;
-        for (int i = 0; i < 27; i++)
+        ItemStack stack;
+        for (int i = 0; i < 27; i++) //27
         {
-            if (!inv.getStackInSlot(9 + i).isEmpty()) filled++;
+            stack = inv.getStackInSlot(9 + i);
+            if (!stack.isEmpty())
+            {
+                filled++;
+                if (Slottings.isTwoHanded(stack)) filled++;
+            }
+        }
+        stack = player.getHeldItemMainhand(); //28
+        if (!stack.isEmpty())
+        {
+            filled++;
+            if (Slottings.isTwoHanded(stack)) filled++;
+        }
+        stack = player.getHeldItemOffhand(); //29
+        if (!stack.isEmpty())
+        {
+            filled++;
+            if (Slottings.isTwoHanded(stack)) filled++;
+        }
+        for (ItemStack armor : inv.armorInventory) //33
+        {
+            if (!armor.isEmpty())
+            {
+                filled++;
+                if (Slottings.isTwoHanded(armor)) filled++;
+            }
+        }
+        for (ItemStack armor : GlobalInventory.getTiamatArmor(player)) //35
+        {
+            if (!armor.isEmpty())
+            {
+                filled++;
+                if (Slottings.isTwoHanded(armor)) filled++;
+            }
         }
 
-        event.applyTransientModifier(MODID + ":ItemWeight", "generic.movementSpeed", 1, -0.5 * filled / 27);
+        //If all slots were filled with 2-handers (including armor, which won't happen), speed would be 0.  This is probably fine.  Only adjust if there is an issue during gameplay.
+        BetterAttributeMod.addMods(entity, new BetterAttributeMod("inventoryWeight", Attributes.MOVE_SPEED.name, 100, 1, -0.5 * filled / 35));
     }
 
 
@@ -206,7 +243,7 @@ public class FaerunUtils
             NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), "tiamatitems", "generic");
             if (compound != null) actionName = compound.getString((mainhand ? "mainhand" : "offhand") + index);
         }
-        if (actionName == null || actionName.equals("")) actionName = mainhand ? "faerunutils.skill.unarmed.straight" : "faerunutils.skill.unarmed.jab";
+        if (actionName == null || actionName.equals("")) actionName = mainhand ? "faerunutils.unarmed.straight" : "faerunutils.unarmed.jab";
 
         tryUseAction(livingBase, CAction.ALL_ACTIONS.get(actionName), stack);
     }

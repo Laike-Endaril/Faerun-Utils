@@ -229,7 +229,7 @@ public abstract class CFaerunAction extends CAction
     {
         boolean useArmor = Math.random() < (Attributes.COVERAGE.getTotalAmount(entity) - Attributes.ARMOR_BYPASS_CHANCE.getTotalAmount(source)) / 100d;
         DecimalWeightedPool<ItemStack> armorCoverage = new DecimalWeightedPool<>();
-        boolean vitalStrike = Math.random() < Attributes.VITAL_STRIKE_CHANCE.getTotalAmount(source);
+        boolean vitalStrike = Math.random() < Attributes.VITAL_STRIKE_CHANCE.getTotalAmount(source) * 0.01;
 
         //Apply active armor mods
         ArrayList<BetterAttributeMod> activeArmorMods = new ArrayList<>();
