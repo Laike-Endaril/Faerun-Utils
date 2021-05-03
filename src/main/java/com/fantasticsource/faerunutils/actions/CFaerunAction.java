@@ -3,6 +3,18 @@ package com.fantasticsource.faerunutils.actions;
 import com.fantasticsource.dynamicstealth.server.senses.sight.Sight;
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.FaerunUtils;
+import com.fantasticsource.faerunutils.actions.weapon.axe.Chop;
+import com.fantasticsource.faerunutils.actions.weapon.axe.OverheadChop;
+import com.fantasticsource.faerunutils.actions.weapon.bow.Shot;
+import com.fantasticsource.faerunutils.actions.weapon.mace.Bash;
+import com.fantasticsource.faerunutils.actions.weapon.mace.OverheadBash;
+import com.fantasticsource.faerunutils.actions.weapon.quarterstaff.LonghandStrike;
+import com.fantasticsource.faerunutils.actions.weapon.quarterstaff.SpinningStrikes;
+import com.fantasticsource.faerunutils.actions.weapon.sickle.StabbingSwing;
+import com.fantasticsource.faerunutils.actions.weapon.sickle.TrippingSlash;
+import com.fantasticsource.faerunutils.actions.weapon.spear.LongThrust;
+import com.fantasticsource.faerunutils.actions.weapon.sword.Slash;
+import com.fantasticsource.faerunutils.actions.weapon.sword.Thrust;
 import com.fantasticsource.faerunutils.actions.weapon.unarmed.Jab;
 import com.fantasticsource.faerunutils.actions.weapon.unarmed.Kick;
 import com.fantasticsource.faerunutils.actions.weapon.unarmed.Straight;
@@ -322,13 +334,6 @@ public abstract class CFaerunAction extends CAction
         BetterAttributeMod.removeMods(entity, activeArmorMods.toArray(new BetterAttributeMod[0]));
     }
 
-    public static void init(FMLPostInitializationEvent event)
-    {
-        new Jab().save();
-        new Straight().save();
-        new Kick().save();
-    }
-
 
     public static String getBlockMaterial(ItemStack stack)
     {
@@ -483,5 +488,79 @@ public abstract class CFaerunAction extends CAction
         if (categoryTags.contains("Heavy")) pitch -= .4f;
 
         MCTools.playSimpleSoundForAll(new ResourceLocation(soundName), source, 16, 2, 1, pitch - 0.2f + Tools.random(0.4f), SoundCategory.HOSTILE);
+    }
+
+
+    public static void init(FMLPostInitializationEvent event)
+    {
+        //Unarmed
+        new Jab().save();
+        new Straight().save();
+        new Kick().save();
+
+        //Sword
+        new Slash().save();
+        new Thrust().save();
+
+        //Axe
+        new Chop().save();
+        new OverheadChop().save();
+
+        //Dagger
+        new com.fantasticsource.faerunutils.actions.weapon.dagger.Slash().save();
+        new com.fantasticsource.faerunutils.actions.weapon.dagger.Thrust().save();
+
+        //Katar
+        new com.fantasticsource.faerunutils.actions.weapon.katar.Thrust().save();
+        new com.fantasticsource.faerunutils.actions.weapon.katar.Slash().save();
+
+        //Mace
+        new Bash().save();
+        new OverheadBash().save();
+
+        //Sickle
+        new StabbingSwing().save();
+        new TrippingSlash().save();
+
+
+        //Shield
+        new com.fantasticsource.faerunutils.actions.weapon.shield.Bash().save();
+
+
+        //Spear
+        new com.fantasticsource.faerunutils.actions.weapon.spear.Thrust().save();
+        new LongThrust().save();
+
+        //Quarterstaff
+        new com.fantasticsource.faerunutils.actions.weapon.quarterstaff.Jab().save();
+        new SpinningStrikes().save();
+        new LonghandStrike().save();
+        new com.fantasticsource.faerunutils.actions.weapon.quarterstaff.OverheadBash().save();
+
+
+        //Polearm
+        new com.fantasticsource.faerunutils.actions.weapon.polearm.Slash().save();
+        new com.fantasticsource.faerunutils.actions.weapon.polearm.Thrust().save();
+        new com.fantasticsource.faerunutils.actions.weapon.polearm.Bash().save();
+
+        //Greatsword
+        new com.fantasticsource.faerunutils.actions.weapon.greatsword.Slash().save();
+        new com.fantasticsource.faerunutils.actions.weapon.greatsword.Thrust().save();
+
+        //Greataxe
+        new com.fantasticsource.faerunutils.actions.weapon.greataxe.Slash().save();
+        new com.fantasticsource.faerunutils.actions.weapon.greataxe.OverheadChop().save();
+
+        //Hammer
+        new com.fantasticsource.faerunutils.actions.weapon.hammer.Bash().save();
+        new com.fantasticsource.faerunutils.actions.weapon.hammer.OverheadBash().save();
+
+        //Scythe
+        new com.fantasticsource.faerunutils.actions.weapon.scythe.StabbingSwing().save();
+        new com.fantasticsource.faerunutils.actions.weapon.scythe.TrippingSlash().save();
+
+
+        //Bow
+        new Shot().save();
     }
 }
