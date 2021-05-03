@@ -223,3 +223,58 @@ attribute.name.faerunutils.projectileDuration=Projectile Duration
 attribute.description.faerunutils.projectileDuration=Increases the duration of your projectiles.
 attribute.name.faerunutils.aoeDuration=AOE Duration
 attribute.description.faerunutils.aoeDuration=Increases the duration of your AOE effects.
+
+
+
+
+
+faerunutils.unarmed.jab=Jab
+faerunutils.unarmed.straight=Straight
+faerunutils.unarmed.kick=Kick
+
+faerunutils.sword.slash=Slash
+faerunutils.sword.thrust=Thrust
+
+faerunutils.axe.chop=Chop
+faerunutils.axe.overheadchop=Overhead Chop
+
+faerunutils.dagger.slash=Slash
+faerunutils.dagger.thrust=Thrust
+
+faerunutils.katar.thrust=Thrust
+faerunutils.katar.slash=Slash
+
+faerunutils.mace.bash=Bash
+faerunutils.mace.overheadbash=Overhead Bash
+
+faerunutils.sickle.stabbingswing=Stabbing Swing
+faerunutils.sickle.trippingslash=Tripping Slash
+
+
+faerunutils.shield.bash=Bash
+
+
+faerunutils.spear.thrust=Thrust
+faerunutils.spear.longthrust=Long Thrust
+
+faerunutils.quarterstaff.jab=Jab
+faerunutils.quarterstaff.spinningstrikes=Spinning Strikes
+faerunutils.quarterstaff.longhandstrike=Longhand Strike
+faerunutils.quarterstaff.overheadbash=Overhead Bash
+
+
+faerunutils.polearm.slash=Slash
+faerunutils.polearm.thrust=Thrust
+faerunutils.polearm.bash=Bash
+
+faerunutils.greatsword.slash=Slash
+faerunutils.greatsword.thrust=Thrust
+
+faerunutils.greataxe.slash=Slash
+faerunutils.greataxe.overheadchop=Overhead Chop
+
+faerunutils.hammer.bash=Bash
+faerunutils.hammer.overheadbash=Overhead Bash
+
+faerunutils.scythe.stabbingswing=Stabbing Swing
+faerunutils.scythe.trippingslash=Tripping Slash
