@@ -8,7 +8,7 @@ public class Thrust extends CFaerunAction
 {
     public Thrust()
     {
-        super("faerunutils.polearm.thrust");
+        super("faerunaction.polearm.thrust");
 
         useTime = 0.5;
         comboUsage = 30;
@@ -32,10 +32,10 @@ public class Thrust extends CFaerunAction
         categoryTags.add("Polearm");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.polearm.thrust");
-        canComboTo.add("faerunutils.polearm.slash");
-        canComboTo.add("faerunutils.polearm.bash");
+        canComboTo.add("faerunaction.polearm.thrust");
+        canComboTo.add("faerunaction.polearm.slash");
+        canComboTo.add("faerunaction.polearm.bash");
     }
 }

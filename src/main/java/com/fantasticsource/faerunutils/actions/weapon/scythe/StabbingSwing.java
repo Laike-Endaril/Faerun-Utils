@@ -8,7 +8,7 @@ public class StabbingSwing extends CFaerunAction
 {
     public StabbingSwing()
     {
-        super("faerunutils.scythe.stabbingswing");
+        super("faerunaction.scythe.stabbingswing");
 
         useTime = 1.25;
         comboUsage = 60;
@@ -32,6 +32,6 @@ public class StabbingSwing extends CFaerunAction
         categoryTags.add("2H");
         categoryTags.add("Scythe");
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
     }
 }

@@ -171,6 +171,9 @@ public class Attributes
         if (!(entity instanceof EntityLivingBase)) return;
 
 
+        BetterAttributeMod.removeModsWithNameContaining(entity, "faerunaction", true);
+
+
         HEALTH.getTotalAmount(entity);
         MOVE_SPEED.getTotalAmount(entity);
 

@@ -8,7 +8,7 @@ public class LonghandStrike extends CFaerunAction
 {
     public LonghandStrike()
     {
-        super("faerunutils.quarterstaff.longhandstrike");
+        super("faerunaction.quarterstaff.longhandstrike");
 
         useTime = 0.5;
         comboUsage = 40;
@@ -30,6 +30,6 @@ public class LonghandStrike extends CFaerunAction
         categoryTags.add("Quarterstaff");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
     }
 }

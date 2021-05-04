@@ -8,7 +8,7 @@ public class Kick extends CFaerunAction
 {
     public Kick()
     {
-        super("faerunutils.unarmed.kick");
+        super("faerunaction.unarmed.kick");
 
         useTime = 1;
         comboUsage = 60;
@@ -33,30 +33,30 @@ public class Kick extends CFaerunAction
         categoryTags.add("Heavy");
 
 
-        canComboTo.add("faerunutils.unarmed.straight");
+        canComboTo.add("faerunaction.unarmed.straight");
 
-        canComboTo.add("faerunutils.sword.slash");
+        canComboTo.add("faerunaction.sword.slash");
 
-        canComboTo.add("faerunutils.axe.chop");
-        canComboTo.add("faerunutils.axe.overheadchop");
+        canComboTo.add("faerunaction.axe.chop");
+        canComboTo.add("faerunaction.axe.overheadchop");
 
-        canComboTo.add("faerunutils.dagger.slash");
-        canComboTo.add("faerunutils.dagger.thrust");
+        canComboTo.add("faerunaction.dagger.slash");
+        canComboTo.add("faerunaction.dagger.thrust");
 
-        canComboTo.add("faerunutils.mace.bash");
+        canComboTo.add("faerunaction.mace.bash");
 
-        canComboTo.add("faerunutils.spear.thrust");
+        canComboTo.add("faerunaction.spear.thrust");
 
-        canComboTo.add("faerunutils.quarterstaff.jab");
-        canComboTo.add("faerunutils.quarterstaff.spinningstrikes");
+        canComboTo.add("faerunaction.quarterstaff.jab");
+        canComboTo.add("faerunaction.quarterstaff.spinningstrikes");
 
-        canComboTo.add("faerunutils.greatsword.slash");
-        canComboTo.add("faerunutils.greatsword.thrust");
+        canComboTo.add("faerunaction.greatsword.slash");
+        canComboTo.add("faerunaction.greatsword.thrust");
 
-        canComboTo.add("faerunutils.greataxe.slash");
+        canComboTo.add("faerunaction.greataxe.slash");
 
-        canComboTo.add("faerunutils.hammer.bash");
+        canComboTo.add("faerunaction.hammer.bash");
 
-        canComboTo.add("faerunutils.bow.shot");
+        canComboTo.add("faerunaction.bow.shot");
     }
 }

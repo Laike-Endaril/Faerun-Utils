@@ -8,7 +8,7 @@ public class OverheadBash extends CFaerunAction
 {
     public OverheadBash()
     {
-        super("faerunutils.hammer.overheadbash");
+        super("faerunaction.hammer.overheadbash");
 
         useTime = 1.5;
         comboUsage = 60;
@@ -30,6 +30,6 @@ public class OverheadBash extends CFaerunAction
         categoryTags.add("Hammer");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
     }
 }

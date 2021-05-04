@@ -8,7 +8,7 @@ public class OverheadBash extends CFaerunAction
 {
     public OverheadBash()
     {
-        super("faerunutils.mace.overheadbash");
+        super("faerunaction.mace.overheadbash");
 
         useTime = 1;
         comboUsage = 50;
@@ -31,21 +31,21 @@ public class OverheadBash extends CFaerunAction
         categoryTags.add("Mace");
 
 
-        canComboTo.add("faerunutils.unarmed.straight");
+        canComboTo.add("faerunaction.unarmed.straight");
 
-        canComboTo.add("faerunutils.sword.slash");
-        canComboTo.add("faerunutils.sword.thrust");
+        canComboTo.add("faerunaction.sword.slash");
+        canComboTo.add("faerunaction.sword.thrust");
 
-        canComboTo.add("faerunutils.axe.chop");
+        canComboTo.add("faerunaction.axe.chop");
 
-        canComboTo.add("faerunutils.dagger.slash");
-        canComboTo.add("faerunutils.dagger.thrust");
+        canComboTo.add("faerunaction.dagger.slash");
+        canComboTo.add("faerunaction.dagger.thrust");
 
-        canComboTo.add("faerunutils.katar.slash");
-        canComboTo.add("faerunutils.katar.thrust");
+        canComboTo.add("faerunaction.katar.slash");
+        canComboTo.add("faerunaction.katar.thrust");
 
-        canComboTo.add("faerunutils.mace.bash");
+        canComboTo.add("faerunaction.mace.bash");
 
-        canComboTo.add("faerunutils.sickle.stabbingswing");
+        canComboTo.add("faerunaction.sickle.stabbingswing");
     }
 }

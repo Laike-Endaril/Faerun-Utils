@@ -8,7 +8,7 @@ public class Slash extends CFaerunAction
 {
     public Slash()
     {
-        super("faerunutils.greatsword.slash");
+        super("faerunaction.greatsword.slash");
 
         useTime = 1;
         comboUsage = 30;
@@ -33,9 +33,9 @@ public class Slash extends CFaerunAction
         categoryTags.add("Greatsword");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.greatsword.slash");
-        canComboTo.add("faerunutils.greatsword.thrust");
+        canComboTo.add("faerunaction.greatsword.slash");
+        canComboTo.add("faerunaction.greatsword.thrust");
     }
 }

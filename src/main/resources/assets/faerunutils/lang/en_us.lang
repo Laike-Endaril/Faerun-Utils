@@ -228,53 +228,53 @@ attribute.description.faerunutils.aoeDuration=Increases the duration of your AOE
 
 
 
-faerunutils.unarmed.jab=Jab
-faerunutils.unarmed.straight=Straight
-faerunutils.unarmed.kick=Kick
+faerunaction.unarmed.jab=Jab
+faerunaction.unarmed.straight=Straight
+faerunaction.unarmed.kick=Kick
 
-faerunutils.sword.slash=Slash
-faerunutils.sword.thrust=Thrust
+faerunaction.sword.slash=Slash
+faerunaction.sword.thrust=Thrust
 
-faerunutils.axe.chop=Chop
-faerunutils.axe.overheadchop=Overhead Chop
+faerunaction.axe.chop=Chop
+faerunaction.axe.overheadchop=Overhead Chop
 
-faerunutils.dagger.slash=Slash
-faerunutils.dagger.thrust=Thrust
+faerunaction.dagger.slash=Slash
+faerunaction.dagger.thrust=Thrust
 
-faerunutils.katar.thrust=Thrust
-faerunutils.katar.slash=Slash
+faerunaction.katar.thrust=Thrust
+faerunaction.katar.slash=Slash
 
-faerunutils.mace.bash=Bash
-faerunutils.mace.overheadbash=Overhead Bash
+faerunaction.mace.bash=Bash
+faerunaction.mace.overheadbash=Overhead Bash
 
-faerunutils.sickle.stabbingswing=Stabbing Swing
-faerunutils.sickle.trippingslash=Tripping Slash
-
-
-faerunutils.shield.bash=Bash
+faerunaction.sickle.stabbingswing=Stabbing Swing
+faerunaction.sickle.trippingslash=Tripping Slash
 
 
-faerunutils.spear.thrust=Thrust
-faerunutils.spear.longthrust=Long Thrust
-
-faerunutils.quarterstaff.jab=Jab
-faerunutils.quarterstaff.spinningstrikes=Spinning Strikes
-faerunutils.quarterstaff.longhandstrike=Longhand Strike
-faerunutils.quarterstaff.overheadbash=Overhead Bash
+faerunaction.shield.bash=Bash
 
 
-faerunutils.polearm.slash=Slash
-faerunutils.polearm.thrust=Thrust
-faerunutils.polearm.bash=Bash
+faerunaction.spear.thrust=Thrust
+faerunaction.spear.longthrust=Long Thrust
 
-faerunutils.greatsword.slash=Slash
-faerunutils.greatsword.thrust=Thrust
+faerunaction.quarterstaff.jab=Jab
+faerunaction.quarterstaff.spinningstrikes=Spinning Strikes
+faerunaction.quarterstaff.longhandstrike=Longhand Strike
+faerunaction.quarterstaff.overheadbash=Overhead Bash
 
-faerunutils.greataxe.slash=Slash
-faerunutils.greataxe.overheadchop=Overhead Chop
 
-faerunutils.hammer.bash=Bash
-faerunutils.hammer.overheadbash=Overhead Bash
+faerunaction.polearm.slash=Slash
+faerunaction.polearm.thrust=Thrust
+faerunaction.polearm.bash=Bash
 
-faerunutils.scythe.stabbingswing=Stabbing Swing
-faerunutils.scythe.trippingslash=Tripping Slash
+faerunaction.greatsword.slash=Slash
+faerunaction.greatsword.thrust=Thrust
+
+faerunaction.greataxe.slash=Slash
+faerunaction.greataxe.overheadchop=Overhead Chop
+
+faerunaction.hammer.bash=Bash
+faerunaction.hammer.overheadbash=Overhead Bash
+
+faerunaction.scythe.stabbingswing=Stabbing Swing
+faerunaction.scythe.trippingslash=Tripping Slash

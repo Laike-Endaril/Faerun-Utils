@@ -8,7 +8,7 @@ public class Jab extends CFaerunAction
 {
     public Jab()
     {
-        super("faerunutils.quarterstaff.jab");
+        super("faerunaction.quarterstaff.jab");
 
         useTime = 0.25;
         comboUsage = 20;
@@ -32,11 +32,11 @@ public class Jab extends CFaerunAction
         categoryTags.add("Quarterstaff");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.quarterstaff.jab");
-        canComboTo.add("faerunutils.quarterstaff.spinningstrikes");
-        canComboTo.add("faerunutils.quarterstaff.overheadbash");
-        canComboTo.add("faerunutils.quarterstaff.longhandstrike");
+        canComboTo.add("faerunaction.quarterstaff.jab");
+        canComboTo.add("faerunaction.quarterstaff.spinningstrikes");
+        canComboTo.add("faerunaction.quarterstaff.overheadbash");
+        canComboTo.add("faerunaction.quarterstaff.longhandstrike");
     }
 }

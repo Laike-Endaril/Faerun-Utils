@@ -8,7 +8,7 @@ public class Slash extends CFaerunAction
 {
     public Slash()
     {
-        super("faerunutils.polearm.slash");
+        super("faerunaction.polearm.slash");
 
         useTime = 1;
         comboUsage = 60;
@@ -33,8 +33,8 @@ public class Slash extends CFaerunAction
         categoryTags.add("Polearm");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.polearm.thrust");
+        canComboTo.add("faerunaction.polearm.thrust");
     }
 }

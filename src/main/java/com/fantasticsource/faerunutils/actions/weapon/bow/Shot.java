@@ -11,7 +11,7 @@ public class Shot extends CFaerunProjectileAction
 {
     public Shot()
     {
-        super("faerunutils.bow.shot");
+        super("faerunaction.bow.shot");
 
         useTime = 0.75;
         comboUsage = 30;
@@ -36,7 +36,7 @@ public class Shot extends CFaerunProjectileAction
         categoryTags.add("Bow");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
     }
 
     @Override

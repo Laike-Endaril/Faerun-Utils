@@ -8,7 +8,7 @@ public class TrippingSlash extends CFaerunAction
 {
     public TrippingSlash()
     {
-        super("faerunutils.scythe.trippingslash");
+        super("faerunaction.scythe.trippingslash");
 
         useTime = 1.5;
         comboUsage = 60;
@@ -32,6 +32,6 @@ public class TrippingSlash extends CFaerunAction
         categoryTags.add("2H");
         categoryTags.add("Scythe");
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
     }
 }

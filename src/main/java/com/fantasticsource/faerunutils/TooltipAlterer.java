@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.faerunutils.actions.CFaerunAction;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionCreatePalette;
 import com.fantasticsource.faerunutils.professions.interactions.InteractionInsure;
 import com.fantasticsource.mctools.MCTools;
@@ -48,33 +49,55 @@ public class TooltipAlterer
             NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), "tiamatitems", "generic");
             if (compound != null)
             {
-                CAction action = CAction.ALL_ACTIONS.get(compound.getString("mainhand0"));
-                if (action != null)
+                CAction mainhand0 = CAction.ALL_ACTIONS.get(compound.getString("mainhand0"));
+                CAction mainhand1 = CAction.ALL_ACTIONS.get(compound.getString("mainhand1"));
+                CAction offhand0 = CAction.ALL_ACTIONS.get(compound.getString("offhand0"));
+                CAction offhand1 = CAction.ALL_ACTIONS.get(compound.getString("offhand1"));
+
+                if (mainhand0 != null)
                 {
                     tooltip.add("");
-                    tooltip.add(TextFormatting.LIGHT_PURPLE + "Mainhand Action 1: " + I18n.translateToLocal(action.name));
-                    //TODO
+                    if (offhand0 == mainhand0) tooltip.add(TextFormatting.LIGHT_PURPLE + "Mainhand / Offhand Action 1: " + I18n.translateToLocal(mainhand0.name));
+                    else tooltip.add(TextFormatting.LIGHT_PURPLE + "Mainhand Action 1: " + I18n.translateToLocal(mainhand0.name));
+
+                    if (mainhand0 instanceof CFaerunAction)
+                    {
+                        //TODO
+                    }
                 }
-                action = CAction.ALL_ACTIONS.get(compound.getString("mainhand1"));
-                if (action != null)
+
+                if (mainhand1 != null)
                 {
                     tooltip.add("");
-                    tooltip.add(TextFormatting.LIGHT_PURPLE + "Mainhand Action 2: " + I18n.translateToLocal(action.name));
-                    //TODO
+                    if (offhand1 == mainhand1) tooltip.add(TextFormatting.LIGHT_PURPLE + "Mainhand / Offhand Action 2: " + I18n.translateToLocal(mainhand0.name));
+                    else tooltip.add(TextFormatting.LIGHT_PURPLE + "Mainhand Action 2: " + I18n.translateToLocal(mainhand0.name));
+
+                    if (mainhand1 instanceof CFaerunAction)
+                    {
+                        //TODO
+                    }
                 }
-                action = CAction.ALL_ACTIONS.get(compound.getString("offhand0"));
-                if (action != null)
+
+                if (offhand0 != null && offhand0 != mainhand0)
                 {
                     tooltip.add("");
-                    tooltip.add(TextFormatting.LIGHT_PURPLE + "Offhand Action 1: " + I18n.translateToLocal(action.name));
-                    //TODO
+                    tooltip.add(TextFormatting.LIGHT_PURPLE + "Offhand Action 1: " + I18n.translateToLocal(offhand0.name));
+
+                    if (offhand0 instanceof CFaerunAction)
+                    {
+                        //TODO
+                    }
                 }
-                action = CAction.ALL_ACTIONS.get(compound.getString("offhand1"));
-                if (action != null)
+
+                if (offhand1 != null && offhand1 != mainhand1)
                 {
                     tooltip.add("");
-                    tooltip.add(TextFormatting.LIGHT_PURPLE + "Offhand Action 2: " + I18n.translateToLocal(action.name));
-                    //TODO
+                    tooltip.add(TextFormatting.LIGHT_PURPLE + "Offhand Action 2: " + I18n.translateToLocal(offhand1.name));
+
+                    if (offhand1 instanceof CFaerunAction)
+                    {
+                        //TODO
+                    }
                 }
             }
         }

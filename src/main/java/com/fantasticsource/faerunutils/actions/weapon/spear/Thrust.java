@@ -8,7 +8,7 @@ public class Thrust extends CFaerunAction
 {
     public Thrust()
     {
-        super("faerunutils.spear.thrust");
+        super("faerunaction.spear.thrust");
 
         useTime = 0.25;
         comboUsage = 25;
@@ -32,9 +32,9 @@ public class Thrust extends CFaerunAction
         categoryTags.add("Spear");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.spear.thrust");
-        canComboTo.add("faerunutils.spear.longthrust");
+        canComboTo.add("faerunaction.spear.thrust");
+        canComboTo.add("faerunaction.spear.longthrust");
     }
 }

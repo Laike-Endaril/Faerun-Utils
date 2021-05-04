@@ -8,7 +8,7 @@ public class OverheadBash extends CFaerunAction
 {
     public OverheadBash()
     {
-        super("faerunutils.quarterstaff.overheadbash");
+        super("faerunaction.quarterstaff.overheadbash");
 
         useTime = 1;
         comboUsage = 50;
@@ -30,9 +30,9 @@ public class OverheadBash extends CFaerunAction
         categoryTags.add("Quarterstaff");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.quarterstaff.jab");
-        canComboTo.add("faerunutils.quarterstaff.spinningstrikes");
+        canComboTo.add("faerunaction.quarterstaff.jab");
+        canComboTo.add("faerunaction.quarterstaff.spinningstrikes");
     }
 }

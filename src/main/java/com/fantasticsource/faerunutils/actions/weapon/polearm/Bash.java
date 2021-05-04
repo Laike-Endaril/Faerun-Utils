@@ -8,7 +8,7 @@ public class Bash extends CFaerunAction
 {
     public Bash()
     {
-        super("faerunutils.polearm.bash");
+        super("faerunaction.polearm.bash");
 
         useTime = 1;
         comboUsage = 60;
@@ -31,8 +31,8 @@ public class Bash extends CFaerunAction
         categoryTags.add("Polearm");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.polearm.thrust");
+        canComboTo.add("faerunaction.polearm.thrust");
     }
 }

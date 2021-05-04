@@ -8,7 +8,7 @@ public class OverheadChop extends CFaerunAction
 {
     public OverheadChop()
     {
-        super("faerunutils.greataxe.overheadchop");
+        super("faerunaction.greataxe.overheadchop");
 
         useTime = 1.5;
         comboUsage = 60;
@@ -33,6 +33,6 @@ public class OverheadChop extends CFaerunAction
         categoryTags.add("Greataxe");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
     }
 }

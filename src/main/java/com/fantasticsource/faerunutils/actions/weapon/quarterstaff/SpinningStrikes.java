@@ -8,7 +8,7 @@ public class SpinningStrikes extends CFaerunAction
 {
     public SpinningStrikes()
     {
-        super("faerunutils.quarterstaff.spinningstrikes");
+        super("faerunaction.quarterstaff.spinningstrikes");
 
         useTime = 0.25;
         comboUsage = 10;
@@ -31,11 +31,11 @@ public class SpinningStrikes extends CFaerunAction
         categoryTags.add("Quarterstaff");
 
 
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.quarterstaff.jab");
-        canComboTo.add("faerunutils.quarterstaff.spinningstrikes");
-        canComboTo.add("faerunutils.quarterstaff.overheadbash");
-        canComboTo.add("faerunutils.quarterstaff.longhandstrike");
+        canComboTo.add("faerunaction.quarterstaff.jab");
+        canComboTo.add("faerunaction.quarterstaff.spinningstrikes");
+        canComboTo.add("faerunaction.quarterstaff.overheadbash");
+        canComboTo.add("faerunaction.quarterstaff.longhandstrike");
     }
 }

@@ -8,7 +8,7 @@ public class Bash extends CFaerunAction
 {
     public Bash()
     {
-        super("faerunutils.mace.bash");
+        super("faerunaction.mace.bash");
 
         useTime = 0.5;
         comboUsage = 20;
@@ -33,28 +33,28 @@ public class Bash extends CFaerunAction
         categoryTags.add("Mace");
 
 
-        canComboTo.add("faerunutils.unarmed.jab");
-        canComboTo.add("faerunutils.unarmed.straight");
-        canComboTo.add("faerunutils.unarmed.kick");
+        canComboTo.add("faerunaction.unarmed.jab");
+        canComboTo.add("faerunaction.unarmed.straight");
+        canComboTo.add("faerunaction.unarmed.kick");
 
-        canComboTo.add("faerunutils.sword.slash");
-        canComboTo.add("faerunutils.sword.thrust");
+        canComboTo.add("faerunaction.sword.slash");
+        canComboTo.add("faerunaction.sword.thrust");
 
-        canComboTo.add("faerunutils.axe.chop");
-        canComboTo.add("faerunutils.axe.overheadchop");
+        canComboTo.add("faerunaction.axe.chop");
+        canComboTo.add("faerunaction.axe.overheadchop");
 
-        canComboTo.add("faerunutils.dagger.slash");
-        canComboTo.add("faerunutils.dagger.thrust");
+        canComboTo.add("faerunaction.dagger.slash");
+        canComboTo.add("faerunaction.dagger.thrust");
 
-        canComboTo.add("faerunutils.katar.slash");
-        canComboTo.add("faerunutils.katar.thrust");
+        canComboTo.add("faerunaction.katar.slash");
+        canComboTo.add("faerunaction.katar.thrust");
 
-        canComboTo.add("faerunutils.mace.bash");
-        canComboTo.add("faerunutils.mace.overheadbash");
+        canComboTo.add("faerunaction.mace.bash");
+        canComboTo.add("faerunaction.mace.overheadbash");
 
-        canComboTo.add("faerunutils.sickle.stabbingswing");
-        canComboTo.add("faerunutils.sickle.trippingslash");
+        canComboTo.add("faerunaction.sickle.stabbingswing");
+        canComboTo.add("faerunaction.sickle.trippingslash");
 
-        canComboTo.add("faerunutils.shield.bash");
+        canComboTo.add("faerunaction.shield.bash");
     }
 }
