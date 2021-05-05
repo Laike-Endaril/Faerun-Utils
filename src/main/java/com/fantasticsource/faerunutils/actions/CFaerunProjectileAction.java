@@ -53,6 +53,7 @@ public abstract class CFaerunProjectileAction extends CFaerunAction
             Attributes.ARMOR_BYPASS_CHANCE.setBaseAmount(projectile, Attributes.ARMOR_BYPASS_CHANCE.getBaseAmount(source));
             Attributes.VITAL_STRIKE_CHANCE.setBaseAmount(projectile, Attributes.VITAL_STRIKE_CHANCE.getBaseAmount(source));
 
+            Attributes.ELEMENTAL_DAMAGE.setBaseAmount(projectile, Attributes.ELEMENTAL_DAMAGE.getBaseAmount(source));
             Attributes.CHEMICAL_DAMAGE.setBaseAmount(projectile, Attributes.CHEMICAL_DAMAGE.getBaseAmount(source));
             Attributes.ACID_DAMAGE.setBaseAmount(projectile, Attributes.ACID_DAMAGE.getBaseAmount(source));
             Attributes.BIOLOGICAL_DAMAGE.setBaseAmount(projectile, Attributes.BIOLOGICAL_DAMAGE.getBaseAmount(source));

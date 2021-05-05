@@ -119,6 +119,8 @@ attribute.description.faerunutils.knockbackStability=How difficult it is to push
 attribute.name.faerunutils.tripStability=Trip Resistance
 attribute.description.faerunutils.tripStability=How difficult it is to trip you.
 
+attribute.name.faerunutils.elementalDamage=Elemental Damage
+attribute.description.faerunutils.elementalDamage=Increases the damage of your element-based attacks (anything not physical, eg. fire, acid, poison, etc).
 attribute.name.faerunutils.chemicalDamage=Chemical Damage
 attribute.description.faerunutils.chemicalDamage=Increases the damage of your chemical-based attacks (eg. acid).
 attribute.name.faerunutils.acidDamage=Acid Damage
