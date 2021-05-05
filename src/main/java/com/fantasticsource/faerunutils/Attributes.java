@@ -62,7 +62,7 @@ public class Attributes
     HEALTH = new BetterAttribute(MODID + ".health", 0, 0, new Pair<>(CONSTITUTION, 30d)).setMCAttribute(SharedMonsterAttributes.MAX_HEALTH, 1),
             HEALTH_REGEN = new BetterAttribute(MODID + ".healthRegen", 0, 0, new Pair<>(CONSTITUTION, 0.1)),
             STAMINA = new BetterAttribute(MODID + ".stamina", 0, 0, new Pair<>(CONSTITUTION, 10d)),
-            STAMINA_REGEN = new BetterAttribute(MODID + ".staminaRegen", 0, 0, new Pair<>(CONSTITUTION, 0.1)),
+            STAMINA_REGEN = new BetterAttribute(MODID + ".staminaRegen", 0, 0, new Pair<>(CONSTITUTION, 0.5)),
             STABILITY = new BetterAttribute(MODID + ".stability", 0, 0, new Pair<>(CONSTITUTION, 10d)),
             INTERRUPT_STABILITY = new BetterAttribute(MODID + ".interruptStability", STABILITY),
             KNOCKBACK_STABILITY = new BetterAttribute(MODID + ".knockbackStability", STABILITY),
@@ -158,7 +158,7 @@ public class Attributes
     }
 
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void entityJoinWorld(EntityJoinWorldEvent event)
     {
         Entity entity = event.getEntity();
@@ -166,6 +166,9 @@ public class Attributes
 
 
         BetterAttributeMod.removeModsWithNameContaining(entity, "faerunaction", true);
+
+
+        for (BetterAttribute attribute : BetterAttribute.BETTER_ATTRIBUTES.values()) attribute.setBaseAmount(entity, attribute.defaultBaseAmount);
 
 
         HEALTH.getTotalAmount(entity);

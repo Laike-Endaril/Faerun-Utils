@@ -39,6 +39,7 @@ public class Straight extends CFaerunAction
 
 
         canComboTo.add("faerunaction.unarmed.jab");
+        canComboTo.add("faerunaction.unarmed.straight");
         canComboTo.add("faerunaction.unarmed.kick");
 
         canComboTo.add("faerunaction.sword.slash");
