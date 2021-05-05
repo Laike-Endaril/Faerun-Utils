@@ -11,7 +11,7 @@ public class OverheadChop extends CFaerunAction
         super("faerunaction.axe.overheadchop");
 
         useTime = 1;
-        comboUsage = 50;
+        comboUsage = 40;
         staminaCost = 20;
         material = "metal";
 
