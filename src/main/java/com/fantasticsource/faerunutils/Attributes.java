@@ -150,9 +150,14 @@ public class Attributes
         if (damageAttribute == Attributes.HEAT_DAMAGE) return Attributes.HEAT_RESISTANCE;
         if (damageAttribute == Attributes.COLD_DAMAGE) return Attributes.COLD_RESISTANCE;
         if (damageAttribute == Attributes.ELECTRIC_DAMAGE) return Attributes.ELECTRIC_RESISTANCE;
-        if (damageAttribute == Attributes.ACID_DAMAGE) return Attributes.ACID_RESISTANCE;
-        if (damageAttribute == Attributes.POISON_DAMAGE) return Attributes.POISON_RESISTANCE;
+        if (damageAttribute == Attributes.POISON_DAMAGE) return Attributes.ACID_RESISTANCE;
+        if (damageAttribute == Attributes.POISON_RESISTANCE) return Attributes.ACID_RESISTANCE;
         if (damageAttribute == Attributes.HEALING_DAMAGE) return Attributes.HEALING_RESISTANCE;
+        if (damageAttribute == Attributes.PHYSICAL_DAMAGE) return Attributes.DEFENSE;
+        if (damageAttribute == Attributes.THERMAL_DAMAGE) return Attributes.THERMAL_RESISTANCE;
+        if (damageAttribute == Attributes.ENERGY_DAMAGE) return Attributes.ENERGY_RESISTANCE;
+        if (damageAttribute == Attributes.BIOLOGICAL_DAMAGE) return Attributes.BIOLOGICAL_RESISTANCE;
+        if (damageAttribute == Attributes.CHEMICAL_DAMAGE) return Attributes.CHEMICAL_RESISTANCE;
         return null;
     }
 
