@@ -25,7 +25,7 @@ public class Attributes
             BODY_TEMPERATURE = new BetterAttribute(MODID + ".temperature"), //Custom scale, not C, F, K, etc.  Status effects and damage start at +-100.  Base value is comfort temp, current value is...current.
             COVERAGE = new BetterAttribute(MODID + ".coverage"), //Based on how much non-destroyed armor you're wearing.  100% with any full set of unbroken armor
 
-    //All stats are balanced around a starting average of 10 and a max of 100 for each base attribute
+    //All stats are balanced around a starting average of 10 and a max of 20 for each base attribute
     STRENGTH = new BetterAttribute(MODID + ".strength", 10), //Physical strength/force
             DEXTERITY = new BetterAttribute(MODID + ".dexterity", 10), //Physical skill/precision/reflexes
             CONSTITUTION = new BetterAttribute(MODID + ".constitution", 10), //Physical integrity/durability/resistance
@@ -33,13 +33,13 @@ public class Attributes
             MAGICAL_SKILL = new BetterAttribute(MODID + ".magicalSkill", 10), //Magical skill/precision/reflexes
             MAGICAL_CONSTITUTION = new BetterAttribute(MODID + ".magicalConstitution", 10), //Magical integrity/durability/resistance
 
-    THERMAL_RECOVERY = new BetterAttribute(MODID + ".thermalRecovery", 5, 0, new Pair<>(CONSTITUTION, 0.1), new Pair<>(MAGICAL_CONSTITUTION, 0.05)),
+    THERMAL_RECOVERY = new BetterAttribute(MODID + ".thermalRecovery", 0, 0, new Pair<>(CONSTITUTION, 0.25), new Pair<>(MAGICAL_CONSTITUTION, 0.25)),
 
     //Meters (blocks) per second; average human RUNNING speed is ~5, world record would be a little over 10.4, both based on a 200m dash
-    MOVE_SPEED = new BetterAttribute(MODID + ".moveSpeed", 4.4, 0, new Pair<>(STRENGTH, 0.02), new Pair<>(DEXTERITY, 0.02), new Pair<>(CONSTITUTION, 0.02)).setMCAttribute(SharedMonsterAttributes.MOVEMENT_SPEED, 0.01782642796),
+    MOVE_SPEED = new BetterAttribute(MODID + ".moveSpeed", 0, 0, new Pair<>(STRENGTH, 0.17), new Pair<>(DEXTERITY, 0.17), new Pair<>(CONSTITUTION, 0.17)).setMCAttribute(SharedMonsterAttributes.MOVEMENT_SPEED, 0.01782642796),
 
-    //As a multiplier; 1 for basic start, 4 for maxed
-    ATTACK_SPEED = new BetterAttribute(MODID + ".attackSpeed", 100, 0, new Pair<>(STRENGTH, 1d), new Pair<>(DEXTERITY, 2d)),
+    //As a percentage; 100 for basic start, 200 for maxed
+    ATTACK_SPEED = new BetterAttribute(MODID + ".attackSpeed", 0, 0, new Pair<>(STRENGTH, 3.3), new Pair<>(DEXTERITY, 6.7)),
 
     //Interrupt/knockback/trip force should have active modifiers per-attack/skill
     INTERRUPT_FORCE = new BetterAttribute(MODID + ".interruptForce", STRENGTH),
@@ -51,19 +51,19 @@ public class Attributes
             BLUNT_DAMAGE = new BetterAttribute(MODID + ".bluntDamage", PHYSICAL_DAMAGE),
 
     //Many of these will be altered further (often reduced) by modifiers on specific weapons and attacks
-    PROJECTILE_ACCURACY = new BetterAttribute(MODID + ".projectileAccuracy", 50, 0, new Pair<>(DEXTERITY, 0.5)),
-            BLOCK_CHANCE = new BetterAttribute(MODID + ".block", 50, 0, new Pair<>(DEXTERITY, 0.4)),
-            PARRY_CHANCE = new BetterAttribute(MODID + ".parry", 0, 0, new Pair<>(DEXTERITY, 0.1)),
-            DODGE_CHANCE = new BetterAttribute(MODID + ".dodge", 50, 0, new Pair<>(DEXTERITY, 0.4)),
+    PROJECTILE_ACCURACY = new BetterAttribute(MODID + ".projectileAccuracy", 0, 0, new Pair<>(DEXTERITY, 5d)),
+            BLOCK_CHANCE = new BetterAttribute(MODID + ".block", 0, 0, new Pair<>(DEXTERITY, 5d)),
+            PARRY_CHANCE = new BetterAttribute(MODID + ".parry", 0, 0, new Pair<>(DEXTERITY, 2.5)),
+            DODGE_CHANCE = new BetterAttribute(MODID + ".dodge", 0, 0, new Pair<>(DEXTERITY, 5d)),
             FINESSE = new BetterAttribute(MODID + ".finesse", 0, 0, new Pair<>(DEXTERITY, 0.2)),
             ARMOR_BYPASS_CHANCE = new BetterAttribute(MODID + ".armorBypass", DEXTERITY),
-            VITAL_STRIKE_CHANCE = new BetterAttribute(MODID + ".vitalStrike", 5, 0, new Pair<>(DEXTERITY, 0.5)),
+            VITAL_STRIKE_CHANCE = new BetterAttribute(MODID + ".vitalStrike", 0, 0, new Pair<>(DEXTERITY, 0.5)),
 
-    HEALTH = new BetterAttribute(MODID + ".health", 300, 0, new Pair<>(CONSTITUTION, 2d)).setMCAttribute(SharedMonsterAttributes.MAX_HEALTH, 1),
+    HEALTH = new BetterAttribute(MODID + ".health", 0, 0, new Pair<>(CONSTITUTION, 30d)).setMCAttribute(SharedMonsterAttributes.MAX_HEALTH, 1),
             HEALTH_REGEN = new BetterAttribute(MODID + ".healthRegen", 0, 0, new Pair<>(CONSTITUTION, 0.1)),
-            STAMINA = new BetterAttribute(MODID + ".stamina", 100, CONSTITUTION),
-            STAMINA_REGEN = new BetterAttribute(MODID + ".staminaRegen", 5, 0, new Pair<>(CONSTITUTION, 0.1)),
-            STABILITY = new BetterAttribute(MODID + ".stability", 100, CONSTITUTION),
+            STAMINA = new BetterAttribute(MODID + ".stamina", 0, 0, new Pair<>(CONSTITUTION, 10d)),
+            STAMINA_REGEN = new BetterAttribute(MODID + ".staminaRegen", 0, 0, new Pair<>(CONSTITUTION, 0.1)),
+            STABILITY = new BetterAttribute(MODID + ".stability", 0, 0, new Pair<>(CONSTITUTION, 10d)),
             INTERRUPT_STABILITY = new BetterAttribute(MODID + ".interruptStability", STABILITY),
             KNOCKBACK_STABILITY = new BetterAttribute(MODID + ".knockbackStability", STABILITY),
             TRIP_STABILITY = new BetterAttribute(MODID + ".tripStability", STABILITY),
@@ -80,7 +80,7 @@ public class Attributes
             HEAT_DAMAGE = new BetterAttribute(MODID + ".heatDamage", THERMAL_DAMAGE),
             COLD_DAMAGE = new BetterAttribute(MODID + ".coldDamage", THERMAL_DAMAGE),
 
-    CAST_SUCCESS_CHANCE = new BetterAttribute(MODID + ".castSuccess", 50, MAGICAL_SKILL),
+    CAST_SUCCESS_CHANCE = new BetterAttribute(MODID + ".castSuccess", 0, 0, new Pair<>(MAGICAL_SKILL, 5d)),
             DISPEL_CHANCE = new BetterAttribute(MODID + ".dispel", 0, 0, new Pair<>(MAGICAL_SKILL, 0.5)),
 
     MANA = new BetterAttribute(MODID + ".mana", 100, MAGICAL_CONSTITUTION),
