@@ -30,8 +30,8 @@ public class Thrust extends CFaerunAction
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.KNOCKBACK_FORCE, 2, 0));
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.TRIP_FORCE, 2, 0));
 
-        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.FINESSE, 2, 2));
-        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.ARMOR_BYPASS_CHANCE, 2, 2));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.FINESSE, 2, 1.5));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.ARMOR_BYPASS_CHANCE, 2, 1.5));
 
 
         categoryTags.add("1H");
