@@ -21,12 +21,20 @@ public class Cooldown extends CFaerunAction
         useTime = time;
     }
 
+
     @Override
     protected void execute(Entity source, String event)
     {
         super.execute(source, event);
-        if (event.equals("end")) Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getTotalAmount(source));
+        if (event.equals("end") && getClass() == Cooldown.class) Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getTotalAmount(source));
     }
+
+
+    @Override
+    protected void onCompletion()
+    {
+    }
+
 
     @Override
     public Cooldown write(ByteBuf buf)

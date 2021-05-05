@@ -1,6 +1,7 @@
 package com.fantasticsource.faerunutils;
 
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.faerunutils.actions.ComboGracePeriod;
 import com.fantasticsource.faerunutils.actions.Cooldown;
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
 import com.fantasticsource.faerunutils.potions.PotionDeepWounds;
@@ -253,6 +254,13 @@ public class FaerunUtils
         if (!(action instanceof CFaerunAction)) action.queue(livingBase, "Main");
         else if (canUseAction(livingBase, (CFaerunAction) action))
         {
+            ArrayList<CAction> queue = ActionQueue.get(livingBase, "Main").queue;
+            if (queue.size() > 0)
+            {
+                CAction finalAction = queue.get(queue.size() - 1);
+                if (finalAction instanceof ComboGracePeriod) finalAction.active = false;
+            }
+
             ((CFaerunAction) action).itemstackUsed = itemstackUsed;
             action.queue(livingBase, "Main");
             ((CFaerunAction) action).itemstackUsed = null;
@@ -267,10 +275,11 @@ public class FaerunUtils
         if (queue.size() == 0) return true;
 
         CAction currentAction = queue.get(0);
-        if (currentAction instanceof Cooldown) return false;
+        if (currentAction.getClass() == Cooldown.class) return false;
         if (!(currentAction instanceof CFaerunAction)) return true;
 
         CAction finalAction = queue.get(queue.size() - 1);
+        if (finalAction instanceof ComboGracePeriod) return ((ComboGracePeriod) finalAction).previousAction.canComboTo.contains(action.name);
         return ((CFaerunAction) finalAction).canComboTo.contains(action.name);
     }
 

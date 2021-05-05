@@ -152,7 +152,7 @@ public abstract class CFaerunAction extends CAction
             case "end":
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 BetterAttributeMod.removeModsWithNameContaining(source, name, true);
-                if (!(this instanceof Cooldown) && queue.queue.size() == 1) new Cooldown(2).queue(source, queue.name);
+                if (!(this instanceof Cooldown) && queue.queue.size() == 1) new ComboGracePeriod(this, 0.5).queue(source, queue.name);
                 break;
         }
 
