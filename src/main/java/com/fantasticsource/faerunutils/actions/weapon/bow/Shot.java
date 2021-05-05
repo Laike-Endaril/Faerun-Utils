@@ -21,15 +21,21 @@ public class Shot extends CFaerunProjectileAction
 
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_RANGE.name, Double.MAX_VALUE));
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_DURATION.name, Double.MAX_VALUE));
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_COUNT.name, 1d));
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_PROJECTILE_TARGETS.name, 1d));
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_SPEED.name, 5d));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_COUNT.name, 1));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_PROJECTILE_TARGETS.name, 1));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_SPEED.name, 5));
 
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PIERCE_DAMAGE.name, 10d));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.SLASH_DAMAGE, 2, 0));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.PIERCE_DAMAGE, 2, 1));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.BLUNT_DAMAGE, 2, 0));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.ELEMENTAL_DAMAGE, 2, 0));
 
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.INTERRUPT_FORCE.name, 10d));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.INTERRUPT_FORCE, 2, 0.1));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.KNOCKBACK_FORCE, 2, 0));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.TRIP_FORCE, 2, 0));
 
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.ARMOR_BYPASS_CHANCE.name, 5d));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.FINESSE, 2, 2));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.ARMOR_BYPASS_CHANCE, 2, 0.75));
 
 
         categoryTags.add("2H");
