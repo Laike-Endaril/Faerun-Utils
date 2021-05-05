@@ -11,7 +11,7 @@ public class Jab extends CFaerunAction
         super("faerunaction.unarmed.jab");
 
         useTime = 0.15;
-        comboUsage = 15;
+        comboUsage = 20;
         staminaCost = 3;
         material = "flesh";
 
