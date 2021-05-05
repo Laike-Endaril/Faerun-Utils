@@ -55,7 +55,7 @@ public class Attributes
             BLOCK_CHANCE = new BetterAttribute(MODID + ".block", 0, 0, new Pair<>(DEXTERITY, 5d)),
             PARRY_CHANCE = new BetterAttribute(MODID + ".parry", 0, 0, new Pair<>(DEXTERITY, 2.5)),
             DODGE_CHANCE = new BetterAttribute(MODID + ".dodge", 0, 0, new Pair<>(DEXTERITY, 5d)),
-            FINESSE = new BetterAttribute(MODID + ".finesse", 0, 0, new Pair<>(DEXTERITY, 0.2)),
+            FINESSE = new BetterAttribute(MODID + ".finesse", DEXTERITY),
             ARMOR_BYPASS_CHANCE = new BetterAttribute(MODID + ".armorBypass", DEXTERITY),
             VITAL_STRIKE_CHANCE = new BetterAttribute(MODID + ".vitalStrike", 0, 0, new Pair<>(DEXTERITY, 0.5)),
 
