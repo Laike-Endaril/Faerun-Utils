@@ -29,6 +29,32 @@ public class TooltipAlterer
         ItemStack stack = event.getItemStack();
         List<String> tooltip = event.getToolTip();
 
+        //Alterations
+
+        for (int i = 0; i < tooltip.size(); i++)
+        {
+            String line = tooltip.get(i);
+
+            String oldValueString = line.replaceAll(".*" + TextFormatting.YELLOW + "Value: " + "([0-9]+).*", "$1");
+            if (!oldValueString.equals("") && oldValueString.replaceAll("[0-9]", "").equals(""))
+            {
+                int c = Integer.parseInt(oldValueString);
+
+                int g = c / 10000;
+                c -= g * 10000;
+
+                int s = c / 100;
+                c -= s * 100;
+
+                String newValueString = (g > 0 ? TextFormatting.GOLD + "" + g + "g " : "") + (s > 0 ? TextFormatting.DARK_GRAY + "" + s + "s " : "") + (c > 0 || (s == 0 && g == 0) ? TextFormatting.RED + "" + c + "c" : "");
+
+                tooltip.set(i, line.replaceAll(TextFormatting.YELLOW + "Value: " + oldValueString, "Value: " + newValueString));
+            }
+        }
+
+
+        //Additions
+
         //Find first empty line
         int i = 0;
         while (i < tooltip.size() && !"".equals(tooltip.get(i))) i++;
