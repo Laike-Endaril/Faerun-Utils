@@ -25,6 +25,7 @@ public class Shot extends CFaerunProjectileAction
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_PROJECTILE_TARGETS.name, 1));
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.PROJECTILE_SPEED.name, 5));
 
+        //Using explicit mod amounts for damage tooltips, even if it's a 1x
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.SLASH_DAMAGE, 2, 0));
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.PIERCE_DAMAGE, 2, 1));
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.BLUNT_DAMAGE, 2, 0));
