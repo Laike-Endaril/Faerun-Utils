@@ -62,7 +62,6 @@ public class FaerunUtils
         Attributes.init();
         MinecraftForge.EVENT_BUS.register(FaerunUtils.class);
         MinecraftForge.EVENT_BUS.register(BlocksAndItems.class);
-        MinecraftForge.EVENT_BUS.register(ProfessionsAndInteractions.class);
         MinecraftForge.EVENT_BUS.register(InteractionInsure.class);
         MinecraftForge.EVENT_BUS.register(ServerChatAlterer.class);
         MinecraftForge.EVENT_BUS.register(PotionDefinitions.class);

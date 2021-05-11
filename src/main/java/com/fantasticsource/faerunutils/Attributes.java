@@ -267,7 +267,7 @@ public class Attributes
         STAMINA.setCurrentAmount(livingBase, Tools.max(0, STAMINA.getCurrentAmount(livingBase) - 5));
 
 
-        livingBase.motionY *= MOVE_SPEED.getTotalAmount(livingBase) / MOVE_SPEED.defaultBaseAmount;
+        livingBase.motionY *= MOVE_SPEED.getTotalAmount(livingBase) / 5.1;
 
         if (livingBase.isSprinting())
         {
