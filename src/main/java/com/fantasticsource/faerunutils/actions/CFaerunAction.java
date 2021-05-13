@@ -449,11 +449,7 @@ public abstract class CFaerunAction extends CAction
         if (this instanceof Cooldown) return;
 
         String blockMat = getBlockMaterial(blockingItemstack);
-        if (material.equals("flesh") && !blockMat.equals("flesh"))
-        {
-            playHitSound(true);
-            //TODO damage self instead of enemy
-        }
+        if (material.equals("flesh") && !blockMat.equals("flesh")) playHitSound(true);
         else MCTools.playSimpleSoundForAll(new ResourceLocation((isHeavy(blockingItemstack) ? "heavy" : "light") + blockMat + "block" + (categoryTags.contains("Heavy") ? "heavy" : "light") + material), source, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
     }
 
