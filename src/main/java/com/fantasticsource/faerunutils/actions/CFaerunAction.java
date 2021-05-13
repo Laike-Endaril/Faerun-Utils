@@ -274,12 +274,14 @@ public abstract class CFaerunAction extends CAction
 
         //Deal damage
         ItemStack armorToDamage = armorCoverage.getRandom();
+        double totalDamage = 0;
         for (BetterAttribute damageAttribute : BetterAttribute.BETTER_ATTRIBUTES.values())
         {
             BetterAttribute defenseAttribute = Attributes.getDefenseAttribute(damageAttribute);
             if (defenseAttribute == null) continue;
 
             double amount = damageAttribute.getTotalAmount(source);
+            totalDamage += amount;
             if (amount <= 0) continue;
 
             double prevented = defenseAttribute.getTotalAmount(entity);
@@ -291,9 +293,7 @@ public abstract class CFaerunAction extends CAction
                 NBTTagCompound compound = MCTools.getSubCompoundIfExists(armorToDamage.getTagCompound(), MODID);
                 if (compound != null) armorDamage -= compound.getDouble("armor." + damageAttribute.name + ".reduction");
                 if (armorDamage > 0) armorToDamage.damageItem((int) armorDamage, (EntityLivingBase) entity);
-                playHitSound(true);
             }
-            else playHitSound(false);
 
             //Vital strike
             amount -= prevented;
@@ -329,6 +329,8 @@ public abstract class CFaerunAction extends CAction
                 ReflectionTool.set(ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD, entity, 0);
             }
         }
+
+        if (totalDamage > 0) playHitSound();
 
         //Remove active armor mods
         BetterAttributeMod.removeMods(entity, activeArmorMods.toArray(new BetterAttributeMod[0]));
@@ -449,7 +451,7 @@ public abstract class CFaerunAction extends CAction
         if (this instanceof Cooldown) return;
 
         String blockMat = getBlockMaterial(blockingItemstack);
-        if (material.equals("flesh") && !blockMat.equals("flesh")) playHitSound(true);
+        if (material.equals("flesh") && !blockMat.equals("flesh")) playHitSound();
         else MCTools.playSimpleSoundForAll(new ResourceLocation((isHeavy(blockingItemstack) ? "heavy" : "light") + blockMat + "block" + (categoryTags.contains("Heavy") ? "heavy" : "light") + material), source, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
     }
 
@@ -469,7 +471,7 @@ public abstract class CFaerunAction extends CAction
         }
     }
 
-    public void playHitSound(boolean hitArmor)
+    public void playHitSound()
     {
         if (this instanceof Cooldown) return;
 
@@ -477,8 +479,6 @@ public abstract class CFaerunAction extends CAction
         double pierce = Attributes.PIERCE_DAMAGE.getTotalAmount(source);
         double blunt = Attributes.BLUNT_DAMAGE.getTotalAmount(source);
         String soundName = slash >= pierce && slash >= blunt ? "slash" : pierce >= blunt ? "pierce" : "bash";
-
-        soundName += hitArmor ? "armor" : "body";
 
         float pitch = 1;
         if (categoryTags.contains("Heavy")) pitch -= .4f;

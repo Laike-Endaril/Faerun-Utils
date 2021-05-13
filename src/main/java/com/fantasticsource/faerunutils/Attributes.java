@@ -50,7 +50,7 @@ public class Attributes
             PIERCE_DAMAGE = new BetterAttribute(MODID + ".pierceDamage", PHYSICAL_DAMAGE),
             BLUNT_DAMAGE = new BetterAttribute(MODID + ".bluntDamage", PHYSICAL_DAMAGE),
 
-    //Many of these will be altered further (often reduced) by modifiers on specific weapons and attacks
+    //Many of these will be altered further by modifiers on specific weapons and attacks
     PROJECTILE_ACCURACY = new BetterAttribute(MODID + ".projectileAccuracy", 0, 0, new Pair<>(DEXTERITY, 5d)),
             BLOCK_CHANCE = new BetterAttribute(MODID + ".block", 0, 0, new Pair<>(DEXTERITY, 5d)),
             PARRY_CHANCE = new BetterAttribute(MODID + ".parry", 0, 0, new Pair<>(DEXTERITY, 2.5)),
