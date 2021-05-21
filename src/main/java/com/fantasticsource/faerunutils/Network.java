@@ -314,7 +314,7 @@ public class Network
                         break;
 
                     case "kick":
-                        FaerunUtils.tryUseAction(player, CAction.ALL_ACTIONS.get("faerunaction.unarmed.kick"), ItemStack.EMPTY);
+                        FaerunUtils.tryUseAction(player, CAction.ALL_ACTIONS.get("faerunaction.unarmed.kick"), ItemStack.EMPTY, true);
                         break;
 
                     case "comboCancel":

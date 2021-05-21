@@ -49,7 +49,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.ArrayList;
 
-@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zzzu,);required-after:fantasticaw@[1.12.2.000,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzq,);required-after:tiamatinventory@[1.12.2.000zzc,);required-after:tiamatinteractions@[1.12.2.000d,);required-after:tiamatactions@[1.12.2.000zzzf,);required-after:dynamicstealth@[1.12.2.113e,)")
+@Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zzzzb,);required-after:fantasticaw@[1.12.2.000b,);required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzq,);required-after:tiamatinventory@[1.12.2.000zzc,);required-after:tiamatinteractions@[1.12.2.000d,);required-after:tiamatactions@[1.12.2.000zzzf,);required-after:dynamicstealth@[1.12.2.113e,)")
 public class FaerunUtils
 {
     public static final String MODID = "faerunutils";
@@ -245,10 +245,10 @@ public class FaerunUtils
         }
         if (actionName == null || actionName.equals("")) actionName = mainhand ? "faerunaction.unarmed.straight" : "faerunaction.unarmed.jab";
 
-        tryUseAction(livingBase, CAction.ALL_ACTIONS.get(actionName), stack);
+        tryUseAction(livingBase, CAction.ALL_ACTIONS.get(actionName), stack, mainhand);
     }
 
-    public static void tryUseAction(EntityLivingBase livingBase, CAction action, ItemStack itemstackUsed)
+    public static void tryUseAction(EntityLivingBase livingBase, CAction action, ItemStack itemstackUsed, boolean mainhand)
     {
         if (!(action instanceof CFaerunAction)) action.queue(livingBase, "Main");
         else if (canUseAction(livingBase, (CFaerunAction) action))
@@ -261,8 +261,8 @@ public class FaerunUtils
             }
 
             ((CFaerunAction) action).itemstackUsed = itemstackUsed;
+            ((CFaerunAction) action).mainhand = mainhand;
             action.queue(livingBase, "Main");
-            ((CFaerunAction) action).itemstackUsed = null;
         }
     }
 

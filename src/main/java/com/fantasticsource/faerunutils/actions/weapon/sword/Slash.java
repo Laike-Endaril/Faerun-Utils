@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.sword;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.faerunutils.animations.Swing1H;
 import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class Slash extends CFaerunAction
@@ -9,6 +10,7 @@ public class Slash extends CFaerunAction
     public Slash()
     {
         super("faerunaction.sword.slash");
+        animation = Swing1H.INSTANCE.copy();
 
         useTime = 0.5;
         comboUsage = 30;

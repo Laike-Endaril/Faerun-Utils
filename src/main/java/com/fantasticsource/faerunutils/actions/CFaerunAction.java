@@ -18,6 +18,7 @@ import com.fantasticsource.faerunutils.actions.weapon.sword.Thrust;
 import com.fantasticsource.faerunutils.actions.weapon.unarmed.Jab;
 import com.fantasticsource.faerunutils.actions.weapon.unarmed.Kick;
 import com.fantasticsource.faerunutils.actions.weapon.unarmed.Straight;
+import com.fantasticsource.faerunutils.animations.CFaerunAnimation;
 import com.fantasticsource.mctools.EntityFilters;
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
@@ -52,12 +53,13 @@ public abstract class CFaerunAction extends CAction
 {
     public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
 
-    public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0;
+    public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0, progressPerSecond = 1, progressPerTick = 0.05;
     public ArrayList<BetterAttributeMod> attributeMods = new ArrayList<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
     public ItemStack itemstackUsed = null;
-    public boolean playedSwishSound = false;
+    public boolean mainhand = true, playedSwishSound = false;
     public String material;
+    public CFaerunAnimation animation = null;
 
     public CFaerunAction()
     {
@@ -126,21 +128,27 @@ public abstract class CFaerunAction extends CAction
                 for (CNode endNode : initEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
                 break;
 
+
             case "start":
                 if (hpCost > 0) Attributes.HEALTH.setCurrentAmount(source, Attributes.HEALTH.getCurrentAmount(source) - hpCost);
                 if (mpCost > 0) Attributes.MANA.setCurrentAmount(source, Attributes.MANA.getCurrentAmount(source) - mpCost);
                 if (staminaCost > 0) Attributes.STAMINA.setCurrentAmount(source, Attributes.STAMINA.getCurrentAmount(source) - staminaCost);
+
                 BetterAttributeMod.addMods(source, attributeMods.toArray(new BetterAttributeMod[0]));
+
+                progressPerSecond = Attributes.ATTACK_SPEED.getTotalAmount(source) * 0.01;
+                progressPerTick = progressPerSecond * 0.05;
+                if (animation != null) animation.start(source, mainhand);
+
                 for (CNode endNode : startEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
                 break;
 
+
             case "tick":
                 for (CNode endNode : tickEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
-                double tempo = Attributes.ATTACK_SPEED.getTotalAmount(source) * 0.01;
-                double tickProgress = tempo * 0.05;
-                timer += tickProgress;
+                timer += progressPerTick;
 
-                if (!playedSwishSound && (useTime - timer) / tempo <= 0.15) playSwishSound();
+                if (!playedSwishSound && (useTime - timer) / progressPerSecond <= 0.15) playSwishSound();
 
                 if (timer >= useTime)
                 {
@@ -148,6 +156,7 @@ public abstract class CFaerunAction extends CAction
                     active = false;
                 }
                 break;
+
 
             case "end":
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
