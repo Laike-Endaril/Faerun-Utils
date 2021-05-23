@@ -5,7 +5,7 @@ import net.minecraft.entity.Entity;
 
 public abstract class CFaerunAnimation extends CBipedAnimation
 {
-    public abstract void start(Entity entity, boolean right);
+    public abstract CFaerunAnimation start(Entity entity, boolean mainhand);
 
     @Override
     public CFaerunAnimation copy()

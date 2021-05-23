@@ -1,5 +1,6 @@
 package com.fantasticsource.faerunutils.animations;
 
+import com.fantasticsource.mctools.animation.CBipedAnimation;
 import com.fantasticsource.tools.component.path.CPathConstant;
 import com.fantasticsource.tools.component.path.CPathSinuous;
 import com.fantasticsource.tools.datastructures.VectorN;
@@ -7,17 +8,15 @@ import net.minecraft.entity.Entity;
 
 public class Swing1H extends CFaerunAnimation
 {
-    public static final Swing1H INSTANCE = new Swing1H();
-
     public Swing1H()
     {
         duration = 500;
     }
 
     @Override
-    public void start(Entity entity, boolean right)
+    public Swing1H start(Entity entity, boolean mainhand)
     {
-        if (right)
+        if (mainhand)
         {
             rightArm.zRotPath.path = new CPathConstant(new VectorN(Math.PI * 0.25));
             rightArm.yRotPath.path = new CPathConstant(new VectorN(Math.PI));
@@ -39,5 +38,10 @@ public class Swing1H extends CFaerunAnimation
                             .mult(new CPathConstant(new VectorN(Math.PI)))
             );
         }
+
+        setAllStartTimes(System.currentTimeMillis());
+        CBipedAnimation.addAnimation(entity, this);
+
+        return this;
     }
 }

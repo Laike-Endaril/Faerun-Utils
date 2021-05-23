@@ -22,6 +22,7 @@ import com.fantasticsource.faerunutils.animations.CFaerunAnimation;
 import com.fantasticsource.mctools.EntityFilters;
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.animation.CBipedAnimation;
 import com.fantasticsource.mctools.betterattributes.BetterAttribute;
 import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 import com.fantasticsource.tiamatactions.action.CAction;
@@ -59,7 +60,7 @@ public abstract class CFaerunAction extends CAction
     public ItemStack itemstackUsed = null;
     public boolean mainhand = true, playedSwishSound = false;
     public String material;
-    public CFaerunAnimation animation = null;
+    protected CFaerunAnimation animation = null;
 
     public CFaerunAction()
     {
@@ -138,7 +139,7 @@ public abstract class CFaerunAction extends CAction
 
                 progressPerSecond = Attributes.ATTACK_SPEED.getTotalAmount(source) * 0.01;
                 progressPerTick = progressPerSecond * 0.05;
-                if (animation != null) animation.start(source, mainhand);
+                playAnimation();
 
                 for (CNode endNode : startEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
                 break;
@@ -161,12 +162,18 @@ public abstract class CFaerunAction extends CAction
             case "end":
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 BetterAttributeMod.removeModsWithNameContaining(source, name, true);
+                if (animation != null) CBipedAnimation.removeAnimation(source, animation);
+
                 if (!(this instanceof Cooldown) && queue.queue.size() == 1) new ComboGracePeriod(this, 0.5).queue(source, queue.name);
                 break;
         }
 
         if (profile) profiler.endSection();
         if (profile) profiler.endSection();
+    }
+
+    protected void playAnimation()
+    {
     }
 
     protected void onCompletion()

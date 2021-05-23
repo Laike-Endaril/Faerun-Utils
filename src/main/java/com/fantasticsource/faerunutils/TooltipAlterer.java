@@ -201,7 +201,6 @@ public class TooltipAlterer
             }
             else if (mod.operation == 2)
             {
-                System.out.println(mod);
                 if (mod.amount <= 0) mods.remove(mod);
             }
         }

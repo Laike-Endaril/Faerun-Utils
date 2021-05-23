@@ -10,7 +10,6 @@ public class Slash extends CFaerunAction
     public Slash()
     {
         super("faerunaction.sword.slash");
-        animation = Swing1H.INSTANCE.copy();
 
         useTime = 0.5;
         comboUsage = 30;
@@ -64,5 +63,13 @@ public class Slash extends CFaerunAction
         canComboTo.add("faerunaction.sickle.trippingslash");
 
         canComboTo.add("faerunaction.shield.bash");
+    }
+
+    @Override
+    protected void playAnimation()
+    {
+        animation = new Swing1H();
+        animation.setAllRates(progressPerSecond);
+        animation.start(source, mainhand);
     }
 }
