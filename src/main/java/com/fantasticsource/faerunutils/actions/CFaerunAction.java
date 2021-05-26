@@ -162,12 +162,12 @@ public abstract class CFaerunAction extends CAction
 
 
             case "end":
-                System.out.println(TextFormatting.AQUA + "END");
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 BetterAttributeMod.removeModsWithNameContaining(source, name, true);
                 if (animation != null) CBipedAnimation.removeAnimation(source, animation);
 
                 if (!(this instanceof Cooldown) && queue.queue.size() == 1) new ComboGracePeriod(this, 0.5).queue(source, queue.name);
+                if (!MCTools.entityIsValid(source)) USED_COMBO_ANIMATIONS.remove(source);
                 break;
         }
 
