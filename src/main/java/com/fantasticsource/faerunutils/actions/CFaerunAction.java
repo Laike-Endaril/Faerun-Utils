@@ -52,6 +52,7 @@ import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public abstract class CFaerunAction extends CAction
 {
+    public static final HashMap<Entity, ArrayList<Class<? extends CFaerunAnimation>>> USED_COMBO_ANIMATIONS = new HashMap<>();
     public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
 
     public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0, progressPerSecond = 1, progressPerTick = 0.05;
@@ -60,6 +61,7 @@ public abstract class CFaerunAction extends CAction
     public ItemStack itemstackUsed = null;
     public boolean mainhand = true, playedSwishSound = false;
     public String material;
+    public Class<? extends CFaerunAnimation>[] animationsToUse = new Class[0];
     protected CFaerunAnimation animation = null;
 
     public CFaerunAction()
@@ -160,6 +162,7 @@ public abstract class CFaerunAction extends CAction
 
 
             case "end":
+                System.out.println(TextFormatting.AQUA + "END");
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 BetterAttributeMod.removeModsWithNameContaining(source, name, true);
                 if (animation != null) CBipedAnimation.removeAnimation(source, animation);
@@ -174,6 +177,32 @@ public abstract class CFaerunAction extends CAction
 
     protected void playAnimation()
     {
+        if (animationsToUse.length == 0) return;
+
+
+        Class<? extends CFaerunAnimation> animationToUse = animationsToUse[0];
+
+        ArrayList<Class<? extends CFaerunAnimation>> previousAnimations = USED_COMBO_ANIMATIONS.get(source);
+        if (previousAnimations != null)
+        {
+            Class<? extends CFaerunAnimation> previousAnimation = previousAnimations.get(previousAnimations.size() - 1);
+            int index = Tools.indexOf(animationsToUse, previousAnimation) + 1;
+            if (index >= animationsToUse.length) index = 0;
+            animationToUse = animationsToUse[index];
+        }
+
+
+        try
+        {
+            animation = animationToUse.newInstance();
+        }
+        catch (InstantiationException | IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+        animation.setAllRates(progressPerSecond);
+        animation.start(source, mainhand);
+        USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(animationToUse);
     }
 
     protected void onCompletion()

@@ -26,7 +26,11 @@ public class Cooldown extends CFaerunAction
     protected void execute(Entity source, String event)
     {
         super.execute(source, event);
-        if (event.equals("end") && getClass() == Cooldown.class) Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getTotalAmount(source));
+        if (event.equals("end") && getClass() == Cooldown.class)
+        {
+            Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getTotalAmount(source));
+            USED_COMBO_ANIMATIONS.remove(source);
+        }
     }
 
 
