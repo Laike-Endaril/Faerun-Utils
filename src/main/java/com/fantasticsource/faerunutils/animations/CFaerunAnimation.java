@@ -5,6 +5,11 @@ import net.minecraft.entity.Entity;
 
 public abstract class CFaerunAnimation extends CBipedAnimation
 {
+    public CFaerunAnimation()
+    {
+        bodyFacesLookDirection = true;
+    }
+
     public abstract CFaerunAnimation start(Entity entity, boolean mainhand);
 
     @Override
