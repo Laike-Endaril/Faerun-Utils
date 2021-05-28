@@ -52,7 +52,7 @@ import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public abstract class CFaerunAction extends CAction
 {
-    public static final HashMap<Entity, ArrayList<Class<? extends CFaerunAnimation>>> USED_COMBO_ANIMATIONS = new HashMap<>();
+    public static final HashMap<Entity, ArrayList<CFaerunAnimation>> USED_COMBO_ANIMATIONS = new HashMap<>();
     public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
 
     public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0, progressPerSecond = 1, progressPerTick = 0.05;
@@ -141,6 +141,14 @@ public abstract class CFaerunAction extends CAction
 
                 progressPerSecond = Attributes.ATTACK_SPEED.getTotalAmount(source) * 0.01;
                 progressPerTick = progressPerSecond * 0.05;
+                if (getClass() != ComboGracePeriod.class)
+                {
+                    ArrayList<CFaerunAnimation> animations = USED_COMBO_ANIMATIONS.get(source);
+                    if (animations != null)
+                    {
+                        for (CFaerunAnimation animation : animations) CBipedAnimation.removeAnimation(source, animation);
+                    }
+                }
                 playAnimation();
 
                 for (CNode endNode : startEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
@@ -164,10 +172,10 @@ public abstract class CFaerunAction extends CAction
             case "end":
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 BetterAttributeMod.removeModsWithNameContaining(source, name, true);
-                if (animation != null) CBipedAnimation.removeAnimation(source, animation);
+                if (animation != null) animation.pauseAll(source);
 
                 if (!(this instanceof Cooldown) && queue.queue.size() == 1) new ComboGracePeriod(this, 0.5).queue(source, queue.name);
-                if (!MCTools.entityIsValid(source)) USED_COMBO_ANIMATIONS.remove(source);
+                if (!MCTools.entityIsValid(source)) USED_COMBO_ANIMATIONS.remove(source); //Remove data if the action ended due to the entity becoming invalid
                 break;
         }
 
@@ -182,11 +190,11 @@ public abstract class CFaerunAction extends CAction
 
         Class<? extends CFaerunAnimation> animationToUse = animationsToUse[0];
 
-        ArrayList<Class<? extends CFaerunAnimation>> previousAnimations = USED_COMBO_ANIMATIONS.get(source);
+        ArrayList<CFaerunAnimation> previousAnimations = USED_COMBO_ANIMATIONS.get(source);
         if (previousAnimations != null)
         {
-            Class<? extends CFaerunAnimation> previousAnimation = previousAnimations.get(previousAnimations.size() - 1);
-            int index = Tools.indexOf(animationsToUse, previousAnimation) + 1;
+            CFaerunAnimation previousAnimation = previousAnimations.get(previousAnimations.size() - 1);
+            int index = Tools.indexOf(animationsToUse, previousAnimation.getClass()) + 1;
             if (index >= animationsToUse.length) index = 0;
             animationToUse = animationsToUse[index];
         }
@@ -202,7 +210,7 @@ public abstract class CFaerunAction extends CAction
         }
         animation.setAllRates(progressPerSecond);
         animation.start(source, mainhand);
-        USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(animationToUse);
+        USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(animation);
     }
 
     protected void onCompletion()

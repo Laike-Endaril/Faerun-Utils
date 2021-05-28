@@ -1,12 +1,15 @@
 package com.fantasticsource.faerunutils.actions;
 
 import com.fantasticsource.faerunutils.Attributes;
+import com.fantasticsource.faerunutils.animations.CFaerunAnimation;
+import com.fantasticsource.mctools.animation.CBipedAnimation;
 import com.fantasticsource.tools.component.CDouble;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 public class Cooldown extends CFaerunAction
 {
@@ -26,10 +29,24 @@ public class Cooldown extends CFaerunAction
     protected void execute(Entity source, String event)
     {
         super.execute(source, event);
-        if (event.equals("end") && getClass() == Cooldown.class)
+        if (getClass() == Cooldown.class)
         {
-            Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getTotalAmount(source));
-            USED_COMBO_ANIMATIONS.remove(source);
+            if (event.equals("start"))
+            {
+                ArrayList<CFaerunAnimation> animations = USED_COMBO_ANIMATIONS.get(source);
+                if (animations != null)
+                {
+                    for (CBipedAnimation animation : animations)
+                    {
+                        CBipedAnimation.removeAnimation(source, animation);
+                    }
+                }
+            }
+            else if (event.equals("end"))
+            {
+                Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getTotalAmount(source));
+                USED_COMBO_ANIMATIONS.remove(source);
+            }
         }
     }
 
