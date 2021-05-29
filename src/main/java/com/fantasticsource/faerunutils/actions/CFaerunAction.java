@@ -172,7 +172,6 @@ public abstract class CFaerunAction extends CAction
             case "end":
                 for (CNode endNode : endEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results, true);
                 BetterAttributeMod.removeModsWithNameContaining(source, name, true);
-                if (animation != null) animation.pauseAll(source);
 
                 if (!(this instanceof Cooldown) && queue.queue.size() == 1) new ComboGracePeriod(this, 0.5).queue(source, queue.name);
                 if (!MCTools.entityIsValid(source)) USED_COMBO_ANIMATIONS.remove(source); //Remove data if the action ended due to the entity becoming invalid
