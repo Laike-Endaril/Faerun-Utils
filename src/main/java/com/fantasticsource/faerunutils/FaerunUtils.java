@@ -260,9 +260,11 @@ public class FaerunUtils
                 if (finalAction instanceof ComboGracePeriod) finalAction.active = false;
             }
 
-            ((CFaerunAction) action).itemstackUsed = itemstackUsed;
-            ((CFaerunAction) action).mainhand = mainhand;
             action.queue(livingBase, "Main");
+            ArrayList<CAction> actions = ActionQueue.get(livingBase, "Main").queue;
+            CFaerunAction queuedAction = (CFaerunAction) actions.get(actions.size() - 1);
+            queuedAction.itemstackUsed = itemstackUsed;
+            queuedAction.mainhand = mainhand;
         }
     }
 
