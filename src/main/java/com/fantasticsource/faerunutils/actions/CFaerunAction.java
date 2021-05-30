@@ -34,6 +34,7 @@ import com.fantasticsource.tiamatactions.node.CNodeComment;
 import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.DecimalWeightedPool;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -54,7 +55,7 @@ import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public abstract class CFaerunAction extends CAction
 {
-    public static final HashMap<Entity, ArrayList<CFaerunAnimation>> USED_COMBO_ANIMATIONS = new HashMap<>();
+    public static final HashMap<Entity, ArrayList<Pair<Boolean, CFaerunAnimation>>> USED_COMBO_ANIMATIONS = new HashMap<>();
     public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
 
     public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0, progressPerSecond = 1, progressPerTick = 0.05;
@@ -145,10 +146,10 @@ public abstract class CFaerunAction extends CAction
                 progressPerTick = progressPerSecond * 0.05;
                 if (getClass() != ComboGracePeriod.class)
                 {
-                    ArrayList<CFaerunAnimation> animations = USED_COMBO_ANIMATIONS.get(source);
+                    ArrayList<Pair<Boolean, CFaerunAnimation>> animations = USED_COMBO_ANIMATIONS.get(source);
                     if (animations != null)
                     {
-                        for (CFaerunAnimation animation : animations) CBipedAnimation.removeAnimation(source, animation);
+                        for (Pair<Boolean, CFaerunAnimation> animation : animations) CBipedAnimation.removeAnimation(source, animation.getValue());
                     }
                 }
                 playAnimation();
@@ -192,12 +193,12 @@ public abstract class CFaerunAction extends CAction
 
         Class<? extends CFaerunAnimation> animationToUse = animationsToUse[0];
 
-        ArrayList<CFaerunAnimation> previousAnimations = USED_COMBO_ANIMATIONS.get(source);
+        ArrayList<Pair<Boolean, CFaerunAnimation>> previousAnimations = USED_COMBO_ANIMATIONS.get(source);
         if (previousAnimations != null)
         {
-            CFaerunAnimation previousAnimation = previousAnimations.get(previousAnimations.size() - 1);
-            int index = Tools.indexOf(animationsToUse, previousAnimation.getClass()) + 1;
-            if (index >= animationsToUse.length) index = 0;
+            Pair<Boolean, CFaerunAnimation> previousAnimation = previousAnimations.get(previousAnimations.size() - 1);
+            int index = Tools.indexOf(animationsToUse, previousAnimation.getValue().getClass()) + 1;
+            if (previousAnimation.getKey() != mainhand || index >= animationsToUse.length) index = 0;
             animationToUse = animationsToUse[index];
         }
 
@@ -212,7 +213,7 @@ public abstract class CFaerunAction extends CAction
         }
         animation.setAllRates(progressPerSecond);
         animation.start(source, mainhand);
-        USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(animation);
+        USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(new Pair<>(mainhand, animation));
     }
 
     protected void onCompletion()
