@@ -270,6 +270,9 @@ public class FaerunUtils
 
     public static boolean canUseAction(Entity entity, CFaerunAction action)
     {
+        if (Attributes.HEALTH.getCurrentAmount(entity) - action.hpCost < 0) return false;
+        if (Attributes.MANA.getCurrentAmount(entity) - action.mpCost < 0) return false;
+        if (Attributes.STAMINA.getCurrentAmount(entity) - action.staminaCost < 0) return false;
         if (Attributes.COMBO.getCurrentAmount(entity) - action.comboUsage < 0) return false;
 
         ArrayList<CAction> queue = ActionQueue.get(entity, "Main").queue;

@@ -55,6 +55,7 @@ import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
 public abstract class CFaerunAction extends CAction
 {
+    public static final double DODGE_COST = 5;
     public static final HashMap<Entity, ArrayList<Pair<Boolean, CFaerunAnimation>>> USED_COMBO_ANIMATIONS = new HashMap<>();
     public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
 
@@ -136,9 +137,27 @@ public abstract class CFaerunAction extends CAction
 
 
             case "start":
-                if (hpCost > 0) Attributes.HEALTH.setCurrentAmount(source, Attributes.HEALTH.getCurrentAmount(source) - hpCost);
-                if (mpCost > 0) Attributes.MANA.setCurrentAmount(source, Attributes.MANA.getCurrentAmount(source) - mpCost);
-                if (staminaCost > 0) Attributes.STAMINA.setCurrentAmount(source, Attributes.STAMINA.getCurrentAmount(source) - staminaCost);
+                if (Attributes.HEALTH.getCurrentAmount(source) - hpCost < 0 || Attributes.MANA.getCurrentAmount(source) - mpCost < 0 || Attributes.STAMINA.getCurrentAmount(source) - staminaCost < 0)
+                {
+                    if (comboUsage > 0) Attributes.COMBO.setCurrentAmount(source, Attributes.COMBO.getCurrentAmount(source) + comboUsage); //Refund combo usage
+                    if (!(this instanceof Cooldown) && queue.queue.size() == 1) new ComboGracePeriod(this, 0.5).queue(source, queue.name);
+                    active = false;
+                    return;
+                }
+
+
+                if (hpCost > 0)
+                {
+                    Attributes.HEALTH.setCurrentAmount(source, Attributes.HEALTH.getCurrentAmount(source) - hpCost);
+                }
+                if (mpCost > 0)
+                {
+                    Attributes.MANA.setCurrentAmount(source, Attributes.MANA.getCurrentAmount(source) - mpCost);
+                }
+                if (staminaCost > 0)
+                {
+                    Attributes.STAMINA.setCurrentAmount(source, Attributes.STAMINA.getCurrentAmount(source) - staminaCost);
+                }
 
                 BetterAttributeMod.addMods(source, attributeMods.toArray(new BetterAttributeMod[0]));
 
@@ -243,48 +262,65 @@ public abstract class CFaerunAction extends CAction
         {
             if (Sight.canSee((EntityLivingBase) entity, source, true))
             {
-                chance = Attributes.BLOCK_CHANCE.getTotalAmount(entity) / 100d;
-                if (thrust) chance *= 0.75;
-                if (FaerunUtils.canBlock(entity) && Math.random() < chance)
+                double stamina = Attributes.STAMINA.getCurrentAmount(entity);
+                double blockCost = Attributes.BLUNT_DAMAGE.getTotalAmount(source) * 0.25 + Attributes.SLASH_DAMAGE.getTotalAmount(source) * 0.15 + Attributes.PIERCE_DAMAGE.getTotalAmount(source) * 0.1;
+                if (stamina >= blockCost)
                 {
-                    ItemStack blockingStack = bestBlockStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand(), isHeavy(itemstackUsed));
-                    if (!isHeavy(itemstackUsed) || canBlockHeavy(blockingStack))
+                    //Block
+                    chance = Attributes.BLOCK_CHANCE.getTotalAmount(entity) / 100d;
+                    if (thrust) chance *= 0.75;
+                    if (FaerunUtils.canBlock(entity) && Math.random() < chance)
                     {
-                        String blockMat = getBlockMaterial(blockingStack);
-                        if (material.equals("flesh") && !blockMat.equals("flesh")) onHit(source);
-                        else if (blockMat.equals("flesh") && !material.equals("flesh")) onHit(entity);
-                        else playBlockSound(blockingStack);
+                        ItemStack blockingStack = bestBlockStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand(), isHeavy(itemstackUsed));
+                        if (!isHeavy(itemstackUsed) || canBlockHeavy(blockingStack))
+                        {
+                            String blockMat = getBlockMaterial(blockingStack);
+                            if (material.equals("flesh") && !blockMat.equals("flesh")) onHit(source);
+                            else if (blockMat.equals("flesh") && !material.equals("flesh")) onHit(entity);
+                            else playBlockSound(blockingStack);
 
-                        //TODO visual block indicators
+                            Attributes.STAMINA.setCurrentAmount(entity, stamina - blockCost);
 
-                        return;
+                            //TODO visual block indicators
+
+                            return;
+                        }
+                    }
+
+                    //Parry
+                    chance = (Attributes.PARRY_CHANCE.getTotalAmount(entity) - finesse) / 100d;
+                    if (thrust) chance *= 0.75;
+                    if (Math.random() < chance)
+                    {
+                        ItemStack parryingStack = bestParryStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand(), isHeavy(itemstackUsed));
+                        if (!isHeavy(itemstackUsed) || canBlockHeavy(parryingStack))
+                        {
+                            if (material.equals("flesh") && !getParryMaterial(parryingStack).equals("flesh")) onHit(source);
+                            else playParrySounds(entity, parryingStack);
+
+                            Attributes.STAMINA.setCurrentAmount(entity, stamina - blockCost * 0.5);
+
+                            //TODO visual parry indicators
+
+                            finesse *= 0.5;
+                            targets--;
+                            continue;
+                        }
                     }
                 }
 
-                chance = (Attributes.PARRY_CHANCE.getTotalAmount(entity) - finesse) / 100d;
-                if (thrust) chance *= 0.75;
-                if (Math.random() < chance)
+                //Dodge
+                if (stamina >= DODGE_COST)
                 {
-                    ItemStack parryingStack = bestParryStack(((EntityLivingBase) entity).getHeldItemMainhand(), ((EntityLivingBase) entity).getHeldItemOffhand(), isHeavy(itemstackUsed));
-                    if (!isHeavy(itemstackUsed) || canBlockHeavy(parryingStack))
+                    chance = (Attributes.DODGE_CHANCE.getTotalAmount(entity) - finesse) / 100d;
+                    if (thrust) chance *= 1.25;
+                    if (Math.random() < chance)
                     {
-                        if (material.equals("flesh") && !getParryMaterial(parryingStack).equals("flesh")) onHit(source);
-                        else playParrySounds(entity, parryingStack);
+                        Attributes.STAMINA.setCurrentAmount(entity, stamina - DODGE_COST);
 
-                        //TODO visual parry indicators
-
-                        finesse *= 0.5;
-                        targets--;
+                        //TODO visual dodge indicators
                         continue;
                     }
-                }
-
-                chance = (Attributes.DODGE_CHANCE.getTotalAmount(entity) - finesse) / 100d;
-                if (thrust) chance *= 1.25;
-                if (Math.random() < chance)
-                {
-                    //TODO visual dodge indicators
-                    continue;
                 }
             }
 
