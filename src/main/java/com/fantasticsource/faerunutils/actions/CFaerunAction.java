@@ -1,6 +1,8 @@
 package com.fantasticsource.faerunutils.actions;
 
 import com.fantasticsource.dynamicstealth.server.senses.sight.Sight;
+import com.fantasticsource.faeruncharacters.VoiceSets;
+import com.fantasticsource.faeruncharacters.nbt.CharacterTags;
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.FaerunUtils;
 import com.fantasticsource.faerunutils.actions.weapon.axe.Chop;
@@ -150,6 +152,7 @@ public abstract class CFaerunAction extends CAction
                     }
                 }
                 playAnimation();
+                playExertionSound();
 
                 for (CNode endNode : startEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
                 break;
@@ -485,6 +488,17 @@ public abstract class CFaerunAction extends CAction
     }
 
 
+    public void playExertionSound()
+    {
+        if (this instanceof Cooldown) return;
+
+        String voice = CharacterTags.getCC((EntityLivingBase) source).getString("Voice");
+        ResourceLocation soundRL = VoiceSets.ALL_VOICE_SETS.get(voice).get("attack");
+
+        MCTools.playSimpleSoundForAll(soundRL, source, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
+    }
+
+
     public void playSwishSound()
     {
         if (this instanceof Cooldown) return;
@@ -497,6 +511,7 @@ public abstract class CFaerunAction extends CAction
 
         MCTools.playSimpleSoundForAll(new ResourceLocation(soundName), source, 16, 2, 1, pitch - 0.2f + Tools.random(0.4f), SoundCategory.HOSTILE);
     }
+
 
     public void playBlockSound(ItemStack blockingItemstack)
     {
