@@ -230,7 +230,7 @@ public abstract class CFaerunAction extends CAction
         {
             e.printStackTrace();
         }
-        animation.setAllRates(progressPerSecond);
+        animation.setAllRates(progressPerSecond * animation.hitTime / useTime);
         animation.start(source, mainhand);
         USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(new Pair<>(mainhand, animation));
     }

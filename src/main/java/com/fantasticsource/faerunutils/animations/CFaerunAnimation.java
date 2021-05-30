@@ -5,6 +5,8 @@ import net.minecraft.entity.Entity;
 
 public abstract class CFaerunAnimation extends CBipedAnimation
 {
+    public double hitTime = 0; //Only used for calculating animation rate server-side at the start of animation
+
     public CFaerunAnimation()
     {
         bodyFacesLookDirection = true;

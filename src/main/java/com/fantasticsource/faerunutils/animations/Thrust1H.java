@@ -10,6 +10,7 @@ public class Thrust1H extends CFaerunAnimation
 {
     public Thrust1H()
     {
+        hitTime = 0.5;
         pauseAt = 1000;
     }
 

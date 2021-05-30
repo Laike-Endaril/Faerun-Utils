@@ -10,6 +10,7 @@ public class ReverseUpwardsSwing1H extends CFaerunAnimation
 {
     public ReverseUpwardsSwing1H()
     {
+        hitTime = 0.5;
         pauseAt = 500;
     }
 

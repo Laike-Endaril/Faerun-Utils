@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.unarmed;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.faerunutils.animations.Thrust1H;
 import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class Jab extends CFaerunAction
@@ -14,6 +15,7 @@ public class Jab extends CFaerunAction
         comboUsage = 20;
         staminaCost = 3;
         material = "flesh";
+        animationsToUse = new Class[]{Thrust1H.class};
 
 
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 0));

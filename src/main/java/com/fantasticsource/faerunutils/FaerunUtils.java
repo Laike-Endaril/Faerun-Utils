@@ -243,7 +243,7 @@ public class FaerunUtils
             NBTTagCompound compound = MCTools.getSubCompoundIfExists(stack.getTagCompound(), "tiamatitems", "generic");
             if (compound != null) actionName = compound.getString((mainhand ? "mainhand" : "offhand") + index);
         }
-        if (actionName == null || actionName.equals("")) actionName = mainhand ? "faerunaction.unarmed.straight" : "faerunaction.unarmed.jab";
+        if (actionName == null || actionName.equals("")) actionName = index == 0 ? "faerunaction.unarmed.jab" : "faerunaction.unarmed.straight";
 
         tryUseAction(livingBase, CAction.ALL_ACTIONS.get(actionName), stack, mainhand);
     }
