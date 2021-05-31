@@ -2,6 +2,7 @@ package com.fantasticsource.faerunutils.actions.weapon.unarmed;
 
 import com.fantasticsource.faerunutils.Attributes;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.faerunutils.animations.AniKick;
 import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 
 public class Kick extends CFaerunAction
@@ -14,6 +15,9 @@ public class Kick extends CFaerunAction
         comboUsage = 50;
         staminaCost = 20;
         material = "flesh";
+        animationsToUse = new Class[]{AniKick.class};
+        selfInterruptible = false;
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.MOVE_SPEED, 200, 2, 0));
 
 
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 0));
@@ -65,5 +69,12 @@ public class Kick extends CFaerunAction
         canComboTo.add("faerunaction.hammer.bash");
 
         canComboTo.add("faerunaction.bow.shot");
+    }
+
+
+    @Override
+    protected void initHitTime()
+    {
+        hitTime = useTime * 0.5;
     }
 }

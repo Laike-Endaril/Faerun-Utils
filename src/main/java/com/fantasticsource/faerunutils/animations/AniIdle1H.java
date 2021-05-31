@@ -5,10 +5,10 @@ import com.fantasticsource.tools.component.path.CPathConstant;
 import com.fantasticsource.tools.datastructures.VectorN;
 import net.minecraft.entity.Entity;
 
-public class Idle1H extends CFaerunAnimation
+public class AniIdle1H extends CFaerunAnimation
 {
     @Override
-    public Idle1H start(Entity entity, boolean mainhand)
+    public AniIdle1H start(Entity entity, boolean mainhand)
     {
         if (mainhand)
         {

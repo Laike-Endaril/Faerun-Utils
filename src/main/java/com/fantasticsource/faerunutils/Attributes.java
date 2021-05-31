@@ -245,7 +245,7 @@ public class Attributes
             if (attribute == STAMINA)
             {
                 double speedMult = Tools.max(0.25, Tools.min(1, attribute.getCurrentAmount(entity) / attribute.getTotalAmount(entity) * 2));
-                BetterAttributeMod.addMods(entity, new BetterAttributeMod("staminaSpeed", MOVE_SPEED.name, 100, 2, speedMult), new BetterAttributeMod("staminaSpeed", ATTACK_SPEED.name, 100, 2, speedMult));
+                BetterAttributeMod.addMods(entity, new BetterAttributeMod("staminaSpeed", MOVE_SPEED.name, 200, 2, speedMult), new BetterAttributeMod("staminaSpeed", ATTACK_SPEED.name, 100, 2, speedMult));
             }
         }
         else

@@ -38,7 +38,7 @@ public class Cooldown extends CFaerunAction
 
 
     @Override
-    protected void onCompletion()
+    protected void doStuff()
     {
     }
 

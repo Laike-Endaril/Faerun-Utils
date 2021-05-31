@@ -59,11 +59,11 @@ public abstract class CFaerunAction extends CAction
     public static final HashMap<Entity, ArrayList<Pair<Boolean, CFaerunAnimation>>> USED_COMBO_ANIMATIONS = new HashMap<>();
     public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
 
-    public double useTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0, progressPerSecond = 1, progressPerTick = 0.05;
+    public double useTime = 0, hitTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0, progressPerSecond = 1, progressPerTick = 0.05;
     public ArrayList<BetterAttributeMod> attributeMods = new ArrayList<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
     public ItemStack itemstackUsed = null;
-    public boolean mainhand = true, playedSwishSound = false;
+    public boolean mainhand = true, playedSwishSound = false, selfInterruptible = true, didTheThing = false;
     public String material;
     public Class<? extends CFaerunAnimation>[] animationsToUse = new Class[0];
     protected CFaerunAnimation animation = null;
@@ -171,6 +171,7 @@ public abstract class CFaerunAction extends CAction
                         for (Pair<Boolean, CFaerunAnimation> animation : animations) CBipedAnimation.removeAnimation(source, animation.getValue());
                     }
                 }
+                initHitTime();
                 playAnimation();
                 playExertionSound();
 
@@ -182,13 +183,19 @@ public abstract class CFaerunAction extends CAction
                 for (CNode endNode : tickEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
                 timer += progressPerTick;
 
-                if (!playedSwishSound && (useTime - timer) / progressPerSecond <= 0.15) playSwishSound();
-
-                if (timer >= useTime)
+                if (!playedSwishSound && (hitTime - timer) / progressPerSecond <= 0.15)
                 {
-                    onCompletion();
-                    active = false;
+                    playSwishSound();
+                    playedSwishSound = true;
                 }
+
+                if (!didTheThing && timer >= hitTime)
+                {
+                    doStuff();
+                    didTheThing = true;
+                }
+
+                if (timer >= useTime) active = false;
                 break;
 
 
@@ -203,6 +210,12 @@ public abstract class CFaerunAction extends CAction
 
         if (profile) profiler.endSection();
         if (profile) profiler.endSection();
+    }
+
+
+    protected void initHitTime()
+    {
+        hitTime = useTime;
     }
 
     protected void playAnimation()
@@ -230,12 +243,13 @@ public abstract class CFaerunAction extends CAction
         {
             e.printStackTrace();
         }
-        animation.setAllRates(progressPerSecond * animation.hitTime / useTime);
+        animation.setAllRates(progressPerSecond * animation.hitTime / hitTime);
         animation.start(source, mainhand);
         USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(new Pair<>(mainhand, animation));
     }
 
-    protected void onCompletion()
+
+    protected void doStuff()
     {
         int targets = (int) Attributes.MAX_MELEE_TARGETS.getTotalAmount(source);
         if (targets == 0) return;
@@ -540,7 +554,6 @@ public abstract class CFaerunAction extends CAction
     {
         if (this instanceof Cooldown) return;
 
-        playedSwishSound = true;
         String soundName = Attributes.MAX_MELEE_ANGLE.getTotalAmount(source) == 0 ? "thrust" : "swing";
 
         float pitch = 1;

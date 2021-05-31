@@ -20,7 +20,7 @@ public abstract class CFaerunProjectileAction extends CFaerunAction
     public abstract Entity getProjectile();
 
     @Override
-    protected void onCompletion()
+    protected void doStuff()
     {
         int projectileCount = (int) Attributes.PROJECTILE_COUNT.getTotalAmount(source);
         double velocity = Attributes.PROJECTILE_SPEED.getTotalAmount(source);

@@ -24,7 +24,7 @@ public class ComboGracePeriod extends Cooldown
 
 
     @Override
-    protected void onCompletion()
+    protected void doStuff()
     {
         new Cooldown(1.5).queue(source, queue.name);
     }

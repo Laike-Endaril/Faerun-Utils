@@ -6,16 +6,16 @@ import com.fantasticsource.tools.component.path.CPathSinuous;
 import com.fantasticsource.tools.datastructures.VectorN;
 import net.minecraft.entity.Entity;
 
-public class Thrust1H extends CFaerunAnimation
+public class AniThrust1H extends CFaerunAnimation
 {
-    public Thrust1H()
+    public AniThrust1H()
     {
         hitTime = 0.5;
         pauseAt = 1000;
     }
 
     @Override
-    public Thrust1H start(Entity entity, boolean mainhand)
+    public AniThrust1H start(Entity entity, boolean mainhand)
     {
         if (mainhand)
         {
