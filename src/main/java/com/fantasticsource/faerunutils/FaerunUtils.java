@@ -1,5 +1,7 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.faeruncharacters.VoiceSets;
+import com.fantasticsource.faeruncharacters.nbt.CharacterTags;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
 import com.fantasticsource.faerunutils.actions.ComboGracePeriod;
 import com.fantasticsource.faerunutils.actions.Cooldown;
@@ -15,11 +17,14 @@ import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.mctools.Slottings;
+import com.fantasticsource.mctools.animation.CBipedAnimation;
 import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
 import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.tiamatactions.action.ActionQueue;
 import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tools.Tools;
+import com.fantasticsource.tools.component.path.CPath;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -30,10 +35,14 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -46,6 +55,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 
@@ -300,6 +310,131 @@ public class FaerunUtils
             Attributes.COMBO.setCurrentAmount(entity, Attributes.COMBO.getCurrentAmount(entity) + ((CFaerunAction) action).comboUsage);
             queue.remove(action);
             i--;
+        }
+    }
+
+
+    @SubscribeEvent
+    public static void entityUpdate(LivingEvent.LivingUpdateEvent event)
+    {
+        EntityLivingBase entity = event.getEntityLiving();
+        boolean serverside = !entity.world.isRemote;
+        if (entity.isOnLadder() && !entity.onGround)
+        {
+            int climbingLegs = 2, climbingArms = 2;
+            CBipedAnimation animation = CBipedAnimation.getCurrent(entity);
+
+            for (CPath.CPathData data : animation.rightLeg.getAllData())
+            {
+                if (data.path != null)
+                {
+                    climbingLegs--;
+                    break;
+                }
+            }
+            for (CPath.CPathData data : animation.leftLeg.getAllData())
+            {
+                if (data.path != null)
+                {
+                    climbingLegs--;
+                    break;
+                }
+            }
+
+            if (!entity.getHeldItemMainhand().isEmpty()) climbingArms--;
+            else for (CPath.CPathData data : animation.rightArm.getAllData())
+            {
+                if (data.path != null)
+                {
+                    climbingArms--;
+                    break;
+                }
+            }
+            if (!entity.getHeldItemOffhand().isEmpty()) climbingArms--;
+            else for (CPath.CPathData data : animation.leftArm.getAllData())
+            {
+                if (data.path != null)
+                {
+                    climbingArms--;
+                    break;
+                }
+            }
+
+
+            if (serverside)
+            {
+                int climbingLimbs = climbingLegs + climbingArms;
+                if (climbingLimbs > 0) Attributes.STAMINA.setCurrentAmount(entity, Tools.max(0, Attributes.STAMINA.getCurrentAmount(entity) - (4.5 - climbingLimbs) * 0.25));
+            }
+
+            if (climbingArms == 0) entity.motionY = -5;
+            else if (climbingArms == 1)
+            {
+                if (climbingLegs == 2)
+                {
+                    entity.motionY -= 0.08;
+                }
+                else
+                {
+                    entity.motionY -= 0.11760000228881837;
+                }
+            }
+            else //2 arms
+            {
+                if (climbingLegs == 1)
+                {
+                    entity.motionY -= 0.11760000228881837;
+                }
+                else if (climbingLegs == 0)
+                {
+                    entity.motionY -= 0.11760000228881837;
+                }
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    public static void clientJump(LivingEvent.LivingJumpEvent event)
+    {
+        EntityLivingBase entity = event.getEntityLiving();
+        if (entity == Minecraft.getMinecraft().player)
+        {
+            entity.motionY *= Attributes.MOVE_SPEED.getTotalAmount(entity) / 5.1;
+
+            if (entity.isSprinting())
+            {
+                float f = entity.rotationYaw * 0.017453292F;
+                entity.motionX += (double) (MathHelper.sin(f) * 0.2F);
+                entity.motionZ -= (double) (MathHelper.cos(f) * 0.2F);
+            }
+
+            Network.WRAPPER.sendToServer(new Network.JumpPacket());
+        }
+    }
+
+    @SubscribeEvent
+    public static void serverJump(LivingEvent.LivingJumpEvent event)
+    {
+        EntityLivingBase entity = event.getEntityLiving();
+        if (!entity.world.isRemote && !(entity instanceof EntityPlayer)) onJump(entity);
+    }
+
+    public static void onJump(EntityLivingBase livingBase)
+    {
+        Attributes.STAMINA.setCurrentAmount(livingBase, Tools.max(0, Attributes.STAMINA.getCurrentAmount(livingBase) - 5));
+
+        String voice = CharacterTags.getCC(livingBase).getString("Voice");
+        ResourceLocation soundRL = VoiceSets.ALL_VOICE_SETS.get(voice).get("jump");
+        MCTools.playSimpleSoundForAll(soundRL, livingBase, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
+
+        livingBase.motionY *= Attributes.MOVE_SPEED.getTotalAmount(livingBase) / 5.1;
+
+        if (livingBase.isSprinting())
+        {
+            float f = livingBase.rotationYaw * 0.017453292F;
+            livingBase.motionX += (double) (MathHelper.sin(f) * 0.2F);
+            livingBase.motionZ -= (double) (MathHelper.cos(f) * 0.2F);
         }
     }
 }

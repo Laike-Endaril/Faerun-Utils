@@ -47,6 +47,7 @@ public class Network
         WRAPPER.registerMessage(RequestPaletteTargetPacketHandler.class, RequestPaletteTargetPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(ApplyPalettePacketHandler.class, ApplyPalettePacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(ControlPacketHandler.class, ControlPacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(JumpPacketHandler.class, JumpPacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -326,6 +327,30 @@ public class Network
                         System.err.println(TextFormatting.RED + "From player: " + player.getName() + " (" + player.getUniqueID() + ")");
                 }
             });
+            return null;
+        }
+    }
+
+
+    public static class JumpPacket implements IMessage
+    {
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+        }
+    }
+
+    public static class JumpPacketHandler implements IMessageHandler<JumpPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(JumpPacket packet, MessageContext ctx)
+        {
+            FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> FaerunUtils.onJump(ctx.getServerHandler().player));
             return null;
         }
     }

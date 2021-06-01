@@ -13,7 +13,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -237,7 +236,7 @@ public class Attributes
             if (attribute == STAMINA)
             {
                 double speedMult = Tools.max(0.25, Tools.min(1, attribute.getCurrentAmount(entity) / attribute.getTotalAmount(entity) * 2));
-                BetterAttributeMod.addMods(entity, new BetterAttributeMod("staminaSpeed", MOVE_SPEED.name, 200, 2, speedMult), new BetterAttributeMod("staminaSpeed", ATTACK_SPEED.name, 100, 2, speedMult));
+                BetterAttributeMod.addMods(entity, new BetterAttributeMod("staminaSpeed", MOVE_SPEED, 200, 2, speedMult), new BetterAttributeMod("staminaSpeed", ATTACK_SPEED, 100, 2, speedMult));
             }
         }
         else
@@ -249,23 +248,6 @@ public class Attributes
                 CustomHUDData.DATA.put(attribute.name.replace(MODID + ".", ""), "" + attribute.getCurrentAmount(event.entity));
                 CustomHUDData.DATA.put("max" + attribute.name.replace(MODID + ".", ""), "" + attribute.getTotalAmount(event.entity));
             }
-        }
-    }
-
-    @SubscribeEvent
-    public static void jump(LivingEvent.LivingJumpEvent event)
-    {
-        EntityLivingBase livingBase = event.getEntityLiving();
-        STAMINA.setCurrentAmount(livingBase, Tools.max(0, STAMINA.getCurrentAmount(livingBase) - 5));
-
-
-        livingBase.motionY *= MOVE_SPEED.getTotalAmount(livingBase) / 5.1;
-
-        if (livingBase.isSprinting())
-        {
-            float f = livingBase.rotationYaw * 0.017453292F;
-            livingBase.motionX += (double) (MathHelper.sin(f) * 0.2F);
-            livingBase.motionZ -= (double) (MathHelper.cos(f) * 0.2F);
         }
     }
 }

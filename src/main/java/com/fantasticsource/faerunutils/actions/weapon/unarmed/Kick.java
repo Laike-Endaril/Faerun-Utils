@@ -18,7 +18,7 @@ public class Kick extends CFaerunAction
         material = "flesh";
         animationsToUse = new Class[]{AniKick.class};
         selfInterruptible = false;
-        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.MOVE_SPEED, 200, 2, 0));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.MOVE_SPEED, 200, 2, 1));
 
 
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 0));
