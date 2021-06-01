@@ -1,7 +1,11 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.faerunutils.actions.CFaerunAction;
+import com.fantasticsource.faerunutils.actions.Cooldown;
 import com.fantasticsource.mctools.betterattributes.BetterAttribute;
 import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
+import com.fantasticsource.tiamatactions.action.ActionQueue;
+import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamathud.CustomHUDData;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
@@ -9,13 +13,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.ArrayList;
 
 import static com.fantasticsource.faerunutils.FaerunUtils.MODID;
 
@@ -195,42 +200,29 @@ public class Attributes
 
 
         double current = livingBase.getHealth(), dif = HEALTH_REGEN.getTotalAmount(livingBase) / 20;
-        if (dif > 0)
-        {
-            current = Tools.min(HEALTH.getTotalAmount(livingBase), current + dif);
-            livingBase.setHealth((float) current);
-        }
-        else if (dif < 0)
-        {
-            current = Tools.max(0, current + dif);
-            livingBase.setHealth((float) current);
-        }
+        current = Tools.min(HEALTH.getTotalAmount(livingBase), current + dif);
+        livingBase.setHealth((float) current);
 
 
         current = STAMINA.getCurrentAmount(livingBase);
         dif = livingBase.isSprinting() ? -0.125 : STAMINA_REGEN.getTotalAmount(livingBase) / 20;
-        if (dif > 0)
-        {
-            current = Tools.min(STAMINA.getTotalAmount(livingBase), current + dif);
-        }
-        else if (dif < 0)
-        {
-            current = Tools.max(0, current + dif);
-        }
+        current = Tools.min(STAMINA.getTotalAmount(livingBase), current + dif);
         STAMINA.setCurrentAmount(livingBase, current);
-        if (current <= 0 && livingBase instanceof EntityPlayerMP) livingBase.setSprinting(false);
+        if (current <= 0) livingBase.setSprinting(false);
+        else
+        {
+            ArrayList<CAction> actions = ActionQueue.get(livingBase, "Main").queue;
+            if (actions != null && actions.size() > 0)
+            {
+                CAction action = actions.get(0);
+                if (action instanceof CFaerunAction && action.getClass() != Cooldown.class) livingBase.setSprinting(false);
+            }
+        }
 
 
         current = MANA.getCurrentAmount(livingBase);
         dif = MANA_REGEN.getTotalAmount(livingBase) / 20;
-        if (dif > 0)
-        {
-            current = Tools.min(MANA.getTotalAmount(livingBase), current + dif);
-        }
-        else if (dif < 0)
-        {
-            current = Tools.max(0, current + dif);
-        }
+        current = Tools.min(MANA.getTotalAmount(livingBase), current + dif);
         MANA.setCurrentAmount(livingBase, current);
     }
 
