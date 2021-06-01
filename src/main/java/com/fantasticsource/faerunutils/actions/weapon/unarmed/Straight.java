@@ -11,7 +11,8 @@ public class Straight extends CFaerunAction
     {
         super("faerunaction.unarmed.straight");
 
-        useTime = 0.25;
+        useTime = 0.5;
+        percentTimeBeforeHit = 0.5;
         comboUsage = 25;
         staminaCost = 5;
         material = "flesh";
@@ -20,7 +21,7 @@ public class Straight extends CFaerunAction
 
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 0));
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MIN_MELEE_RANGE, 0));
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 2));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 1));
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS, 1));
 
         //Using explicit mod amounts for damage tooltips, even if it's a 1x

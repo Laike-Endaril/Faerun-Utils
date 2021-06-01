@@ -20,12 +20,12 @@ public class AniKick extends CFaerunAnimation
         rightLeg.zRotPath.path = new CPathConstant(new VectorN(Math.PI * 0.15));
         rightLeg.yRotPath.path = new CPathSinuous(new CPathConstant(new VectorN(0.5)), 1, -0.25)
                 .add(new CPathConstant(new VectorN(0.5)))
-                .power(new CPathConstant(new VectorN(8)))
+                .power(new CPathConstant(new VectorN(16 / (handItemSwap.rate * handItemSwap.rate))))
                 .mult(new CPathConstant(new VectorN(Math.PI * -0.05)));
         rightLeg.xRotPath.path = new CPathConstant(new VectorN(Math.PI * 0.25)).add(
                 new CPathSinuous(new CPathConstant(new VectorN(0.5)), 1, -0.25)
                         .add(new CPathConstant(new VectorN(0.5)))
-                        .power(new CPathConstant(new VectorN(8)))
+                        .power(new CPathConstant(new VectorN(16 / (handItemSwap.rate * handItemSwap.rate))))
                         .mult(new CPathConstant(new VectorN(Math.PI * -0.75)))
         );
 

@@ -11,7 +11,8 @@ public class Jab extends CFaerunAction
     {
         super("faerunaction.unarmed.jab");
 
-        useTime = 0.15;
+        useTime = 0.3;
+        percentTimeBeforeHit = 0.5;
         comboUsage = 20;
         staminaCost = 3;
         material = "flesh";
@@ -20,7 +21,7 @@ public class Jab extends CFaerunAction
 
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 0));
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MIN_MELEE_RANGE, 0));
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 2));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 1));
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS, 1));
 
         //Using explicit mod amounts for damage tooltips, even if it's a 1x

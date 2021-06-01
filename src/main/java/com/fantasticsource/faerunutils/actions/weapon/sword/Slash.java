@@ -19,9 +19,9 @@ public class Slash extends CFaerunAction
         animationsToUse = new Class[]{AniDownwardsSwing1H.class, AniReverseUpwardsSwing1H.class};
 
 
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 35));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 90));
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MIN_MELEE_RANGE, 0));
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 3));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 2));
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS, 2));
 
         //Using explicit mod amounts for damage tooltips, even if it's a 1x

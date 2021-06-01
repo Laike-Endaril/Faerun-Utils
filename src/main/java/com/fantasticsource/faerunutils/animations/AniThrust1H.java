@@ -27,14 +27,14 @@ public class AniThrust1H extends CFaerunAnimation
             rightArm.xRotPath.path = new CPathConstant(new VectorN(Math.PI * 0.25)).add(
                     new CPathSinuous(new CPathConstant(new VectorN(0.5)), 1, -0.25)
                             .add(new CPathConstant(new VectorN(0.5)))
-                            .power(new CPathConstant(new VectorN(8)))
+                            .power(new CPathConstant(new VectorN(16 / (handItemSwap.rate * handItemSwap.rate))))
                             .mult(new CPathConstant(new VectorN(Math.PI * -0.75)))
             );
 
             rightItem.xRotPath.path = new CPathConstant(new VectorN(Math.PI * 0.35)).add(
                     new CPathSinuous(new CPathConstant(new VectorN(0.5)), 1, -0.25)
                             .add(new CPathConstant(new VectorN(0.5)))
-                            .power(new CPathConstant(new VectorN(8)))
+                            .power(new CPathConstant(new VectorN(16 / (handItemSwap.rate * handItemSwap.rate))))
                             .mult(new CPathConstant(new VectorN(Math.PI * -0.85)))
             );
         }
@@ -48,14 +48,14 @@ public class AniThrust1H extends CFaerunAnimation
             leftArm.xRotPath.path = new CPathConstant(new VectorN(Math.PI * 0.25)).add(
                     new CPathSinuous(new CPathConstant(new VectorN(0.5)), 1, -0.25)
                             .add(new CPathConstant(new VectorN(0.5)))
-                            .power(new CPathConstant(new VectorN(8)))
+                            .power(new CPathConstant(new VectorN(16 / (handItemSwap.rate * handItemSwap.rate))))
                             .mult(new CPathConstant(new VectorN(Math.PI * -0.75)))
             );
 
             leftItem.xRotPath.path = new CPathConstant(new VectorN(Math.PI * 0.35)).add(
                     new CPathSinuous(new CPathConstant(new VectorN(0.5)), 1, -0.25)
                             .add(new CPathConstant(new VectorN(0.5)))
-                            .power(new CPathConstant(new VectorN(8)))
+                            .power(new CPathConstant(new VectorN(16 / (handItemSwap.rate * handItemSwap.rate))))
                             .mult(new CPathConstant(new VectorN(Math.PI * -0.85)))
             );
         }

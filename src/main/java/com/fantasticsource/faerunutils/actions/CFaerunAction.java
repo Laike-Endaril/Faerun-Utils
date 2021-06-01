@@ -59,7 +59,7 @@ public abstract class CFaerunAction extends CAction
     public static final HashMap<Entity, ArrayList<Pair<Boolean, CFaerunAnimation>>> USED_COMBO_ANIMATIONS = new HashMap<>();
     public static final Field ENTITY_LIVING_BASE_LAST_DAMAGE_FIELD = ReflectionTool.getField(EntityLivingBase.class, "field_110153_bc", "lastDamage");
 
-    public double useTime = 0, hitTime = 0, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0, progressPerSecond = 1, progressPerTick = 0.05;
+    public double useTime = 0, percentTimeBeforeHit = 1, hpCost = 0, mpCost = 0, staminaCost = 0, comboUsage = 0, timer = 0, progressPerSecond = 1, progressPerTick = 0.05;
     public ArrayList<BetterAttributeMod> attributeMods = new ArrayList<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
     public ItemStack itemstackUsed = null;
@@ -171,7 +171,6 @@ public abstract class CFaerunAction extends CAction
                         for (Pair<Boolean, CFaerunAnimation> animation : animations) CBipedAnimation.removeAnimation(source, animation.getValue());
                     }
                 }
-                initHitTime();
                 playAnimation();
                 playExertionSound();
 
@@ -182,6 +181,7 @@ public abstract class CFaerunAction extends CAction
             case "tick":
                 for (CNode endNode : tickEndpointNodes.toArray(new CNode[0])) endNode.executeTree(mainAction, this, results);
                 timer += progressPerTick;
+                double hitTime = useTime * percentTimeBeforeHit;
 
                 if (!playedSwishSound && (hitTime - timer) / progressPerSecond <= 0.15)
                 {
@@ -213,11 +213,6 @@ public abstract class CFaerunAction extends CAction
     }
 
 
-    protected void initHitTime()
-    {
-        hitTime = useTime;
-    }
-
     protected void playAnimation()
     {
         if (animationsToUse.length == 0) return;
@@ -243,7 +238,7 @@ public abstract class CFaerunAction extends CAction
         {
             e.printStackTrace();
         }
-        animation.setAllRates(progressPerSecond * animation.hitTime / hitTime);
+        animation.setAllRates(progressPerSecond * animation.hitTime / (useTime * percentTimeBeforeHit));
         animation.start(source, mainhand);
         USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(new Pair<>(mainhand, animation));
     }

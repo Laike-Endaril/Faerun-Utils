@@ -11,7 +11,8 @@ public class Thrust extends CFaerunAction
     {
         super("faerunaction.sword.thrust");
 
-        useTime = 0.5;
+        useTime = 1;
+        percentTimeBeforeHit = 0.5;
         comboUsage = 30;
         staminaCost = 10;
         material = "metal";
@@ -20,12 +21,12 @@ public class Thrust extends CFaerunAction
 
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 0));
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MIN_MELEE_RANGE, 0));
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 3.5));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 2));
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS, 1));
 
         //Using explicit mod amounts for damage tooltips, even if it's a 1x
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.SLASH_DAMAGE, 2, 0));
-        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.PIERCE_DAMAGE, 2, 1));
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.PIERCE_DAMAGE, 2, 2));
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.BLUNT_DAMAGE, 2, 0));
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.ELEMENTAL_DAMAGE, 2, 0));
 

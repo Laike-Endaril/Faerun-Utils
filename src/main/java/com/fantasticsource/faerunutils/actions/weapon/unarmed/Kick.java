@@ -12,6 +12,7 @@ public class Kick extends CFaerunAction
         super("faerunaction.unarmed.kick");
 
         useTime = 1;
+        percentTimeBeforeHit = 0.5;
         comboUsage = 50;
         staminaCost = 20;
         material = "flesh";
@@ -22,7 +23,7 @@ public class Kick extends CFaerunAction
 
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_ANGLE, 0));
 //        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MIN_MELEE_RANGE, 0));
-        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 2.5));
+        attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_RANGE, 1));
         attributeMods.add(new BetterAttributeMod(name + "0", Attributes.MAX_MELEE_TARGETS, 1));
 
         //Using explicit mod amounts for damage tooltips, even if it's a 1x
@@ -37,6 +38,8 @@ public class Kick extends CFaerunAction
 
 //        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.FINESSE, 2, 1));
         attributeMods.add(new BetterAttributeMod(name + "2", Attributes.ARMOR_BYPASS_CHANCE, 2, 0));
+
+        attributeMods.add(new BetterAttributeMod(name + "2", Attributes.DODGE_CHANCE, 2, 0.25));
 
 
         categoryTags.add("1L");
@@ -69,12 +72,5 @@ public class Kick extends CFaerunAction
         canComboTo.add("faerunaction.hammer.bash");
 
         canComboTo.add("faerunaction.bow.shot");
-    }
-
-
-    @Override
-    protected void initHitTime()
-    {
-        hitTime = useTime * 0.5;
     }
 }
