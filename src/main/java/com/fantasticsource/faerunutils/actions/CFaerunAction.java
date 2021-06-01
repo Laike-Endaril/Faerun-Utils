@@ -27,12 +27,14 @@ import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.animation.CBipedAnimation;
 import com.fantasticsource.mctools.betterattributes.BetterAttribute;
 import com.fantasticsource.mctools.betterattributes.BetterAttributeMod;
+import com.fantasticsource.mctools.component.path.CPathEntityPitch;
 import com.fantasticsource.tiamatactions.action.CAction;
 import com.fantasticsource.tiamatactions.config.TiamatActionsConfig;
 import com.fantasticsource.tiamatactions.node.CNode;
 import com.fantasticsource.tiamatactions.node.CNodeComment;
 import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
+import com.fantasticsource.tools.component.path.CPath;
 import com.fantasticsource.tools.datastructures.DecimalWeightedPool;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.Entity;
@@ -63,7 +65,7 @@ public abstract class CFaerunAction extends CAction
     public ArrayList<BetterAttributeMod> attributeMods = new ArrayList<>();
     public ArrayList<String> categoryTags = new ArrayList<>(), canComboTo = new ArrayList<>();
     public ItemStack itemstackUsed = null;
-    public boolean mainhand = true, playedSwishSound = false, selfInterruptible = true, didTheThing = false;
+    public boolean mainhand = true, playedSwishSound = false, selfInterruptible = true, didTheThing = false, usesPitch = false;
     public String material;
     public Class<? extends CFaerunAnimation>[] animationsToUse = new Class[0];
     protected CFaerunAnimation animation = null;
@@ -240,6 +242,14 @@ public abstract class CFaerunAction extends CAction
         }
         animation.setAllRates(progressPerSecond * animation.hitTime / (useTime * percentTimeBeforeHit));
         animation.start(source, mainhand);
+        if (usesPitch)
+        {
+            for (CPath.CPathData data : new CPath.CPathData[]{animation.rightArm.xRotPath, animation.leftArm.xRotPath})
+            {
+                if (data.path != null) data.path.add(new CPathEntityPitch(source));
+            }
+            CBipedAnimation.updateAnimation(source, animation);
+        }
         USED_COMBO_ANIMATIONS.computeIfAbsent(source, o -> new ArrayList<>()).add(new Pair<>(mainhand, animation));
     }
 
@@ -267,7 +277,7 @@ public abstract class CFaerunAction extends CAction
         double finesse = Attributes.FINESSE.getTotalAmount(source);
         boolean thrust = Attributes.MAX_MELEE_ANGLE.getTotalAmount(source) == 0;
         double chance;
-        for (Entity entity : EntityFilters.inCone(sourceEyes, source.getRotationYawHead(), source.rotationPitch, source.width * 0.5 + Attributes.MAX_MELEE_RANGE.getTotalAmount(source), Attributes.MAX_MELEE_ANGLE.getTotalAmount(source), true, entities))
+        for (Entity entity : EntityFilters.inCone(sourceEyes, source.getRotationYawHead(), usesPitch ? source.rotationPitch : 0, source.width * 0.5 + Attributes.MAX_MELEE_RANGE.getTotalAmount(source), Attributes.MAX_MELEE_ANGLE.getTotalAmount(source), true, entities))
         {
             if (Sight.canSee((EntityLivingBase) entity, source, true))
             {

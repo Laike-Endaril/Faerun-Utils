@@ -11,6 +11,7 @@ public class Thrust extends CFaerunAction
     {
         super("faerunaction.sword.thrust");
 
+        usesPitch = true;
         useTime = 1;
         percentTimeBeforeHit = 0.5;
         comboUsage = 30;

@@ -11,6 +11,7 @@ public class Jab extends CFaerunAction
     {
         super("faerunaction.unarmed.jab");
 
+        usesPitch = true;
         useTime = 0.3;
         percentTimeBeforeHit = 0.5;
         comboUsage = 20;

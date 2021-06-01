@@ -11,6 +11,7 @@ public class Straight extends CFaerunAction
     {
         super("faerunaction.unarmed.straight");
 
+        usesPitch = true;
         useTime = 0.5;
         percentTimeBeforeHit = 0.5;
         comboUsage = 25;
