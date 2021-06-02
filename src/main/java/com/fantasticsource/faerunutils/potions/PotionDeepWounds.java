@@ -8,7 +8,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
@@ -55,7 +54,7 @@ public class PotionDeepWounds extends BetterPotion
     public static void livingDamage(LivingDamageEvent event)
     {
         EntityLivingBase entity = event.getEntityLiving();
-        if (entity instanceof EntityPlayerMP)
+        if (!entity.world.isRemote)
         {
             PotionEffect effect = entity.getActivePotionEffect(PotionDefinitions.POTION_EFFECT_DEEP_WOUNDS);
             int level = (int) ((effect == null ? 0 : effect.getAmplifier() + 1) + event.getAmount() * 0.5);
