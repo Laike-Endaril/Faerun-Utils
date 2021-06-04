@@ -1,10 +1,13 @@
 package com.fantasticsource.faerunutils;
 
+import com.fantasticsource.customentities.CustomLivingEntity;
+import com.fantasticsource.dynamicstealth.server.ai.edited.AINearestAttackableTargetEdit;
 import com.fantasticsource.faeruncharacters.VoiceSets;
 import com.fantasticsource.faeruncharacters.nbt.CharacterTags;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
 import com.fantasticsource.faerunutils.actions.ComboGracePeriod;
 import com.fantasticsource.faerunutils.actions.Cooldown;
+import com.fantasticsource.faerunutils.ai.AIFaerunMelee;
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
 import com.fantasticsource.faerunutils.potions.PotionDeepWounds;
 import com.fantasticsource.faerunutils.potions.PotionDefinitions;
@@ -28,6 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -168,6 +172,14 @@ public class FaerunUtils
             //Remove vanilla knockback
             AttributeMap attributeMap = (AttributeMap) livingBase.getAttributeMap();
             attributeMap.getAttributeInstance(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1);
+
+
+            if (entity instanceof CustomLivingEntity)
+            {
+                CustomLivingEntity customEntity = (CustomLivingEntity) entity;
+                customEntity.targetTasks.addTask(0, new AINearestAttackableTargetEdit<EntityPlayerMP>(new EntityAINearestAttackableTarget(customEntity, EntityPlayerMP.class, 0, true, false, e -> true)));
+                customEntity.tasks.addTask(0, new AIFaerunMelee(customEntity));
+            }
         }
     }
 
@@ -245,7 +257,9 @@ public class FaerunUtils
             stack = livingBase.getHeldItemOffhand();
             other = livingBase.getHeldItemMainhand();
         }
-        if (stack.isEmpty() && Slottings.isTwoHanded(other)) stack = other;
+        ArrayList<ItemStack> validItems = GlobalInventory.getValidEquippedItems(livingBase);
+        if (!validItems.contains(stack) || !Slottings.isTwoHanded(stack) && (Slottings.isTwoHanded(other) || stack.isEmpty())) stack = other;
+        if (!validItems.contains(stack)) stack = ItemStack.EMPTY;
 
         String actionName = null;
         if (stack.hasTagCompound())
