@@ -1,18 +1,282 @@
-faerunutils.config.gcMessageMode=GC Message Mode
-faerunutils.config.gcMessageMode.tooltip=0 = none, 1 = basic, 2 = detail
-faerunutils.config.firstTimeSpawn=First Time Spawn
-faerunutils.config.firstTimeSpawn.tooltip=Where a player spawns the very first time they join the server; leave blank to disable.  Syntax is just comma-separated x, y, z
-faerunutils.config.cnpcResetDistance=CNPC reset distance
-faerunutils.config.cnpcResetDistance.tooltip=If a CNPC roams this far or more from their spawn point, they reset
+faerunutils.keyCategory=Faerun Utils
+
+faerunutils.key.mainhand=Mainhand Action 1
+faerunutils.key.mainhand2=Mainhand Action 2
+faerunutils.key.offhand=Offhand Action 1
+faerunutils.key.offhand2=Offhand Action 2
+faerunutils.key.kick=Kick
+faerunutils.key.comboCancel=Combo Cancel
 
 
 
 itemGroup.faerunutils=Faerun Utils
 
-tile.faerunutils:bettercraftingtable.name=Better Crafting Table
+tile.faerunutils:assembler.name=Assembler
 
-faerunutils:recipe.null=No Recipe
+faerunutils.bag=Bag
 
-faerunutils:recipe.salvage=Salvage
-faerunutils:recipe.repair=Repair
-faerunutils:recipe.sell=Sell
+
+
+faerunutils.deepwounds=Deep Wounds
+potion.effect.faerunutils.deepwounds=Potion of Deep Wounds
+splash_potion.effect.faerunutils.deepwounds=Splash Potion of Deep Wounds
+lingering_potion.effect.faerunutils.deepwounds=Lingering Potion of Deep Wounds
+tipped_arrow.effect.faerunutils.deepwounds=Arrow of Deep Wounds
+
+
+
+faerunutils.cmd.die.usage=I kill you!
+faerunutils.cmd.joinInstanceType.usage=Join an instance based on a saved template name (player, templateName, maxPlayers, minHostiles, minDist, x1, y1, z1, [x2, y2, z2], [x3, y3, z3]...)
+faerunutils.cmd.openBag.usage=Make a player attempt to open a bag in their main- or off-hand (player, [itemType])
+
+
+
+attribute.name.faerunutils.temperature=Body Temperature
+attribute.description.faerunutils.temperature=Your current body temperature.  Under normal circumstances for a human, 0 is comfortable and negative effects start occurring at +/-100.
+attribute.value.faerunutils.temperature=%3$s (%1$s is best)
+attribute.name.faerunutils.coverage=Coverage
+attribute.description.faerunutils.coverage=How much of your body is covered with armor.  Higher amounts mean your armor will reduce the damage of attacks more often.
+attribute.value.faerunutils.coverage=%s%%
+
+attribute.name.faerunutils.strength=Strength
+attribute.description.faerunutils.strength=Your physical strength.  Affects many things, including physical attack power and speed.
+attribute.name.faerunutils.dexterity=Dexterity
+attribute.description.faerunutils.dexterity=Your physical skill, flexibility, and reflexes.  Affects many things, including your speed and many chance-based effects like block, dodge, parry, and vital strike.
+attribute.name.faerunutils.constitution=Constitution
+attribute.description.faerunutils.constitution=Your physical hardiness.  Affects many things, including health and stamina.
+attribute.name.faerunutils.magicalForce=Magical Force
+attribute.description.faerunutils.magicalForce=How powerfully you channel magic.  Affects damage when casting spells.
+attribute.name.faerunutils.magicalSkill=Magical Skill
+attribute.description.faerunutils.magicalSkill=Your skill with magic.  Affects your cast success rate and chance of dispelling incoming enemy spells.
+attribute.name.faerunutils.magicalConstitution=Magical Constitution
+attribute.description.faerunutils.magicalConstitution=Your mental fortitude.  Affects mana.
+
+attribute.name.faerunutils.thermalRecovery=Thermal Recovery Rate
+attribute.description.faerunutils.thermalRecovery=How quickly you return to normal body temperature, in degrees per second.
+attribute.value.faerunutils.thermalRecovery=%s/s
+
+attribute.name.faerunutils.moveSpeed=Move Speed
+attribute.description.faerunutils.moveSpeed=How fast you move, in meters (blocks) per second.
+attribute.value.faerunutils.attackSpeed=%smps
+attribute.name.faerunutils.attackSpeed=Attack Speed
+attribute.description.faerunutils.attackSpeed=Your relative attack speed.  Your weapons have a heavy effect on this.
+attribute.value.faerunutils.attackSpeed=%s%%
+
+attribute.name.faerunutils.interruptForce=Interrupt Force
+attribute.description.faerunutils.interruptForce=If your interrupt force is higher than your opponents interrupt stability when you hit them, their current action is interrupted.
+attribute.name.faerunutils.knockbackForce=Knockback Force
+attribute.description.faerunutils.knockbackForce=If your knockback force is higher than your opponents knockback stability when you hit them, they are pushed away from you.
+attribute.name.faerunutils.tripForce=Trip Force
+attribute.description.faerunutils.tripForce=If your trip force is higher than your opponents trip stability when you hit them, their current action is interrupted and they are temporarily knocked down.
+attribute.name.faerunutils.physicalDamage=Physical Damage
+attribute.description.faerunutils.physicalDamage=Affects slashing, piercing, and blunt damage
+attribute.name.faerunutils.slashDamage=Slash Damage
+attribute.description.faerunutils.slashDamage=Affects how much damage you deal with slashing attacks.
+attribute.name.faerunutils.pierceDamage=Pierce Damage
+attribute.description.faerunutils.pierceDamage=Affects how much damage you deal with piercing attacks.
+attribute.name.faerunutils.bluntDamage=Blunt Damage
+attribute.description.faerunutils.bluntDamage=Affects how much damage you deal with blunt attacks.
+
+attribute.name.faerunutils.projectileAccuracy=Projectile Accuracy
+attribute.description.faerunutils.projectileAccuracy=How accurate your projectiles are.  May be heavily affected by the specific attack or skill being used (some are naturally less accurate).
+attribute.value.faerunutils.projectileAccuracy=%s%%
+attribute.name.faerunutils.block=Block Chance
+attribute.description.faerunutils.block=Increases the chance of blocking frontal physical attacks.  You cannot block and attack with the same weapon at once.
+attribute.value.faerunutils.block=%s%%
+attribute.name.faerunutils.parry=Parry Chance
+attribute.description.faerunutils.parry=Increases the chance of parrying frontal physical attacks.  You can parry while attacking.  A parried attack may still hit someone else, but has a higher chance of being avoided.
+attribute.value.faerunutils.parry=%s%%
+attribute.name.faerunutils.dodge=Dodge Chance
+attribute.description.faerunutils.dodge=Increases the chance of dodging frontal physical attacks.  You can dodge while attacking.  A dodged will hit someone else if they are in range.
+attribute.value.faerunutils.dodge=%s%%
+attribute.name.faerunutils.finesse=Finesse
+attribute.description.faerunutils.finesse=Your ability to adjust the course of your melee attacks.  Effectively reduces your opponent's chance of parrying or dodging your attacks.
+attribute.name.faerunutils.armorBypass=Armor Bypass Chance
+attribute.description.faerunutils.armorBypass=Increases the chance of finding a gap in your enemy's armor, landing a strike which ignores their armor's defenses.
+attribute.value.faerunutils.armorBypass=%s%%
+attribute.name.faerunutils.vitalStrike=Vital Strike Chance
+attribute.description.faerunutils.vitalStrike=Increases the chance of striking a vital area of the body, dealing 3x damage AFTER damage is reduced by any armor hit.
+attribute.value.faerunutils.vitalStrike=%s%%
+
+attribute.name.faerunutils.health=Health
+attribute.description.faerunutils.health=If this reaches 0, your life will be in danger.
+attribute.value.faerunutils.health=%3$s / %1$s
+attribute.name.faerunutils.healthRegen=Health Regen
+attribute.description.faerunutils.healthRegen=How quickly you regenerate health (per second).
+attribute.value.faerunutils.healthRegen=%s/s
+attribute.name.faerunutils.stamina=Stamina
+attribute.description.faerunutils.stamina=Your ability to physically move depends on this.  Lower stamina will reduce your body's ability to function.
+attribute.value.faerunutils.stamina=%3$s / %1$s
+attribute.name.faerunutils.staminaRegen=Stamina Regen
+attribute.description.faerunutils.staminaRegen=How quickly you regenerate stamina (per second).
+attribute.value.faerunutils.staminaRegen=%s/s
+attribute.name.faerunutils.stability=Stability
+attribute.description.faerunutils.stability=How difficult it is for outside forces to move you.  Affects interruption, knockback, and trip resistance.
+attribute.name.faerunutils.interruptStability=Interruption Resistance
+attribute.description.faerunutils.interruptStability=How difficult it is to interrupt your actions.
+attribute.name.faerunutils.knockbackStability=Knockback Resistance
+attribute.description.faerunutils.knockbackStability=How difficult it is to push you away.
+attribute.name.faerunutils.tripStability=Trip Resistance
+attribute.description.faerunutils.tripStability=How difficult it is to trip you.
+
+attribute.name.faerunutils.elementalDamage=Elemental Damage
+attribute.description.faerunutils.elementalDamage=Increases the damage of your element-based attacks (anything not physical, eg. fire, acid, poison, etc).
+attribute.name.faerunutils.chemicalDamage=Chemical Damage
+attribute.description.faerunutils.chemicalDamage=Increases the damage of your chemical-based attacks (eg. acid).
+attribute.name.faerunutils.acidDamage=Acid Damage
+attribute.description.faerunutils.acidDamage=Increases the damage of your acid-based attacks.
+attribute.name.faerunutils.biologicalDamage=Biological Damage
+attribute.description.faerunutils.biologicalDamage=Increases the strength of your biological skills (eg. healing and poison).
+attribute.name.faerunutils.healingDamage=Healing
+attribute.description.faerunutils.healingDamage=How effective your healing spells are.
+attribute.name.faerunutils.poisonDamage=Poison Damage
+attribute.description.faerunutils.poisonDamage=Increases the damage of your poisons.
+attribute.name.faerunutils.energyDamage=Energy Damage
+attribute.description.faerunutils.energyDamage=Increases the damage and effectiveness of your energy-based skills (eg. electrical and thermal).
+attribute.name.faerunutils.electricDamage=Electric Damage
+attribute.description.faerunutils.electricDamage=Increases the damage of your electrical attacks.
+attribute.name.faerunutils.thermalDamage=Thermal Damage
+attribute.description.faerunutils.thermalDamage=Increases the damage and effectiveness of your thermal skills (heat and cold).
+attribute.name.faerunutils.heatDamage=Heat Damage
+attribute.description.faerunutils.heatDamage=Increases the potency of your heat / fire-based skills.
+attribute.name.faerunutils.coldDamage=Cold Damage
+attribute.description.faerunutils.coldDamage=Increases the potency of your cold / ice-based skills.
+
+attribute.name.faerunutils.castSuccess=Cast Success Chance
+attribute.description.faerunutils.castSuccess=How often your spells succeed.  Very important for a spellcaster.
+attribute.value.faerunutils.castSuccess=%s%%
+attribute.name.faerunutils.dispel=Dispel Chance
+attribute.description.faerunutils.dispel=Increases the chance of dispelling incoming spells.
+attribute.value.faerunutils.dispel=%s%%
+
+attribute.name.faerunutils.mana=Mana
+attribute.description.faerunutils.mana=Your mental presence.  If this is below 0, you're unconscious.
+attribute.value.faerunutils.mana=%3$s / %1$s
+attribute.name.faerunutils.manaRegen=Mana Regen
+attribute.description.faerunutils.manaRegen=How quickly your mana regenerates (per second).
+attribute.value.faerunutils.manaRegen=%s/s
+
+attribute.name.faerunutils.defense=Defense
+attribute.description.faerunutils.defense=Reduces incoming physical damage (slashing, piercing, and blunt).
+attribute.name.faerunutils.slashDefense=Slash Defense
+attribute.description.faerunutils.slashDefense=Reduces incoming damage from slashing attacks.
+attribute.name.faerunutils.pierceDefense=Pierce Defense
+attribute.description.faerunutils.pierceDefense=Reduces incoming damage from piercing attacks.
+attribute.name.faerunutils.fallDefense=Fall Defense
+attribute.description.faerunutils.fallDefense=Reduces incoming damage from falling.
+attribute.name.faerunutils.bluntDefense=Blunt Defense
+attribute.description.faerunutils.bluntDefense=Reduces incoming damage from blunt attacks.
+
+attribute.name.faerunutils.elementalResist=Elemental Resistance
+attribute.description.faerunutils.elementalResist=Reduces all incoming elemental damage.
+attribute.name.faerunutils.chemicalResist=Chemical Resistance
+attribute.description.faerunutils.chemicalResist=Reduces incoming chemical damage (eg. acid).
+attribute.name.faerunutils.acidResist=Acid Resistance
+attribute.description.faerunutils.acidResist=Reduces incoming acid damage.
+attribute.name.faerunutils.biologicalResist=Biological Resistance
+attribute.description.faerunutils.biologicalResist=Reduces incoming biological effects (healing, poison).
+attribute.name.faerunutils.healingResist=Healing Resistance
+attribute.description.faerunutils.healingResist=Reduces incoming healing.
+attribute.name.faerunutils.poisonResist=Poison Resistance
+attribute.description.faerunutils.poisonResist=Reduces incoming poison damage.
+attribute.name.faerunutils.energyResist=Energy Resistance
+attribute.description.faerunutils.energyResist=Reduces incoming energy damage (electrical, thermal).
+attribute.name.faerunutils.electricResist=Electrical Resistance
+attribute.description.faerunutils.electricResist=Reduces incoming electrical damage.
+attribute.name.faerunutils.thermalResist=Thermal Resistance
+attribute.description.faerunutils.thermalResist=Reduces incoming thermal damage (heat / fire, cold / ice).
+attribute.name.faerunutils.heatResist=Heat Resistance
+attribute.description.faerunutils.heatResist=Reduces incoming heat / fire damage.
+attribute.name.faerunutils.coldResist=Cold Resistance
+attribute.description.faerunutils.coldResist=Reduces incoming cold / ice damage.
+
+attribute.name.faerunutils.range=Range
+attribute.description.faerunutils.range=Increases the range of your attacks and skills.
+attribute.name.faerunutils.meleeRange=Melee Range
+attribute.description.faerunutils.meleeRange=Increases the range of your melee attacks and skills.
+attribute.name.faerunutils.minMeleeRange=Minimum Melee Range
+attribute.description.faerunutils.minMeleeRange=Increases the minimum range of your melee attacks and skills.
+attribute.name.faerunutils.maxMeleeRange=Maximum Melee Range
+attribute.description.faerunutils.maxMeleeRange=Increases the maximum range of your melee attacks and skills.
+attribute.name.faerunutils.projectileRange=Projectile Range
+attribute.description.faerunutils.projectileRange=Increases the range of your projectile attacks and skills.
+attribute.name.faerunutils.minProjectileRange=Minimum Projectile Range
+attribute.description.faerunutils.minProjectileRange=Increases the minimum range of your projectile attacks and skills.
+attribute.name.faerunutils.maxProjectileRange=Maximum Projectile Range
+attribute.description.faerunutils.maxProjectileRange=Increases the maximum range of your projectile attacks and skills.
+
+attribute.name.faerunutils.maxTargets=Maximum Targets
+attribute.description.faerunutils.maxTargets=Increases the number of targets your attacks and skills hit.
+attribute.name.faerunutils.maxMeleeTargets=Maximum Melee Targets
+attribute.description.faerunutils.maxMeleeTargets=Increases the number of targets your melee attacks and skills hit.
+attribute.name.faerunutils.maxProjectileTargets=Maximum Projectile Targets
+attribute.description.faerunutils.maxProjectileTargets=Increases the number of targets your projectile attacks and skills hit.
+
+attribute.name.faerunutils.maxAngle=Maximum Attack Angle
+attribute.description.faerunutils.maxAngle=Increases the angle of attacks and skills that use a cone shape.
+attribute.name.faerunutils.combo=Combo
+attribute.description.faerunutils.combo=Each attack in a combo uses a certain amount of this.  When you don't have any left, the combo ends.  Recharges at the end of a combo.
+attribute.value.faerunutils.combo=%3$s / %1$s
+attribute.name.faerunutils.projectileCount=Projectile Count
+attribute.description.faerunutils.projectileCount=Increases the number of projectiles you create.
+attribute.name.faerunutils.projectileSpeed=Projectile Speed
+attribute.description.faerunutils.projectileSpeed=Increases the speed of your projectiles.
+attribute.name.faerunutils.projectileDuration=Projectile Duration
+attribute.description.faerunutils.projectileDuration=Increases the duration of your projectiles.
+attribute.name.faerunutils.aoeDuration=AOE Duration
+attribute.description.faerunutils.aoeDuration=Increases the duration of your AOE effects.
+
+
+
+
+
+faerunaction.unarmed.jab=Jab
+faerunaction.unarmed.straight=Straight
+faerunaction.unarmed.kick=Kick
+
+faerunaction.sword.slash=Slash
+faerunaction.sword.thrust=Thrust
+
+faerunaction.axe.chop=Chop
+faerunaction.axe.overheadchop=Overhead Chop
+
+faerunaction.dagger.slash=Slash
+faerunaction.dagger.thrust=Thrust
+
+faerunaction.katar.thrust=Thrust
+faerunaction.katar.slash=Slash
+
+faerunaction.mace.bash=Bash
+faerunaction.mace.overheadbash=Overhead Bash
+
+faerunaction.sickle.stabbingswing=Stabbing Swing
+faerunaction.sickle.trippingslash=Tripping Slash
+
+
+faerunaction.shield.bash=Bash
+
+
+faerunaction.spear.thrust=Thrust
+faerunaction.spear.longthrust=Long Thrust
+
+faerunaction.quarterstaff.jab=Jab
+faerunaction.quarterstaff.spinningstrikes=Spinning Strikes
+faerunaction.quarterstaff.longhandstrike=Longhand Strike
+faerunaction.quarterstaff.overheadbash=Overhead Bash
+
+
+faerunaction.polearm.slash=Slash
+faerunaction.polearm.thrust=Thrust
+faerunaction.polearm.bash=Bash
+
+faerunaction.greatsword.slash=Slash
+faerunaction.greatsword.thrust=Thrust
+
+faerunaction.greataxe.slash=Slash
+faerunaction.greataxe.overheadchop=Overhead Chop
+
+faerunaction.hammer.bash=Bash
+faerunaction.hammer.overheadbash=Overhead Bash
+
+faerunaction.scythe.stabbingswing=Stabbing Swing
+faerunaction.scythe.trippingslash=Tripping Slash
