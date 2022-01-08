@@ -7,7 +7,6 @@ import com.fantasticsource.faeruncharacters.nbt.CharacterTags;
 import com.fantasticsource.faerunutils.actions.CFaerunAction;
 import com.fantasticsource.faerunutils.actions.ComboGracePeriod;
 import com.fantasticsource.faerunutils.actions.Cooldown;
-import com.fantasticsource.faerunutils.ai.AIFaerunMelee;
 import com.fantasticsource.faerunutils.bag.CmdOpenBag;
 import com.fantasticsource.faerunutils.potions.PotionDeepWounds;
 import com.fantasticsource.faerunutils.potions.PotionDefinitions;
@@ -62,6 +61,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 @Mod(modid = FaerunUtils.MODID, name = FaerunUtils.NAME, version = FaerunUtils.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zzzzm,);required-after:fantasticaw@[1.12.2.000d,);required-after:customentities@[1.12.2.000,);required-after:weightedspawnzones@[1.12.2.000,);;required-after:instances@[1.12.2.001e,);required-after:tiamatitems@[1.12.2.000zzq,);required-after:tiamatinventory@[1.12.2.000zzc,);required-after:tiamatinteractions@[1.12.2.000d,);required-after:tiamatactions@[1.12.2.000zzzf,);required-after:dynamicstealth@[1.12.2.113e,)")
 public class FaerunUtils
@@ -178,7 +178,7 @@ public class FaerunUtils
             {
                 CustomLivingEntity customEntity = (CustomLivingEntity) entity;
                 customEntity.targetTasks.addTask(0, new AINearestAttackableTargetEdit<EntityPlayerMP>(new EntityAINearestAttackableTarget(customEntity, EntityPlayerMP.class, 0, true, false, e -> true)));
-                customEntity.tasks.addTask(0, new AIFaerunMelee(customEntity));
+//                customEntity.tasks.addTask(0, new AIFaerunMelee(customEntity));
             }
         }
     }
@@ -438,8 +438,10 @@ public class FaerunUtils
     {
         Attributes.STAMINA.setCurrentAmount(livingBase, Tools.max(0, Attributes.STAMINA.getCurrentAmount(livingBase) - 5));
 
-        String voice = CharacterTags.getCC(livingBase).getString("Voice");
-        ResourceLocation soundRL = VoiceSets.ALL_VOICE_SETS.get(voice).get("jump");
+        LinkedHashMap<String, ResourceLocation> voiceSet = VoiceSets.ALL_VOICE_SETS.get(CharacterTags.getCC(livingBase).getString("Voice"));
+        if (voiceSet == null) return;
+
+        ResourceLocation soundRL = voiceSet.get("jump");
         MCTools.playSimpleSoundForAll(soundRL, livingBase, 16, 2, 1, 0.8f + Tools.random(0.4f), SoundCategory.HOSTILE);
 
         livingBase.motionY *= Attributes.MOVE_SPEED.getTotalAmount(livingBase) / 5.1;
